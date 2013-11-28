@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Tools {
     public static class StringExtensions {
@@ -14,6 +15,10 @@ namespace Tools {
                     }
                 }
             }
+        }
+
+        public static string Join(this IEnumerable<string> elements, string separator) {
+            return string.Join(separator, elements.ToArray());
         }
     }
 }
