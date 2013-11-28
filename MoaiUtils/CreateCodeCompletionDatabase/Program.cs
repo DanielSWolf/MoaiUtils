@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
+using CommandLine;
+using CommandLine.Text;
 using log4net;
 using log4net.Appender;
 using log4net.Config;
@@ -15,8 +16,18 @@ namespace CreateCodeCompletionDatabase {
             BasicConfigurator.Configure(new ConsoleAppender { Layout = new SimpleLayout() });
 
             try {
+                // Parse command line arguments
+                var configuration = new Configuration();
+                if (!Parser.Default.ParseArguments(args, configuration)) {
+                    Console.WriteLine(HelpText.AutoBuild(configuration,
+                        current => HelpText.DefaultParsingErrorsHandler(configuration, current)));
+                    return 1;
+                }
+
+                // Parse Moai code
                 var parser = new MoaiCodeParser();
-                parser.Parse(new DirectoryInfo(@"D:\dev\projects\moai\src"));
+                parser.Parse(new DirectoryInfo(configuration.InputDirectory));
+
                 return 0;
             } catch (Exception e) {
                 log.Fatal(e.Message, e);

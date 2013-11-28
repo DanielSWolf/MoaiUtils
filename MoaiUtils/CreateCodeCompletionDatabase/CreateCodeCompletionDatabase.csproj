@@ -34,6 +34,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CommandLine">
+      <HintPath>..\packages\CommandLineParser.1.9.71\lib\net40\CommandLine.dll</HintPath>
+    </Reference>
     <Reference Include="log4net">
       <HintPath>..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
     </Reference>
@@ -47,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Annotation.cs" />
+    <Compile Include="Configuration.cs" />
     <Compile Include="Graph\INamedEntity.cs" />
     <Compile Include="MoaiCodeParser.cs" />
     <Compile Include="Graph\MoaiType.cs" />
