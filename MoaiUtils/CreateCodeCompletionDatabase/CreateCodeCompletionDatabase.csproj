@@ -57,6 +57,7 @@
     <Compile Include="Graph\MethodOverride.cs" />
     <Compile Include="Graph\MoaiParameter.cs" />
     <Compile Include="Graph\MoaiReturnValue.cs" />
+    <Compile Include="MoaiLuaObject.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

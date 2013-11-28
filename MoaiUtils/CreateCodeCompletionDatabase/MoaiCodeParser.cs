@@ -22,10 +22,25 @@ namespace CreateCodeCompletionDatabase {
             // Parse Moai types and store them by type name
             typesByName = new Dictionary<string, MoaiType>();
             ParseMoaiCodeFiles(moaiSourceDirectory);
+
+            // MOAILuaObject is not documented, probably because it would mess up
+            // the Doxygen-generated documentation. Use dummy code instead.
+            ParseMoaiCode(MoaiLuaObject.DummyCode, "in MoaiLuaObject dummy code");
+
+            // Make sure every class directly or indirectly inherits from MOAILuaObject
+            MoaiType moaiLuaObjectType = GetOrCreateType("MOAILuaObject");
+            foreach (MoaiType type in typesByName.Values) {
+                if (!(type.AncestorTypes.Contains(moaiLuaObjectType)) && type != moaiLuaObjectType) {
+                    type.BaseTypes.Add(moaiLuaObjectType);
+                }
+            }
         }
 
         public IEnumerable<MoaiType> Types {
-            get { return typesByName.Values; }
+            get {
+                return typesByName.Values
+                    .Where(type => type.Description != null || type.Members.Any());
+            }
         }
 
         private void ParseMoaiCodeFiles(DirectoryInfo moaiSourceDirectory) {
@@ -42,10 +57,24 @@ namespace CreateCodeCompletionDatabase {
 
         private static readonly Regex documentationRegex = new Regex(@"
             /\*\*\s*
+                # Documentation
                 (?<annotation>(?<!\S)@[\s\S]*?)+
             \*/\s*
             (
-                (class|struct)\s+(?<className>[A-Za-z0-9_]+) |
+                # Class definition
+                (class|struct)\s+
+                (?<className>[A-Za-z0-9_]+)\s*
+                (
+                    :\s*
+                    (
+                        ((public|protected|private|virtual)\s*)+
+                        (?<baseClassName>[A-Za-z0-9_:<,\s>]+?)\s*
+                        ,?\s*
+                    )+
+                    {
+                )?
+                |
+                # Method definition
                 int\s+(?<className>[A-Za-z0-9_]+)\s*::\s*(?<methodName>[A-Za-z0-9_]+)
             )", RegexOptions.IgnorePatternWhitespace | RegexOptions.ExplicitCapture | RegexOptions.Compiled);
 
@@ -57,15 +86,19 @@ namespace CreateCodeCompletionDatabase {
         }
 
         private void ParseMoaiCodeFile(FileInfo codeFile, string context) {
-            // Find all documentation blocks within the code file
             string code = File.ReadAllText(codeFile.FullName);
+            ParseMoaiCode(code, context);
+        }
+
+        private void ParseMoaiCode(string code, string context) {
+            // Find all documentation blocks
             var matches = documentationRegex.Matches(code);
 
             foreach (Match match in matches) {
                 string typeName = match.Groups["className"].Value;
                 MoaiType type = GetOrCreateType(typeName);
 
-                // Parse annotations, filtering out the unknown ones
+                // Parse annotations, filtering out unknown ones
                 Annotation[] annotations = match.Groups["annotation"].Captures
                     .Cast<Capture>()
                     .Select(capture => Annotation.Create(capture.Value))
@@ -84,13 +117,21 @@ namespace CreateCodeCompletionDatabase {
                     ParseMethodDocumentation(type, annotations, methodContext);
                 } else {
                     // The documentation was attached to a type definition
+                    
+                    // Get base type names, ignoring all template classes
+                    MoaiType[] baseTypes = match.Groups["baseClassName"].Captures
+                        .Cast<Capture>()
+                        .Select(capture => capture.Value)
+                        .Where(name => !name.Contains("<"))
+                        .Select(GetOrCreateType)
+                        .ToArray();
                     string typeContext = string.Format("for type {0} {1}", typeName, context);
-                    ParseTypeDocumentation(type, annotations, typeContext);
+                    ParseTypeDocumentation(type, annotations, baseTypes, typeContext);
                 }
             }
         }
 
-        private void ParseTypeDocumentation(MoaiType type, Annotation[] annotations, string context) {
+        private void ParseTypeDocumentation(MoaiType type, Annotation[] annotations, MoaiType[] baseTypes, string context) {
             // Check that there is a single @name annotation
             int nameAnnotationCount = annotations.OfType<NameAnnotation>().Count();
             if (nameAnnotationCount == 0) {
@@ -113,6 +154,9 @@ namespace CreateCodeCompletionDatabase {
                     log.WarnFormat("Incomplete {0} annotation {1}.", annotation.Command, context);
                 }
             }
+
+            // Store base types
+            type.BaseTypes.AddRange(baseTypes);
 
             // Parse annotations
             foreach (var annotation in annotations) {
