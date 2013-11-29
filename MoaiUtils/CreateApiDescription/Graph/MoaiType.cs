@@ -2,7 +2,7 @@
 using System.Linq;
 using Tools;
 
-namespace CreateCodeCompletionDatabase.Graph {
+namespace CreateApiDescription.Graph {
     public class MoaiType : INamedEntity, IDocumentedEntity {
         public MoaiType() {
             Members = new List<MoaiTypeMember>();

@@ -1,6 +1,6 @@
 ﻿using CommandLine;
 
-namespace CreateCodeCompletionDatabase {
+namespace CreateApiDescription {
     public class Configuration {
         [Option('i', "input", Required = true,
             HelpText = "The Moai src directory")]

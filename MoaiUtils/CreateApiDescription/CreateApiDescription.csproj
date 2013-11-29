@@ -7,8 +7,8 @@
     <ProjectGuid>{1EF1CDF5-48D3-4D02-895B-9648F62606C5}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CreateCodeCompletionDatabase</RootNamespace>
-    <AssemblyName>CreateCodeCompletionDatabase</AssemblyName>
+    <RootNamespace>CreateApiDescription</RootNamespace>
+    <AssemblyName>CreateApiDescription</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>

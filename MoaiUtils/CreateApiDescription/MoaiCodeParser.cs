@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using CreateCodeCompletionDatabase.Graph;
+using CreateApiDescription.Graph;
 using log4net;
 using Tools;
 
-namespace CreateCodeCompletionDatabase {
+namespace CreateApiDescription {
     public class MoaiCodeParser {
         private static readonly ILog log = LogManager.GetLogger(typeof(MoaiCodeParser));
 

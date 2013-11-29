@@ -7,7 +7,7 @@ using log4net.Appender;
 using log4net.Config;
 using log4net.Layout;
 
-namespace CreateCodeCompletionDatabase {
+namespace CreateApiDescription {
     class Program {
         private static readonly ILog log = LogManager.GetLogger(typeof(Program).Assembly.GetName().Name);
 

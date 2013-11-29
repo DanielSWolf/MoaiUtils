@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Tools;
 
-namespace CreateCodeCompletionDatabase {
+namespace CreateApiDescription {
     public abstract class Annotation {
         private static readonly Regex whitespaceRegex = new Regex(@"\s+", RegexOptions.Compiled);
 

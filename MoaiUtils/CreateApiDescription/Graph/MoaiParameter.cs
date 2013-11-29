@@ -1,4 +1,4 @@
-﻿namespace CreateCodeCompletionDatabase.Graph {
+﻿namespace CreateApiDescription.Graph {
     public class MoaiParameter : INamedEntity, IDocumentedEntity {
         public string Name { get; set; }
         public string Description { get; set; }

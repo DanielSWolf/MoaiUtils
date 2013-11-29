@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace CreateCodeCompletionDatabase.Graph {
+namespace CreateApiDescription.Graph {
     public class MoaiMethod : MoaiTypeMember {
         public MoaiMethod() {
             Overrides = new List<MethodOverride>();

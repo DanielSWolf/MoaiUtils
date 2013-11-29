@@ -1,4 +1,4 @@
-﻿namespace CreateCodeCompletionDatabase.Graph {
+﻿namespace CreateApiDescription.Graph {
     public class MoaiField : MoaiTypeMember {}
 
     public class MoaiConstant : MoaiField {}
