@@ -75,6 +75,12 @@ namespace LuaIO {
         }
 
         private static void Write(LuaTable table, IndentedTextWriter indentedTextWriter) {
+            // Write empty tables in a single line
+            if (table.Count == 0) {
+                indentedTextWriter.Write("{}");
+                return;
+            }
+
             // Determine whether to use auto-indexing for numeric keys.
             // Use auto-indexing if all n keys of numeric type form the sequence 1, 2, 3 .. n
             bool useAutoIndexing = table
