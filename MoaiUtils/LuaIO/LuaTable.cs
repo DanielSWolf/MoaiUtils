@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Globalization;
 using System.Linq;
 
 namespace LuaIO {
@@ -148,5 +149,39 @@ namespace LuaIO {
         }
 
         #endregion
+    }
+
+    public static class LuaTableExtensions {
+        public static LuaTable ToLuaList(this IEnumerable elements) {
+            var result = new LuaTable();
+            foreach (object element in elements) {
+                result.Add(element);
+            }
+            return result;
+        }
+
+        public static LuaTable ToLuaDictionary<TElement>(this IEnumerable<TElement> elements, Func<TElement, object> keySelector) {
+            var result = new LuaTable();
+            foreach (TElement element in elements) {
+                result.Add(keySelector(element), element);
+            }
+            return result;
+        }
+
+        public static LuaTable ToLuaDictionary<TElement>(this IEnumerable<TElement> elements, Func<TElement, object> keySelector, Func<TElement, object> valueSelector) {
+            var result = new LuaTable();
+            foreach (TElement element in elements) {
+                result.Add(keySelector(element), valueSelector(element));
+            }
+            return result;
+        }
+
+        public static LuaTable ToLuaDictionary<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> pairs) {
+            var result = new LuaTable();
+            foreach (var pair in pairs) {
+                result.Add(pair.Key, pair.Value);
+            }
+            return result;
+        }
     }
 }
