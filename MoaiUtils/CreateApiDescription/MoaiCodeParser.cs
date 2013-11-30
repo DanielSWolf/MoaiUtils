@@ -188,7 +188,7 @@ namespace CreateApiDescription {
         private static readonly Regex typeNameRegex = new Regex(@"^[A-Za-z_][A-Za-z0-9_]*$", RegexOptions.Compiled);
 
         private void ParseMethodDocumentation(MoaiType type, Annotation[] annotations, string context) {
-            // Check that there is a single @name annotation. Otherwise exit.
+            // Check that there is a single @name annotation and that it isn't a duplicate. Otherwise exit.
             int nameAnnotationCount = annotations.OfType<NameAnnotation>().Count();
             if (nameAnnotationCount == 0) {
                 log.WarnFormat("Missing @name {0}.", context);
@@ -196,6 +196,11 @@ namespace CreateApiDescription {
             }
             if (nameAnnotationCount > 1) {
                 log.WarnFormat("Multiple @name annotations {0}.", context);
+            }
+            var nameAnnotation = annotations.OfType<NameAnnotation>().Single();
+            if (type.Members.Any(member => member.Name == nameAnnotation.Value)) {
+                log.WarnFormat("Multiple members with name '{0}' {1}.", nameAnnotation.Value, context);
+                return;
             }
 
             // Check that there is a single @text annotation
@@ -223,14 +228,16 @@ namespace CreateApiDescription {
             bool isStatic = annotations
                 .OfType<InParameterAnnotation>()
                 .All(param => param.Name != "self");
-            var method = new MoaiMethod { OwningType = type, IsStatic = isStatic };
+            var method = new MoaiMethod {
+                Name = nameAnnotation.Value,
+                OwningType = type,
+                IsStatic = isStatic
+            };
             type.Members.Add(method);
             MethodOverride currentOverride = null;
             foreach (var annotation in annotations) {
                 if (annotation is NameAnnotation) {
-                    // Set method name
-                    var nameAnnotation = (NameAnnotation) annotation;
-                    method.Name = nameAnnotation.Value;
+                    // Nothing to do - name has already been set.
                 } else if (annotation is TextAnnotation) {
                     // Set method description
                     method.Description = ((TextAnnotation) annotation).Value;
