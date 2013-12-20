@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Globalization;
 using System.Linq;
 
 namespace LuaIO {
@@ -36,8 +35,10 @@ namespace LuaIO {
                 return elements[key];
             }
             set {
-                CleanKeyValuePair(ref key, ref value);
-                elements[key] = value;
+                KeyValuePair<object, object>? pair = CleanKeyValuePair(key, value);
+                if (pair != null) {
+                    elements[pair.Value.Key] = pair.Value.Value;
+                }
             }
         }
 
@@ -84,22 +85,34 @@ namespace LuaIO {
             }
         }
 
-        private void CleanKeyValuePair(ref object key, ref object value) {
+        private KeyValuePair<object, object>? CleanKeyValuePair(object key, object value) {
+            // Key must be set.
             if (!(key is bool || key is double || key is int || key is string || key is LuaTable || key is LuaFunction || key is LuaCommentKey)) {
                 throw new ArgumentException(string.Format(
                     "Unsupported key [{0}]. Keys must be of type bool, double/int, string, LuaTable, LuaFunction, or LuaCommentKey.",
                     key ?? "null"));
             }
+
+            // Value should be set - null value means ignore this.
+            if (value == null) {
+                return null;
+            }
             if (!(value is bool || value is double || value is int || value is string || value is LuaTable || value is LuaFunction || value is LuaComment)) {
                 throw new ArgumentException(string.Format(
                     "Unsupported value [{0}]. Values must be of type bool, double/int, string, LuaTable, LuaFunction, or LuaComment.",
-                    value ?? "null"));
+                    value));
             }
+
+            // At this point, key and value are both set. Check that they are compatible.
             if ((key is LuaCommentKey) != (value is LuaComment)) {
                 throw new ArgumentException("LuaCommentKey and LuaComment must be used together.");
             }
+
+            // Apply trivial conversions
             if (key is int) key = (double) (int) key;
             if (value is int) value = (double) (int) value;
+
+            return new KeyValuePair<object, object>(key, value);
         }
 
         #region IDictionary overhead
