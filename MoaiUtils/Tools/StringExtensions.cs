@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace Tools {
     public static class StringExtensions {
@@ -19,6 +20,14 @@ namespace Tools {
 
         public static string Join(this IEnumerable<string> elements, string separator) {
             return string.Join(separator, elements.ToArray());
+        }
+
+        public static string Enclose(this string s, string left, string right) {
+            var result = new StringBuilder(left.Length + s.Length + right.Length);
+            result.Append(left);
+            result.Append(s);
+            result.Append(right);
+            return result.ToString();
         }
     }
 }
