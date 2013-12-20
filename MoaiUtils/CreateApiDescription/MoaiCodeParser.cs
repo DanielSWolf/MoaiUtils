@@ -20,11 +20,13 @@ namespace CreateApiDescription {
             }
 
             // Parse Moai types and store them by type name
+            log.Info("Parsing Moai types.");
             typesByName = new Dictionary<string, MoaiType>();
             ParseMoaiCodeFiles(moaiSourceDirectory);
 
             // MOAILuaObject is not documented, probably because it would mess up
             // the Doxygen-generated documentation. Use dummy code instead.
+            log.Info("Adding hard-coded documentation for MoaiLuaObject base class.");
             ParseMoaiCode(MoaiLuaObject.DummyCode, "in MoaiLuaObject dummy code");
 
             // Make sure every class directly or indirectly inherits from MOAILuaObject
@@ -34,6 +36,41 @@ namespace CreateApiDescription {
                     type.BaseTypes.Add(moaiLuaObjectType);
                 }
             }
+
+            log.Info("Creating compact method signatures.");
+            foreach (MoaiType type in typesByName.Values) {
+                foreach (MoaiMethod method in type.Members.OfType<MoaiMethod>()) {
+                    if (!method.Overloads.Any()) {
+                        log.WarnFormat("No documentation found for method {0}.", method);
+                        continue;
+                    }
+
+                    try {
+                        method.InParameterSignature = GetCompactSignature(method.Overloads.Select(overload => overload.InParameters.ToArray()));
+                        method.OutParameterSignature = GetCompactSignature(method.Overloads.Select(overload => overload.OutParameters.ToArray()));
+                    } catch (Exception e) {
+                        log.WarnFormat("Error determining signature for method {0}. {1}", method, e.Message);
+                    }
+                }
+            }
+        }
+
+        private static ISignature GetCompactSignature(IEnumerable<MoaiParameter[]> overloads) {
+            List<Parameter[]> parameterOverloads = new List<Parameter[]>();
+            foreach (MoaiParameter[] overload in overloads) {
+                // Input parameters may be optional. In these cases, create multiple overloads.
+                for (int index = overload.Length - 1;
+                    index >= 0 && overload[index] is MoaiInParameter && ((MoaiInParameter) overload[index]).IsOptional;
+                    index--) {
+                    parameterOverloads.Add(ConvertOverload(overload.Take(index)).ToArray());
+                }
+                parameterOverloads.Add(ConvertOverload(overload).ToArray());
+            }
+            return CompactSignature.FromOverloads(parameterOverloads.ToArray());
+        }
+
+        private static IEnumerable<Parameter> ConvertOverload(IEnumerable<MoaiParameter> overload) {
+            return overload.Select(parameter => new Parameter { Name = parameter.Name, Type = parameter.Type.Name, ShowName = true });
         }
 
         public IEnumerable<MoaiType> Types {
@@ -117,7 +154,7 @@ namespace CreateApiDescription {
                     ParseMethodDocumentation(type, annotations, methodContext);
                 } else {
                     // The documentation was attached to a type definition
-                    
+
                     // Get base type names, ignoring all template classes
                     MoaiType[] baseTypes = match.Groups["baseClassName"].Captures
                         .Cast<Capture>()
@@ -234,7 +271,7 @@ namespace CreateApiDescription {
                 IsStatic = isStatic
             };
             type.Members.Add(method);
-            MethodOverride currentOverride = null;
+            MoaiMethodOverload currentOverload = null;
             foreach (var annotation in annotations) {
                 if (annotation is NameAnnotation) {
                     // Nothing to do - name has already been set.
@@ -242,41 +279,39 @@ namespace CreateApiDescription {
                     // Set method description
                     method.Description = ((TextAnnotation) annotation).Value;
                 } else if (annotation is ParameterAnnotation) {
-                    if (currentOverride == null) {
-                        currentOverride = new MethodOverride { OwningMethod = method };
-                        method.Overrides.Add(currentOverride);
+                    if (currentOverload == null) {
+                        currentOverload = new MoaiMethodOverload { OwningMethod = method };
+                        method.Overloads.Add(currentOverload);
                     }
                     var parameterAnnotation = (ParameterAnnotation) annotation;
                     if (parameterAnnotation.Type != null && !typeNameRegex.IsMatch(parameterAnnotation.Type)) {
                         log.WarnFormat("'{0}' is no valid type {1}.", parameterAnnotation.Type, context);
                     }
+                    string paramName = parameterAnnotation.Name;
                     if (annotation is InParameterAnnotation | annotation is OptionalInParameterAnnotation) {
                         // Add input parameter
-                        var parameter = new MoaiParameter {
-                            Name = parameterAnnotation.Name,
+                        if (currentOverload.InParameters.Any(param => param.Name == paramName)) {
+                            log.WarnFormat("Multiple '{0}' params for single overload {1}.", paramName, context);
+                        }
+                        var inParameter = new MoaiInParameter {
+                            Name = paramName,
                             Description = parameterAnnotation.Description,
                             Type = GetOrCreateType(parameterAnnotation.Type),
                             IsOptional = annotation is OptionalInParameterAnnotation
                         };
-                        currentOverride.Parameters.Add(parameter);
+                        currentOverload.InParameters.Add(inParameter);
                     } else {
-                        // A nil return value is helpful to show the documentation is complete,
-                        // but it needs no representation.
-                        if (parameterAnnotation.Type == "nil") continue;
-
-                        // Add return value
-                        var returnValue = new MoaiReturnValue {
+                        // Add output parameter
+                        var outParameter = new MoaiOutParameter {
+                            Name = paramName,
                             Type = GetOrCreateType(parameterAnnotation.Type),
-                            // Return values have no name. Merge name into description.
-                            Description = (parameterAnnotation.Description != null)
-                                ? string.Format("{0}: {1}", parameterAnnotation.Name, parameterAnnotation.Description)
-                                : parameterAnnotation.Name
+                            Description = parameterAnnotation.Description
                         };
-                        currentOverride.ReturnValues.Add(returnValue);
+                        currentOverload.OutParameters.Add(outParameter);
                     }
                 } else if (annotation is OverloadAnnotation) {
                     // Let the next parameter annotation start a new override
-                    currentOverride = null;
+                    currentOverload = null;
                 } else {
                     log.WarnFormat("Unexpected {0} annotation {1}", annotation.Command, context);
                 }

@@ -54,16 +54,19 @@
   <ItemGroup>
     <Compile Include="Annotation.cs" />
     <Compile Include="Configuration.cs" />
+    <Compile Include="Exporters\ZeroBraneExporter.cs" />
     <Compile Include="Graph\INamedEntity.cs" />
+    <Compile Include="Exporters\IApiExporter.cs" />
+    <Compile Include="Graph\MoaiParameter.cs" />
     <Compile Include="MoaiCodeParser.cs" />
     <Compile Include="Graph\MoaiType.cs" />
     <Compile Include="Graph\MoaiTypeMember.cs" />
     <Compile Include="Graph\MoaiField.cs" />
     <Compile Include="Graph\IDocumentedEntity.cs" />
     <Compile Include="Graph\MoaiMethod.cs" />
-    <Compile Include="Graph\MethodOverride.cs" />
-    <Compile Include="Graph\MoaiParameter.cs" />
-    <Compile Include="Graph\MoaiReturnValue.cs" />
+    <Compile Include="Graph\MoaiMethodOverload.cs" />
+    <Compile Include="Graph\MoaiInParameter.cs" />
+    <Compile Include="Graph\MoaiOutParameter.cs" />
     <Compile Include="MoaiLuaObject.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -73,6 +76,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\LuaIO\LuaIO.csproj">
+      <Project>{d1933642-5fa7-4ea6-831f-52721ab6073d}</Project>
+      <Name>LuaIO</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Tools\Tools.csproj">
       <Project>{63cb06a7-298f-411c-b010-c13bd1e612ec}</Project>
       <Name>Tools</Name>

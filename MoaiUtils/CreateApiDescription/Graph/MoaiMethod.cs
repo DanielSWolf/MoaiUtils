@@ -3,11 +3,13 @@
 namespace CreateApiDescription.Graph {
     public class MoaiMethod : MoaiTypeMember {
         public MoaiMethod() {
-            Overrides = new List<MethodOverride>();
+            Overloads = new List<MoaiMethodOverload>();
         }
 
         public bool IsStatic { get; set; }
-        public List<MethodOverride> Overrides { get; private set; }
+        public List<MoaiMethodOverload> Overloads { get; private set; }
+        public ISignature InParameterSignature { get; set; }
+        public ISignature OutParameterSignature { get; set; }
 
         public override string ToString() {
             return base.ToString() + "()";

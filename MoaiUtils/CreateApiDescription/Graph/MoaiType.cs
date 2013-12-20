@@ -14,10 +14,12 @@ namespace CreateApiDescription.Graph {
         public List<MoaiTypeMember> Members { get; private set; }
         public List<MoaiType> BaseTypes { get; private set; }
 
-        public override string ToString() {
-            return string.Format(
-                BaseTypes.Any() ? "class {0} : {1}" : "class {0}",
-                Name, BaseTypes.Select(type => type.Name).Join(", "));
+        public string Signature {
+            get {
+                return string.Format(
+                    BaseTypes.Any() ? "class {0} : {1}" : "class {0}",
+                    Name, BaseTypes.Select(type => type.Name).Join(", "));
+            }
         }
 
         public IEnumerable<MoaiTypeMember> InheritedMembers {
@@ -39,6 +41,10 @@ namespace CreateApiDescription.Graph {
                     .Concat(BaseTypes.SelectMany(baseType => baseType.AncestorTypes))
                     .Distinct();
             }
+        }
+
+        public override string ToString() {
+            return Signature;
         }
 
         private class MemberNameEqualityComparer : IEqualityComparer<MoaiTypeMember> {
