@@ -1,4 +1,4 @@
-﻿namespace CreateApiDescription.Graph {
+﻿namespace CreateApiDescription.CodeGraph {
     public interface IDocumentedEntity {
         string Description { get; }
     }

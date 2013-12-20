@@ -1,4 +1,4 @@
-﻿namespace CreateApiDescription.Graph {
+﻿namespace CreateApiDescription.CodeGraph {
     public abstract class MoaiParameter : INamedEntity, IDocumentedEntity {
         public string Name { get; set; }
         public string Description { get; set; }

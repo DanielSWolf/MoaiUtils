@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using CreateApiDescription.Graph;
+using CreateApiDescription.CodeGraph;
 using log4net;
 using Tools;
 

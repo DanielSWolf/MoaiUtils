@@ -1,4 +1,4 @@
-﻿namespace CreateApiDescription.Graph {
+﻿namespace CreateApiDescription.CodeGraph {
     public class MoaiField : MoaiTypeMember {}
 
     public class MoaiConstant : MoaiField {}
