@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace CreateApiDescription.CodeGraph {
+namespace MoaiUtils.CreateApiDescription.CodeGraph {
     public class MoaiMethod : MoaiTypeMember {
         public MoaiMethod() {
             Overloads = new List<MoaiMethodOverload>();

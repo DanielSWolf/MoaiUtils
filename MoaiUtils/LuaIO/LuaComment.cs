@@ -1,4 +1,4 @@
-﻿namespace LuaIO {
+﻿namespace MoaiUtils.LuaIO {
     public class LuaComment {
         public LuaComment(string text, bool blankLineBefore = false, bool blankLineAfter = false) {
             Text = text;

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Tools {
+namespace MoaiUtils.Tools {
     /// <summary>
     /// Allows to find all partitions of a set. See http://stackoverflow.com/a/20530130/52041
     /// </summary>

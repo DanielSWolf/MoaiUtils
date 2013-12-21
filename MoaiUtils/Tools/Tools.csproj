@@ -7,7 +7,7 @@
     <ProjectGuid>{63CB06A7-298F-411C-B010-C13BD1E612EC}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Tools</RootNamespace>
+    <RootNamespace>MoaiUtils.Tools</RootNamespace>
     <AssemblyName>Tools</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

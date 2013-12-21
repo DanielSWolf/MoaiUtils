@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Tools {
+namespace MoaiUtils.Tools {
     public static class EnumerableExtensions {
         public static IOrderedEnumerable<T> OrderBy<T>(this IEnumerable<T> source, Func<T, T, int> compare) {
             return source.OrderBy(element => element, new InlineComparer<T>(compare));

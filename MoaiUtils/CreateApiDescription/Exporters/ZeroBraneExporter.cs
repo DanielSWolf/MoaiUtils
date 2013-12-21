@@ -1,13 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using CreateApiDescription.CodeGraph;
-using LuaIO;
-using Tools;
+using MoaiUtils.CreateApiDescription.CodeGraph;
+using MoaiUtils.LuaIO;
+using MoaiUtils.Tools;
 
-namespace CreateApiDescription.Exporters {
+namespace MoaiUtils.CreateApiDescription.Exporters {
     public class ZeroBraneExporter : IApiExporter {
         public void Export(IEnumerable<MoaiType> types, DirectoryInfo outputDirectory) {
             LuaTable typeListTable = CreateTypeListTable(types);

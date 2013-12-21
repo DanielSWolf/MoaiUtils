@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace Tools {
+namespace MoaiUtils.Tools {
     public static class FileSystemInfoExtensions {
         public static DirectoryInfo GetDirectoryInfo(this DirectoryInfo directoryInfo, string relativePath) {
             return new DirectoryInfo(Path.Combine(directoryInfo.FullName, relativePath));

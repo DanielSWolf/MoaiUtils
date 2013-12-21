@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Tools;
+using MoaiUtils.Tools;
 
-namespace CreateApiDescription.CodeGraph {
+namespace MoaiUtils.CreateApiDescription.CodeGraph {
     public class MoaiType : INamedEntity, IDocumentedEntity {
         public MoaiType() {
             Members = new List<MoaiTypeMember>();

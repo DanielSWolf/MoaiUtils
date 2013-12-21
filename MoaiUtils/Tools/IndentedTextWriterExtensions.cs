@@ -1,7 +1,7 @@
 ﻿using System;
 using System.CodeDom.Compiler;
 
-namespace Tools {
+namespace MoaiUtils.Tools {
     public static class IndentedTextWriterExtensions {
         public static IDisposable IndentBlock(this IndentedTextWriter indentedTextWriter) {
             return new Indenter(indentedTextWriter);

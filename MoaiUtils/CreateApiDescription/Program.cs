@@ -3,14 +3,14 @@ using System.IO;
 using System.Linq;
 using CommandLine;
 using CommandLine.Text;
-using CreateApiDescription.CodeGraph;
-using CreateApiDescription.Exporters;
 using log4net;
 using log4net.Appender;
 using log4net.Config;
 using log4net.Layout;
+using MoaiUtils.CreateApiDescription.CodeGraph;
+using MoaiUtils.CreateApiDescription.Exporters;
 
-namespace CreateApiDescription {
+namespace MoaiUtils.CreateApiDescription {
     class Program {
         private static readonly ILog log = LogManager.GetLogger(typeof(Program).Assembly.GetName().Name);
 

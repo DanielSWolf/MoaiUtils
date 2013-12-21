@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Tools;
+using MoaiUtils.Tools;
 
-namespace CreateApiDescription {
+namespace MoaiUtils.CreateApiDescription {
     public abstract class Annotation {
         private static readonly Regex whitespaceRegex = new Regex(@"\s+", RegexOptions.Compiled);
 

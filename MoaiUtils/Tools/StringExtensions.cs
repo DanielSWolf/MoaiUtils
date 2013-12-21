@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace Tools {
+namespace MoaiUtils.Tools {
     public static class StringExtensions {
         public static IEnumerable<string> SplitIntoLines(this string s) {
             using (var stringReader = new StringReader(s)) {

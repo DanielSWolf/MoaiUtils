@@ -2,10 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using MoaiUtils.Tools;
 using MoreLinq;
-using Tools;
 
-namespace CreateApiDescription {
+namespace MoaiUtils.CreateApiDescription {
     /// <summary>
     /// Utility class to create a shorthand signature that represents multiple overloads
     /// (something like "number radius | (number innerRadius, number outerRadius)")

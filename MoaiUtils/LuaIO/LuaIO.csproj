@@ -7,7 +7,7 @@
     <ProjectGuid>{D1933642-5FA7-4EA6-831F-52721AB6073D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>LuaIO</RootNamespace>
+    <RootNamespace>MoaiUtils.LuaIO</RootNamespace>
     <AssemblyName>LuaIO</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

@@ -5,7 +5,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 
-namespace LuaIO {
+namespace MoaiUtils.LuaIO {
     /// <summary>
     /// This class imitates the behavior of a table in Lua.
     /// In addition, it guarantees that items are kept in the same order in which they were added.

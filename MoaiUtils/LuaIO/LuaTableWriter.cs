@@ -6,9 +6,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using Tools;
+using MoaiUtils.Tools;
 
-namespace LuaIO {
+namespace MoaiUtils.LuaIO {
     public class LuaTableWriter {
         public static void Write(LuaTable table, FileInfo fileInfo, LuaComment headComment = null) {
             using (var file = fileInfo.CreateText()) {

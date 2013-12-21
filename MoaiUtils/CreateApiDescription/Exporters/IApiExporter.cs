@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using CreateApiDescription.CodeGraph;
+using MoaiUtils.CreateApiDescription.CodeGraph;
 
-namespace CreateApiDescription.Exporters {
+namespace MoaiUtils.CreateApiDescription.Exporters {
     public interface IApiExporter {
         void Export(IEnumerable<MoaiType> types, DirectoryInfo outputDirectory);
     }
