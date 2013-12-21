@@ -52,6 +52,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Common\Properties\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Annotation.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="Exporters\ZeroBraneExporter.cs" />
@@ -76,6 +79,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{BA167A20-C6AA-4E0A-AF61-F54744D0ADF9}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\LuaIO\LuaIO.csproj">
       <Project>{d1933642-5fa7-4ea6-831f-52721ab6073d}</Project>
       <Name>LuaIO</Name>

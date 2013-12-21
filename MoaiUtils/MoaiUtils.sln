@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LuaIO", "LuaIO\LuaIO.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tools", "Tools\Tools.csproj", "{63CB06A7-298F-411C-B010-C13BD1E612EC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{BA167A20-C6AA-4E0A-AF61-F54744D0ADF9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{63CB06A7-298F-411C-B010-C13BD1E612EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{63CB06A7-298F-411C-B010-C13BD1E612EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{63CB06A7-298F-411C-B010-C13BD1E612EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA167A20-C6AA-4E0A-AF61-F54744D0ADF9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA167A20-C6AA-4E0A-AF61-F54744D0ADF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA167A20-C6AA-4E0A-AF61-F54744D0ADF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA167A20-C6AA-4E0A-AF61-F54744D0ADF9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -7,6 +7,7 @@ using log4net;
 using log4net.Appender;
 using log4net.Config;
 using log4net.Layout;
+using MoaiUtils.Common;
 using MoaiUtils.CreateApiDescription.CodeGraph;
 using MoaiUtils.CreateApiDescription.Exporters;
 
@@ -17,6 +18,9 @@ namespace MoaiUtils.CreateApiDescription {
         static int Main(string[] args) {
             // Configure log4net
             BasicConfigurator.Configure(new ConsoleAppender { Layout = new SimpleLayout() });
+
+            log.Info(CurrentUtility.Signature);
+            log.Info(CurrentUtility.MoaiUtilsHint);
 
             try {
                 // Parse command line arguments

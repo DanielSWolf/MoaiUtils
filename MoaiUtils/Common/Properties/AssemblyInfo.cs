@@ -1,4 +1,4 @@
 ﻿using System.Reflection;
 
-[assembly: AssemblyTitle("Tools")]
+[assembly: AssemblyTitle("Common")]
 [assembly: AssemblyDescription("")]

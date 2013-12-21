@@ -39,6 +39,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Common\Properties\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="FileSystemInfoExtensions.cs" />
     <Compile Include="IndentedTextWriterExtensions.cs" />
