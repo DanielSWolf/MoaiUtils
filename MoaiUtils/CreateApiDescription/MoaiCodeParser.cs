@@ -151,7 +151,7 @@ namespace MoaiUtils.CreateApiDescription {
                     // The documentation was attached to a method definition
                     string methodName = match.Groups["methodName"].Value;
                     string methodContext = string.Format("for {0}::{1}() {2}", typeName, methodName, context);
-                    ParseMethodDocumentation(type, annotations, methodContext);
+                    ParseMethodDocumentation(type, annotations, methodName, methodContext);
                 } else {
                     // The documentation was attached to a type definition
 
@@ -224,7 +224,7 @@ namespace MoaiUtils.CreateApiDescription {
 
         private static readonly Regex typeNameRegex = new Regex(@"^[A-Za-z_][A-Za-z0-9_]*$", RegexOptions.Compiled);
 
-        private void ParseMethodDocumentation(MoaiType type, Annotation[] annotations, string context) {
+        private void ParseMethodDocumentation(MoaiType type, Annotation[] annotations, string nativeMethodName, string context) {
             // Check that there is a single @name annotation and that it isn't a duplicate. Otherwise exit.
             int nameAnnotationCount = annotations.OfType<NameAnnotation>().Count();
             if (nameAnnotationCount == 0) {
@@ -238,6 +238,15 @@ namespace MoaiUtils.CreateApiDescription {
             if (type.Members.Any(member => member.Name == nameAnnotation.Value)) {
                 log.WarnFormat("Multiple members with name '{0}' {1}.", nameAnnotation.Value, context);
                 return;
+            }
+
+            // Check that @name annotation sticks to convention
+            if (!nativeMethodName.StartsWith("_")) {
+                log.WarnFormat("Unexpected C++ method name '{0}' {1}. By convention, the name of a Lua method implementation shold start with an underscore.", nativeMethodName, context);
+            }
+            string expectedName = nativeMethodName.Substring(1);
+            if (nameAnnotation.Value != expectedName) {
+                log.WarnFormat("Unexpected @name '{0}'. By convention expected '{1}' {2}.", nameAnnotation.Value, expectedName, context);
             }
 
             // Check that there is a single @text annotation
