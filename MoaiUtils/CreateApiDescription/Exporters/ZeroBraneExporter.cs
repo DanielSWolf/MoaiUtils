@@ -120,7 +120,7 @@ namespace MoaiUtils.CreateApiDescription.Exporters {
                 if (inParameter.IsOptional) {
                     result.Append("[");
                 }
-                result.Append("in: ");
+                result.Append("–> ");
                 AppendParameterInfo(result, inParameter);
                 if (inParameter.IsOptional) {
                     result.Append("]");
@@ -128,7 +128,7 @@ namespace MoaiUtils.CreateApiDescription.Exporters {
                 result.AppendLine();
             }
             foreach (var outParameter in overload.OutParameters) {
-                result.Append("out: ");
+                result.Append("<– ");
                 AppendParameterInfo(result, outParameter);
                 result.AppendLine();
             }
