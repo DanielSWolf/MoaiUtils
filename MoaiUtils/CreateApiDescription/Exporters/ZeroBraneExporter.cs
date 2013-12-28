@@ -76,6 +76,7 @@ namespace MoaiUtils.CreateApiDescription.Exporters {
             StringBuilder description = new StringBuilder();
             description.AppendLine(method.Description);
             if (method.Overloads.Count == 1) {
+                description.AppendLine();
                 description.Append(GetOverloadInfo(method.Overloads.Single()));
             } else if (method.Overloads.Any()) {
                 foreach (var overload in method.Overloads) {
