@@ -9,5 +9,9 @@ namespace MoaiUtils.CreateApiDescription {
         [Option('o', "output", Required = true,
             HelpText = "The output directory where the code completion file(s) will be created")]
         public string OutputDirectory { get; set; }
+
+        [Option("fullPath", DefaultValue = false,
+            HelpText = "Show full file paths in messages (rather than relative paths)")]
+        public bool FullPathInMessages { get; set; }
     }
 }

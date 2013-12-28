@@ -13,7 +13,7 @@ namespace MoaiUtils.CreateApiDescription {
 
         private Dictionary<string, MoaiType> typesByName = new Dictionary<string, MoaiType>();
 
-        public void Parse(DirectoryInfo moaiSourceDirectory) {
+        public void Parse(DirectoryInfo moaiSourceDirectory, bool fullPathInMessages) {
             // Check that the input directory looks like the Moai src directory
             if (!moaiSourceDirectory.GetDirectoryInfo("moai-core").Exists) {
                 throw new ApplicationException(string.Format("Path '{0}' does not appear to be the 'src' directory of a Moai source copy.", moaiSourceDirectory));
@@ -22,7 +22,7 @@ namespace MoaiUtils.CreateApiDescription {
             // Parse Moai types and store them by type name
             log.Info("Parsing Moai types.");
             typesByName = new Dictionary<string, MoaiType>();
-            ParseMoaiCodeFiles(moaiSourceDirectory);
+            ParseMoaiCodeFiles(moaiSourceDirectory, fullPathInMessages);
 
             // MOAILuaObject is not documented, probably because it would mess up
             // the Doxygen-generated documentation. Use dummy code instead.
@@ -80,14 +80,14 @@ namespace MoaiUtils.CreateApiDescription {
             }
         }
 
-        private void ParseMoaiCodeFiles(DirectoryInfo moaiSourceDirectory) {
+        private void ParseMoaiCodeFiles(DirectoryInfo moaiSourceDirectory, bool fullPathInMessages) {
             IEnumerable<FileInfo> codeFiles = Directory
                 .EnumerateFiles(moaiSourceDirectory.FullName, "*.*", SearchOption.AllDirectories)
                 .Where(name => name.EndsWith(".cpp") || name.EndsWith(".h"))
                 .Select(name => new FileInfo(name));
 
             foreach (var codeFile in codeFiles) {
-                string context = string.Format("in {0}", codeFile.RelativeTo(moaiSourceDirectory));
+                string context = string.Format("in {0}", fullPathInMessages ? codeFile.FullName : codeFile.RelativeTo(moaiSourceDirectory));
                 ParseMoaiCodeFile(codeFile, context);
             }
         }
