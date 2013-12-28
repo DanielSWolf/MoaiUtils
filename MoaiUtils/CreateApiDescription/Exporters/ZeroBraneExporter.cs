@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using MoaiUtils.Common;
 using MoaiUtils.CreateApiDescription.CodeGraph;
 using MoaiUtils.LuaIO;
@@ -35,7 +36,7 @@ namespace MoaiUtils.CreateApiDescription.Exporters {
         private LuaTable CreateTypeTable(MoaiType type) {
             return new LuaTable {
                 { "type", "class" },
-                { "description", type.Description },
+                { "description", ConvertString(type.Description) },
                 { "childs", CreateMemberListTable(type) }
             };
         }
@@ -67,7 +68,7 @@ namespace MoaiUtils.CreateApiDescription.Exporters {
         private LuaTable CreateMemberTable(MoaiField field) {
             return new LuaTable {
                 { "type", "value" },
-                { "description", field.Description }
+                { "description", ConvertString(field.Description) }
             };
         }
 
@@ -86,7 +87,7 @@ namespace MoaiUtils.CreateApiDescription.Exporters {
 
             var memberTable = new LuaTable {
                 { "type", method.IsStatic ? "function" : "method" },
-                { "description", description.ToString().Trim() },
+                { "description", ConvertString(description.ToString().Trim()) },
                 { "args", method.InParameterSignature != null ? method.InParameterSignature.ToString(SignatureGrouping.Any) : null },
                 { "returns", method.OutParameterSignature != null ? method.OutParameterSignature.ToString(SignatureGrouping.Any) : null },
                 { "valuetype", GetValueType(method)}
@@ -143,6 +144,15 @@ namespace MoaiUtils.CreateApiDescription.Exporters {
             if (parameter.Description != null) {
                 result.AppendFormat(": {0}", parameter.Description);
             }
+        }
+
+        private static readonly Regex newlineRegex = new Regex(@"\r\n?|\n", RegexOptions.Compiled);
+
+        // For whatever reason, ZeroBrane expects line breaks to be marked with "<br>".
+        // It doesn't understand any other HTML, though.
+        private static string ConvertString(string s) {
+            if (s == null) return null;
+            return newlineRegex.Replace(s, "<br>");
         }
     }
 }
