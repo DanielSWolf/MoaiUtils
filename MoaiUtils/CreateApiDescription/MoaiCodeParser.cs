@@ -222,7 +222,10 @@ namespace MoaiUtils.CreateApiDescription {
             }
         }
 
-        private static readonly Regex typeNameRegex = new Regex(@"^[A-Za-z_][A-Za-z0-9_]*$", RegexOptions.Compiled);
+        // A parameter type may contain (or consist of) an ellipsis.
+        private static readonly Regex parameterTypeNameRegex = new Regex(
+            @"^[A-Za-z_][A-Za-z0-9_]*(\.\.\.)?|\.\.\.$",
+            RegexOptions.Compiled);
 
         private void ParseMethodDocumentation(MoaiType type, Annotation[] annotations, string nativeMethodName, string context) {
             // Check that there is a single @name annotation and that it isn't a duplicate. Otherwise exit.
@@ -293,7 +296,7 @@ namespace MoaiUtils.CreateApiDescription {
                         method.Overloads.Add(currentOverload);
                     }
                     var parameterAnnotation = (ParameterAnnotation) annotation;
-                    if (parameterAnnotation.Type != null && !typeNameRegex.IsMatch(parameterAnnotation.Type)) {
+                    if (parameterAnnotation.Type != null && !parameterTypeNameRegex.IsMatch(parameterAnnotation.Type)) {
                         log.WarnFormat("'{0}' is no valid type {1}.", parameterAnnotation.Type, context);
                     }
                     string paramName = parameterAnnotation.Name;
