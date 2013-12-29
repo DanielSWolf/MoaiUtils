@@ -2,16 +2,19 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using log4net;
 using MoaiUtils.CreateApiDescription.CodeGraph;
 using MoaiUtils.Tools;
+using MoreLinq;
 
 namespace MoaiUtils.CreateApiDescription {
     public class MoaiCodeParser {
         private static readonly ILog log = LogManager.GetLogger(typeof(MoaiCodeParser));
 
-        private Dictionary<string, MoaiType> typesByName = new Dictionary<string, MoaiType>();
+        private Dictionary<string, MoaiType> typesByName;
+        private Dictionary<string, SortedSet<string>> referencingContextsByTypeName;
 
         public void Parse(DirectoryInfo moaiSourceDirectory, bool fullPathInMessages) {
             // Check that the input directory looks like the Moai src directory
@@ -19,9 +22,17 @@ namespace MoaiUtils.CreateApiDescription {
                 throw new ApplicationException(string.Format("Path '{0}' does not appear to be the 'src' directory of a Moai source copy.", moaiSourceDirectory));
             }
 
+            // Initialize type list with primitive types
+            typesByName = new Dictionary<string, MoaiType>();
+            referencingContextsByTypeName = new Dictionary<string, SortedSet<string>>();
+            var primitiveTypeNames = new[] { "nil", "boolean", "number", "string", "userdata", "function", "thread", "table" };
+            foreach (string primitiveTypeName in primitiveTypeNames) {
+                typesByName[primitiveTypeName] = new MoaiType { Name = primitiveTypeName, IsPrimitive = true };
+                referencingContextsByTypeName[primitiveTypeName] = new SortedSet<string>();
+            }
+
             // Parse Moai types and store them by type name
             log.Info("Parsing Moai types.");
-            typesByName = new Dictionary<string, MoaiType>();
             ParseMoaiCodeFiles(moaiSourceDirectory, fullPathInMessages);
 
             // MOAILuaObject is not documented, probably because it would mess up
@@ -30,11 +41,16 @@ namespace MoaiUtils.CreateApiDescription {
             ParseMoaiCode(MoaiLuaObject.DummyCode, "in MoaiLuaObject dummy code");
 
             // Make sure every class directly or indirectly inherits from MOAILuaObject
-            MoaiType moaiLuaObjectType = GetOrCreateType("MOAILuaObject");
+            MoaiType moaiLuaObjectType = GetOrCreateType("MOAILuaObject", null);
             foreach (MoaiType type in typesByName.Values) {
                 if (!(type.AncestorTypes.Contains(moaiLuaObjectType)) && type != moaiLuaObjectType) {
                     type.BaseTypes.Add(moaiLuaObjectType);
                 }
+            }
+
+            // Check if we have information on all referenced classes
+            foreach (MoaiType type in typesByName.Values.ToArray()) {
+                WarnIfSpeculative(type);
             }
 
             log.Info("Creating compact method signatures.");
@@ -52,6 +68,51 @@ namespace MoaiUtils.CreateApiDescription {
                         log.WarnFormat("Error determining signature for method {0}. {1}", method, e.Message);
                     }
                 }
+            }
+        }
+
+        private void WarnIfSpeculative(MoaiType type) {
+            if (type.Name == "...") return;
+
+            var referencingContexts = referencingContextsByTypeName[type.Name];
+            if (type.Name.EndsWith("...")) {
+                type = GetOrCreateType(type.Name.Substring(0, type.Name.Length - 3), null);
+            }
+
+            if (type.IsSpeculative) {
+                // Make an educated guess as to what type was meant.
+                var commonProposals = new Dictionary<string, string> {
+                    { "bool", "boolean" },
+                    { "num", "number" },
+                    { "int", "number" },
+                    { "integer", "number" },
+                    { "float", "number" },
+                    { "double", "number" }
+                };
+                string nameProposal;
+                if (commonProposals.ContainsKey(type.Name)) {
+                    nameProposal = commonProposals[type.Name];
+                } else {
+                    nameProposal = typesByName
+                        .Where(pair => !pair.Value.IsSpeculative)
+                        .Select(pair => pair.Key)
+                        .MinBy(name => Levenshtein.Distance(name, type.Name));
+                    if (Levenshtein.Similarity(nameProposal, type.Name) < 0.6) {
+                        nameProposal = null;
+                    }
+                }
+
+                StringBuilder message = new StringBuilder();
+                message.AppendFormat("Found references to missing or undocumented type '{0}'.", type.Name);
+                if (nameProposal != null) {
+                    message.AppendFormat(" Should this be '{0}'?", nameProposal);
+                }
+                message.AppendLine();
+                foreach (string referencingContext in referencingContexts) {
+                    message.Append("- ");
+                    message.AppendLine(referencingContext);
+                }
+                log.WarnFormat(message.ToString());
             }
         }
 
@@ -76,7 +137,7 @@ namespace MoaiUtils.CreateApiDescription {
         public IEnumerable<MoaiType> Types {
             get {
                 return typesByName.Values
-                    .Where(type => type.Description != null || type.Members.Any());
+                    .Where(type => !type.IsSpeculative && !type.IsPrimitive);
             }
         }
 
@@ -115,9 +176,13 @@ namespace MoaiUtils.CreateApiDescription {
                 int\s+(?<className>[A-Za-z0-9_]+)\s*::\s*(?<methodName>[A-Za-z0-9_]+)
             )", RegexOptions.IgnorePatternWhitespace | RegexOptions.ExplicitCapture | RegexOptions.Compiled);
 
-        private MoaiType GetOrCreateType(string typeName) {
+        private MoaiType GetOrCreateType(string typeName, string context) {
             if (!typesByName.ContainsKey(typeName)) {
                 typesByName[typeName] = new MoaiType { Name = typeName };
+                referencingContextsByTypeName[typeName] = new SortedSet<string>();
+            }
+            if (context != null) {
+                referencingContextsByTypeName[typeName].Add(context);
             }
             return typesByName[typeName];
         }
@@ -133,7 +198,7 @@ namespace MoaiUtils.CreateApiDescription {
 
             foreach (Match match in matches) {
                 string typeName = match.Groups["className"].Value;
-                MoaiType type = GetOrCreateType(typeName);
+                MoaiType type = GetOrCreateType(typeName, context);
 
                 // Parse annotations, filtering out unknown ones
                 Annotation[] annotations = match.Groups["annotation"].Captures
@@ -160,7 +225,7 @@ namespace MoaiUtils.CreateApiDescription {
                         .Cast<Capture>()
                         .Select(capture => capture.Value)
                         .Where(name => !name.Contains("<"))
-                        .Select(GetOrCreateType)
+                        .Select(name => GetOrCreateType(name, context))
                         .ToArray();
                     string typeContext = string.Format("for type {0} {1}", typeName, context);
                     ParseTypeDocumentation(type, annotations, baseTypes, typeContext);
@@ -221,11 +286,6 @@ namespace MoaiUtils.CreateApiDescription {
                 }
             }
         }
-
-        // A parameter type may contain (or consist of) an ellipsis.
-        private static readonly Regex parameterTypeNameRegex = new Regex(
-            @"^[A-Za-z_][A-Za-z0-9_]*(\.\.\.)?|\.\.\.$",
-            RegexOptions.Compiled);
 
         private void ParseMethodDocumentation(MoaiType type, Annotation[] annotations, string nativeMethodName, string context) {
             // Check that there is a single @name annotation and that it isn't a duplicate. Otherwise exit.
@@ -296,9 +356,6 @@ namespace MoaiUtils.CreateApiDescription {
                         method.Overloads.Add(currentOverload);
                     }
                     var parameterAnnotation = (ParameterAnnotation) annotation;
-                    if (parameterAnnotation.Type != null && !parameterTypeNameRegex.IsMatch(parameterAnnotation.Type)) {
-                        log.WarnFormat("'{0}' is no valid type {1}.", parameterAnnotation.Type, context);
-                    }
                     string paramName = parameterAnnotation.Name;
                     if (annotation is InParameterAnnotation | annotation is OptionalInParameterAnnotation) {
                         // Add input parameter
@@ -308,7 +365,7 @@ namespace MoaiUtils.CreateApiDescription {
                         var inParameter = new MoaiInParameter {
                             Name = paramName,
                             Description = parameterAnnotation.Description,
-                            Type = GetOrCreateType(parameterAnnotation.Type),
+                            Type = GetOrCreateType(parameterAnnotation.Type, context),
                             IsOptional = annotation is OptionalInParameterAnnotation
                         };
                         currentOverload.InParameters.Add(inParameter);
@@ -316,7 +373,7 @@ namespace MoaiUtils.CreateApiDescription {
                         // Add output parameter
                         var outParameter = new MoaiOutParameter {
                             Name = paramName,
-                            Type = GetOrCreateType(parameterAnnotation.Type),
+                            Type = GetOrCreateType(parameterAnnotation.Type, context),
                             Description = parameterAnnotation.Description
                         };
                         currentOverload.OutParameters.Add(outParameter);

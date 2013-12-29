@@ -10,6 +10,7 @@ namespace MoaiUtils.CreateApiDescription.CodeGraph {
         }
 
         public string Name { get; set; }
+        public bool IsPrimitive { get; set; }
         public string Description { get; set; }
         public List<MoaiTypeMember> Members { get; private set; }
         public List<MoaiType> BaseTypes { get; private set; }
@@ -47,8 +48,12 @@ namespace MoaiUtils.CreateApiDescription.CodeGraph {
             return Signature;
         }
 
+        public bool IsSpeculative {
+            get { return !IsPrimitive && Description == null && !Members.Any(); }
+        }
+
         private class MemberNameEqualityComparer : IEqualityComparer<MoaiTypeMember> {
-            public static MemberNameEqualityComparer Instance = new MemberNameEqualityComparer();
+            public static readonly MemberNameEqualityComparer Instance = new MemberNameEqualityComparer();
 
             private MemberNameEqualityComparer() {}
 

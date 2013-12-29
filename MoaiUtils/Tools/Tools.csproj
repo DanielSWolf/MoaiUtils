@@ -45,6 +45,7 @@
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="FileSystemInfoExtensions.cs" />
     <Compile Include="IndentedTextWriterExtensions.cs" />
+    <Compile Include="Levenshtein.cs" />
     <Compile Include="Partitioning.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StringExtensions.cs" />
