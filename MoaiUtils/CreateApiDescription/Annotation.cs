@@ -7,12 +7,13 @@ namespace MoaiUtils.CreateApiDescription {
     public abstract class Annotation {
         private static readonly Regex whitespaceRegex = new Regex(@"\s+", RegexOptions.Compiled);
 
-        protected Annotation(string[] elements) {
+        protected Annotation(string[] elements, FilePosition filePosition) {
             CheckElements(elements);
             Elements = elements;
+            FilePosition = filePosition;
         }
 
-        public static Annotation Create(string text) {
+        public static Annotation Create(string text, FilePosition filePosition) {
             if (text == null) throw new ArgumentNullException("text");
             if (!text.StartsWith("@")) throw new ArgumentException("Annotation must start with an '@' character.");
 
@@ -21,29 +22,30 @@ namespace MoaiUtils.CreateApiDescription {
             string command = elements[0];
             switch (command) {
                 case "@name":
-                    return new NameAnnotation(elements);
+                    return new NameAnnotation(elements, filePosition);
                 case "@text":
-                    return new TextAnnotation(elements);
+                    return new TextAnnotation(elements, filePosition);
                 case "@const":
-                    return new ConstantAnnotation(elements);
+                    return new ConstantAnnotation(elements, filePosition);
                 case "@flag":
-                    return new FlagAnnotation(elements);
+                    return new FlagAnnotation(elements, filePosition);
                 case "@attr":
-                    return new AttributeAnnotation(elements);
+                    return new AttributeAnnotation(elements, filePosition);
                 case "@in":
-                    return new InParameterAnnotation(elements);
+                    return new InParameterAnnotation(elements, filePosition);
                 case "@opt":
-                    return new OptionalInParameterAnnotation(elements);
+                    return new OptionalInParameterAnnotation(elements, filePosition);
                 case "@out":
-                    return new OutParameterAnnotation(elements);
+                    return new OutParameterAnnotation(elements, filePosition);
                 case "@overload":
-                    return new OverloadAnnotation(elements);
+                    return new OverloadAnnotation(elements, filePosition);
                 default:
-                    return new UnknownAnnotation(elements);
+                    return new UnknownAnnotation(elements, filePosition);
             }
         }
 
-        public string[] Elements { get; set; }
+        public string[] Elements { get; private set; }
+        public FilePosition FilePosition { get; private set; }
 
         public string Command {
             get { return Elements[0]; }
@@ -93,7 +95,7 @@ namespace MoaiUtils.CreateApiDescription {
     }
 
     public class NameAnnotation : Annotation {
-        public NameAnnotation(string[] elements) : base(elements) { }
+        public NameAnnotation(string[] elements, FilePosition filePosition) : base(elements, filePosition) { }
 
         public string Value {
             get { return GetElementAt(1); }
@@ -105,7 +107,7 @@ namespace MoaiUtils.CreateApiDescription {
     }
 
     public class TextAnnotation : Annotation {
-        public TextAnnotation(string[] elements) : base(elements) { }
+        public TextAnnotation(string[] elements, FilePosition filePosition) : base(elements, filePosition) { }
 
         public string Value {
             get { return GetStringStartingAt(1); }
@@ -117,7 +119,7 @@ namespace MoaiUtils.CreateApiDescription {
     }
 
     public abstract class FieldAnnotation : Annotation {
-        protected FieldAnnotation(string[] elements) : base(elements) { }
+        protected FieldAnnotation(string[] elements, FilePosition filePosition) : base(elements, filePosition) { }
 
         public string Name {
             get { return GetElementAt(1); }
@@ -133,19 +135,19 @@ namespace MoaiUtils.CreateApiDescription {
     }
 
     public class ConstantAnnotation : FieldAnnotation {
-        public ConstantAnnotation(string[] elements) : base(elements) { }
+        public ConstantAnnotation(string[] elements, FilePosition filePosition) : base(elements, filePosition) { }
     }
 
     public class FlagAnnotation : FieldAnnotation {
-        public FlagAnnotation(string[] elements) : base(elements) { }
+        public FlagAnnotation(string[] elements, FilePosition filePosition) : base(elements, filePosition) { }
     }
 
     public class AttributeAnnotation : FieldAnnotation {
-        public AttributeAnnotation(string[] elements) : base(elements) { }
+        public AttributeAnnotation(string[] elements, FilePosition filePosition) : base(elements, filePosition) { }
     }
 
     public abstract class ParameterAnnotation : Annotation {
-        protected ParameterAnnotation(string[] elements) : base(elements) { }
+        protected ParameterAnnotation(string[] elements, FilePosition filePosition) : base(elements, filePosition) { }
 
         public string Type {
             get { return GetElementAt(1); }
@@ -168,15 +170,15 @@ namespace MoaiUtils.CreateApiDescription {
     }
 
     public class InParameterAnnotation : ParameterAnnotation {
-        public InParameterAnnotation(string[] elements) : base(elements) { }
+        public InParameterAnnotation(string[] elements, FilePosition filePosition) : base(elements, filePosition) { }
     }
 
     public class OptionalInParameterAnnotation : ParameterAnnotation {
-        public OptionalInParameterAnnotation(string[] elements) : base(elements) { }
+        public OptionalInParameterAnnotation(string[] elements, FilePosition filePosition) : base(elements, filePosition) { }
     }
 
     public class OutParameterAnnotation : ParameterAnnotation {
-        public OutParameterAnnotation(string[] elements) : base(elements) { }
+        public OutParameterAnnotation(string[] elements, FilePosition filePosition) : base(elements, filePosition) { }
 
         public override bool IsComplete {
             get {
@@ -187,7 +189,7 @@ namespace MoaiUtils.CreateApiDescription {
     }
 
     public class OverloadAnnotation : Annotation {
-        public OverloadAnnotation(string[] elements) : base(elements) {}
+        public OverloadAnnotation(string[] elements, FilePosition filePosition) : base(elements, filePosition) { }
 
         public override bool IsComplete {
             get { return true; }
@@ -195,7 +197,7 @@ namespace MoaiUtils.CreateApiDescription {
     }
 
     public class UnknownAnnotation : Annotation {
-        public UnknownAnnotation(string[] elements) : base(elements) { }
+        public UnknownAnnotation(string[] elements, FilePosition filePosition) : base(elements, filePosition) { }
 
         public override bool IsComplete {
             get { return true; }

@@ -6,6 +6,7 @@ namespace MoaiUtils.CreateApiDescription.CodeGraph {
             Overloads = new List<MoaiMethodOverload>();
         }
 
+        public MethodPosition MethodPosition { get; set; }
         public bool IsStatic { get; set; }
         public List<MoaiMethodOverload> Overloads { get; private set; }
         public ISignature InParameterSignature { get; set; }

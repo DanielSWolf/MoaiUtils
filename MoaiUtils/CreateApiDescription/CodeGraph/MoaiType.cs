@@ -7,13 +7,16 @@ namespace MoaiUtils.CreateApiDescription.CodeGraph {
         public MoaiType() {
             Members = new List<MoaiTypeMember>();
             BaseTypes = new List<MoaiType>();
+            ReferencingFilePositions = new SortedSet<FilePosition>();
         }
 
+        public TypePosition TypePosition { get; set; }
         public string Name { get; set; }
         public bool IsPrimitive { get; set; }
         public string Description { get; set; }
         public List<MoaiTypeMember> Members { get; private set; }
         public List<MoaiType> BaseTypes { get; private set; }
+        public SortedSet<FilePosition> ReferencingFilePositions { get; private set; }
 
         public string Signature {
             get {
