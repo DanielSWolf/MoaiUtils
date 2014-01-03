@@ -51,8 +51,8 @@ namespace MoaiUtils.CreateApiDescription.CodeGraph {
             return Signature;
         }
 
-        public bool IsSpeculative {
-            get { return !IsPrimitive && Description == null && !Members.Any(); }
+        public bool IsDocumented {
+            get { return Description != null || Members.Any(); }
         }
 
         private class MemberNameEqualityComparer : IEqualityComparer<MoaiTypeMember> {

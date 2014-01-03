@@ -35,13 +35,13 @@ namespace MoaiUtils.CreateApiDescription {
                 var parser = new MoaiCodeParser();
                 parser.Parse(new DirectoryInfo(configuration.InputDirectory), configuration.FullPathInMessages);
 
-                var methods = parser.Types
+                var methods = parser.DocumentedTypes
                     .SelectMany(type => type.Members.OfType<MoaiMethod>())
                     .OrderByDescending(method => method.Overloads.Aggregate(0, (count, o) => o.InParameters.Count + count));
 
                 // Export API description
                 IApiExporter exporter = new ZeroBraneExporter();
-                exporter.Export(parser.Types, new DirectoryInfo(configuration.OutputDirectory));
+                exporter.Export(parser.DocumentedTypes, new DirectoryInfo(configuration.OutputDirectory));
 
                 return 0;
             } catch (Exception e) {

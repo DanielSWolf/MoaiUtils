@@ -76,7 +76,7 @@ namespace MoaiUtils.CreateApiDescription {
                 type = GetOrCreateType(type.Name.Substring(0, type.Name.Length - 3), null);
             }
 
-            if (type.IsSpeculative) {
+            if (!type.IsDocumented && !type.IsPrimitive) {
                 // Make an educated guess as to what type was meant.
                 var commonProposals = new Dictionary<string, string> {
                     { "bool", "boolean" },
@@ -91,7 +91,7 @@ namespace MoaiUtils.CreateApiDescription {
                     nameProposal = commonProposals[type.Name];
                 } else {
                     nameProposal = typesByName
-                        .Where(pair => !pair.Value.IsSpeculative)
+                        .Where(pair => pair.Value.IsDocumented || pair.Value.IsPrimitive)
                         .Select(pair => pair.Key)
                         .MinBy(name => Levenshtein.Distance(name, type.Name));
                     if (Levenshtein.Similarity(nameProposal, type.Name) < 0.6) {
@@ -131,10 +131,10 @@ namespace MoaiUtils.CreateApiDescription {
             return overload.Select(parameter => new Parameter { Name = parameter.Name, Type = parameter.Type.Name, ShowName = true });
         }
 
-        public IEnumerable<MoaiType> Types {
+        public IEnumerable<MoaiType> DocumentedTypes {
             get {
                 return typesByName.Values
-                    .Where(type => !type.IsSpeculative && !type.IsPrimitive);
+                    .Where(type => type.IsDocumented);
             }
         }
 
