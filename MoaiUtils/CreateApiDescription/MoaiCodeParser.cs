@@ -251,13 +251,6 @@ namespace MoaiUtils.CreateApiDescription {
                 log.WarnFormat("Multiple @text annotations. [{0}]", typePosition);
             }
 
-            // Check that all annotations are complete
-            foreach (var annotation in annotations) {
-                if (!annotation.IsComplete) {
-                    log.WarnFormat("Incomplete {0} annotation. [{1}]", annotation.Command, typePosition);
-                }
-            }
-
             // Store base types
             type.BaseTypes.AddRange(baseTypes);
 
@@ -330,13 +323,6 @@ namespace MoaiUtils.CreateApiDescription {
                 log.WarnFormat(
                     "Missing @out annotation. Even for void methods, an @out annotation with type nil is expected. [{0}]",
                     methodPosition);
-            }
-
-            // Check that all annotations are complete
-            foreach (var annotation in annotations) {
-                if (!annotation.IsComplete) {
-                    log.WarnFormat("Incomplete {0} annotation. [{1}]", annotation.Command, methodPosition);
-                }
             }
 
             // Parse annotations

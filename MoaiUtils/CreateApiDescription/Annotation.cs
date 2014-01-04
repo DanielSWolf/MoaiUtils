@@ -1,57 +1,67 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using log4net;
 using MoaiUtils.Tools;
 
 namespace MoaiUtils.CreateApiDescription {
     public abstract class Annotation {
-        private static readonly Regex whitespaceRegex = new Regex(@"\s+", RegexOptions.Compiled);
+        protected static readonly ILog log = LogManager.GetLogger(typeof(Annotation));
 
-        protected Annotation(string[] elements, FilePosition filePosition) {
-            CheckElements(elements);
-            Elements = elements;
+        private static readonly Regex whitespaceRegex = new Regex(@"\s+", RegexOptions.Compiled);
+        private static readonly Regex wordWithWhitespaceRegex = new Regex(@"(?<word>\S+)(?<whitespace>\s*)", RegexOptions.Compiled);
+
+        protected Annotation(string text, FilePosition filePosition) {
+            if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("text is empty.");
+
+            IEnumerable<Match> matches = wordWithWhitespaceRegex.Matches(text.Trim()).Cast<Match>();
+            Elements = matches
+                .Select(match => match.Groups["word"].Value)
+                .ToArray();
+            WhitespaceAfterElements = matches
+                .Select(match => match.Groups["whitespace"].Value)
+                .ToArray();
+
             FilePosition = filePosition;
         }
 
         public static Annotation Create(string text, FilePosition filePosition) {
-            if (text == null) throw new ArgumentNullException("text");
-            if (!text.StartsWith("@")) throw new ArgumentException("Annotation must start with an '@' character.");
+            if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("text is empty.");
 
-            var elements = whitespaceRegex.Split(text.Trim()).ToArray();
-            CheckElements(elements);
-            string command = elements[0];
+            Match match = wordWithWhitespaceRegex.Match(text.Trim());
+            string command = match.Groups["word"].Value;
             switch (command) {
                 case "@name":
-                    return new NameAnnotation(elements, filePosition);
+                    return new NameAnnotation(text, filePosition);
                 case "@text":
-                    return new TextAnnotation(elements, filePosition);
+                    return new TextAnnotation(text, filePosition);
                 case "@const":
-                    return new ConstantAnnotation(elements, filePosition);
+                    return new ConstantAnnotation(text, filePosition);
                 case "@flag":
-                    return new FlagAnnotation(elements, filePosition);
+                    return new FlagAnnotation(text, filePosition);
                 case "@attr":
-                    return new AttributeAnnotation(elements, filePosition);
+                    return new AttributeAnnotation(text, filePosition);
                 case "@in":
-                    return new InParameterAnnotation(elements, filePosition);
+                    return new InParameterAnnotation(text, filePosition);
                 case "@opt":
-                    return new OptionalInParameterAnnotation(elements, filePosition);
+                    return new OptionalInParameterAnnotation(text, filePosition);
                 case "@out":
-                    return new OutParameterAnnotation(elements, filePosition);
+                    return new OutParameterAnnotation(text, filePosition);
                 case "@overload":
-                    return new OverloadAnnotation(elements, filePosition);
+                    return new OverloadAnnotation(text, filePosition);
                 default:
-                    return new UnknownAnnotation(elements, filePosition);
+                    return new UnknownAnnotation(text, filePosition);
             }
         }
 
         public string[] Elements { get; private set; }
+        public string[] WhitespaceAfterElements { get; private set; }
         public FilePosition FilePosition { get; private set; }
 
         public string Command {
             get { return Elements[0]; }
         }
-
-        public abstract bool IsComplete { get; }
 
         protected string GetElementAt(int index) {
             if (index >= Elements.Length) return null;
@@ -62,11 +72,6 @@ namespace MoaiUtils.CreateApiDescription {
             if (index >= Elements.Length) return null;
             string htmlString = Elements.Skip(index).Join(" ");
             return ToPlainText(htmlString);
-        }
-
-        private static void CheckElements(string[] elements) {
-            if (elements == null) throw new ArgumentNullException("elements");
-            if (elements.Length < 1) throw new ArgumentException("An annotation needs at least one element, its command.");
         }
 
         private static readonly Regex paragraphEntityRegex = new Regex(@"<\s*(p|/\s*p|ul|/\s*ul|/\s*li)\s*>", RegexOptions.Compiled);
@@ -95,31 +100,39 @@ namespace MoaiUtils.CreateApiDescription {
     }
 
     public class NameAnnotation : Annotation {
-        public NameAnnotation(string[] elements, FilePosition filePosition) : base(elements, filePosition) { }
+        public NameAnnotation(string text, FilePosition filePosition)
+            : base(text, filePosition) {
+            if (Value == null) {
+                log.WarnFormat("{0} annotation is missing its value. [{1}]", Command, filePosition);
+            }
+        }
 
         public string Value {
             get { return GetElementAt(1); }
         }
-
-        public override bool IsComplete {
-            get { return Value != null; }
-        }
     }
 
     public class TextAnnotation : Annotation {
-        public TextAnnotation(string[] elements, FilePosition filePosition) : base(elements, filePosition) { }
+        public TextAnnotation(string text, FilePosition filePosition) : base(text, filePosition) {
+            if (Value == null) {
+                log.WarnFormat("{0} annotation is missing its value. [{1}]", Command, filePosition);
+            }
+        }
 
         public string Value {
             get { return GetStringStartingAt(1); }
         }
-
-        public override bool IsComplete {
-            get { return Value != null; }
-        }
     }
 
     public abstract class FieldAnnotation : Annotation {
-        protected FieldAnnotation(string[] elements, FilePosition filePosition) : base(elements, filePosition) { }
+        protected FieldAnnotation(string text, FilePosition filePosition) : base(text, filePosition) {
+            if (Name == null) {
+                log.WarnFormat("{0} annotation is missing its name (1st word). [{1}]", Command, filePosition);
+            }
+            if (Description == null) {
+                log.WarnFormat("{0} annotation '{1}' is missing its description (2nd word+). [{2}]", Command, Name, filePosition);
+            }
+        }
 
         public string Name {
             get { return GetElementAt(1); }
@@ -128,26 +141,28 @@ namespace MoaiUtils.CreateApiDescription {
         public string Description {
             get { return GetStringStartingAt(2); }
         }
-
-        public override bool IsComplete {
-            get { return Description != null; }
-        }
     }
 
     public class ConstantAnnotation : FieldAnnotation {
-        public ConstantAnnotation(string[] elements, FilePosition filePosition) : base(elements, filePosition) { }
+        public ConstantAnnotation(string text, FilePosition filePosition) : base(text, filePosition) { }
     }
 
     public class FlagAnnotation : FieldAnnotation {
-        public FlagAnnotation(string[] elements, FilePosition filePosition) : base(elements, filePosition) { }
+        public FlagAnnotation(string text, FilePosition filePosition) : base(text, filePosition) { }
     }
 
     public class AttributeAnnotation : FieldAnnotation {
-        public AttributeAnnotation(string[] elements, FilePosition filePosition) : base(elements, filePosition) { }
+        public AttributeAnnotation(string text, FilePosition filePosition) : base(text, filePosition) { }
     }
 
     public abstract class ParameterAnnotation : Annotation {
-        protected ParameterAnnotation(string[] elements, FilePosition filePosition) : base(elements, filePosition) { }
+        protected ParameterAnnotation(string text, FilePosition filePosition) : base(text, filePosition) {
+            if (Type == null) {
+                log.WarnFormat("{0} annotation is missing its type (1st word). [{1}]", Command, filePosition);
+            }
+            // Not all parameter annotations require a type or name.
+            // Let the derived classes decide.
+        }
 
         public string Type {
             get { return GetElementAt(1); }
@@ -160,47 +175,35 @@ namespace MoaiUtils.CreateApiDescription {
         public string Description {
             get { return GetStringStartingAt(3); }
         }
-
-        public override bool IsComplete {
-            get {
-                // Let's not insist on a description for well-named parameters.
-                return Name != null;
-            }
-        }
     }
 
     public class InParameterAnnotation : ParameterAnnotation {
-        public InParameterAnnotation(string[] elements, FilePosition filePosition) : base(elements, filePosition) { }
+        public InParameterAnnotation(string text, FilePosition filePosition) : base(text, filePosition) {
+            if (Name == null) {
+                log.WarnFormat("{0} annotation with type '{1}' is missing its name (2nd word). [{2}]", Command, Type, filePosition);
+            }
+            // Let's not insist on a description for well-named parameters.
+        }
     }
 
     public class OptionalInParameterAnnotation : ParameterAnnotation {
-        public OptionalInParameterAnnotation(string[] elements, FilePosition filePosition) : base(elements, filePosition) { }
+        public OptionalInParameterAnnotation(string text, FilePosition filePosition) : base(text, filePosition) {
+            if (Name == null) {
+                log.WarnFormat("{0} annotation with type '{1}' is missing its name (2nd word). [{2}]", Command, Type, filePosition);
+            }
+            // Let's not insist on a description for well-named parameters.
+        }
     }
 
     public class OutParameterAnnotation : ParameterAnnotation {
-        public OutParameterAnnotation(string[] elements, FilePosition filePosition) : base(elements, filePosition) { }
-
-        public override bool IsComplete {
-            get {
-                // The return type often suffices.
-                return Type != null;
-            }
-        }
+        public OutParameterAnnotation(string text, FilePosition filePosition) : base(text, filePosition) { }
     }
 
     public class OverloadAnnotation : Annotation {
-        public OverloadAnnotation(string[] elements, FilePosition filePosition) : base(elements, filePosition) { }
-
-        public override bool IsComplete {
-            get { return true; }
-        }
+        public OverloadAnnotation(string text, FilePosition filePosition) : base(text, filePosition) { }
     }
 
     public class UnknownAnnotation : Annotation {
-        public UnknownAnnotation(string[] elements, FilePosition filePosition) : base(elements, filePosition) { }
-
-        public override bool IsComplete {
-            get { return true; }
-        }
+        public UnknownAnnotation(string text, FilePosition filePosition) : base(text, filePosition) { }
     }
 }
