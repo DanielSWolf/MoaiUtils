@@ -47,7 +47,9 @@ namespace MoaiUtils.CreateApiDescription {
             }
 
             // Check if we have information on all referenced classes
-            foreach (MoaiType type in typesByName.Values.ToArray()) {
+            IEnumerable<MoaiType> typesReferencedInDocumentation = typesByName.Values
+                .Where(type => type.DocumentationReferences.Any());
+            foreach (MoaiType type in typesReferencedInDocumentation.ToArray()) {
                 WarnIfSpeculative(type);
             }
 
@@ -100,12 +102,12 @@ namespace MoaiUtils.CreateApiDescription {
                 }
 
                 StringBuilder message = new StringBuilder();
-                message.AppendFormat("Found references to missing or undocumented type '{0}'.", type.Name);
+                message.AppendFormat("Documentation mentions missing or undocumented type '{0}'.", type.Name);
                 if (nameProposal != null) {
                     message.AppendFormat(" Should this be '{0}'?", nameProposal);
                 }
                 message.AppendLine();
-                foreach (FilePosition referencingFilePosition in type.ReferencingFilePositions) {
+                foreach (FilePosition referencingFilePosition in type.DocumentationReferences) {
                     message.AppendFormat("> {0}", referencingFilePosition);
                     message.AppendLine();
                 }
@@ -173,12 +175,12 @@ namespace MoaiUtils.CreateApiDescription {
                 int\s+(?<className>[A-Za-z0-9_]+)\s*::\s*(?<methodName>[A-Za-z0-9_]+)
             )", RegexOptions.IgnorePatternWhitespace | RegexOptions.ExplicitCapture | RegexOptions.Compiled);
 
-        private MoaiType GetOrCreateType(string typeName, FilePosition filePosition) {
+        private MoaiType GetOrCreateType(string typeName, FilePosition documentationPosition) {
             MoaiType result = typesByName.ContainsKey(typeName)
                 ? typesByName[typeName]
                 : typesByName[typeName] = new MoaiType { Name = typeName };
-            if (filePosition != null) {
-                result.ReferencingFilePositions.Add(filePosition);
+            if (documentationPosition != null) {
+                result.DocumentationReferences.Add(documentationPosition);
             }
             return result;
         }
@@ -224,7 +226,7 @@ namespace MoaiUtils.CreateApiDescription {
                     MoaiType[] baseTypes = match.Groups["baseClassName"].Captures
                         .Cast<Capture>()
                         .Where(capture => !capture.Value.Contains("<"))
-                        .Select(capture => GetOrCreateType(capture.Value, documentationPosition))
+                        .Select(capture => GetOrCreateType(capture.Value, null))
                         .ToArray();
 
                     var typePosition = (TypePosition) documentationPosition;
