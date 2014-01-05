@@ -167,7 +167,7 @@ namespace MoaiUtils.CreateApiDescription {
                 // There is only a single space before the description
                 log.WarnFormat(
                     "{0} annotation has only a single space between its name ('{1}') and its description ('{2}'). This often indicates that the description is not self-contained. [{3}]",
-                    Command, Name, Description, filePosition);
+                    Command, Name, Description.GetExcerpt(), filePosition);
             }
         }
 

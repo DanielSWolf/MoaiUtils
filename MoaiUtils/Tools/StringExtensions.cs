@@ -29,5 +29,13 @@ namespace MoaiUtils.Tools {
             result.Append(right);
             return result.ToString();
         }
+
+        public static string GetExcerpt(this string s, int maxLength = 20) {
+            if (s.Length <= maxLength) return s;
+            s = s.Substring(0, maxLength - 3);
+            s = s.Split('\r', '\n')[0];
+            return s + "...";
+        }
+
     }
 }
