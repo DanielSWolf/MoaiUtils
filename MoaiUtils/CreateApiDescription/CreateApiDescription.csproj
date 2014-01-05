@@ -72,6 +72,7 @@
     <Compile Include="CodeGraph\MoaiInParameter.cs" />
     <Compile Include="CodeGraph\MoaiOutParameter.cs" />
     <Compile Include="MoaiLuaObject.cs" />
+    <Compile Include="PathFormat.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CompactSignature.cs" />

@@ -4,18 +4,29 @@ using MoaiUtils.Tools;
 
 namespace MoaiUtils.CreateApiDescription {
     public class FilePosition : IComparable {
-        public FilePosition(FileInfo fileInfo, DirectoryInfo rootDirectory, bool printFullPath) {
+        public FilePosition(FileInfo fileInfo, DirectoryInfo rootDirectory, PathFormat messagePathFormat) {
             FileInfo = fileInfo;
             RootDirectory = rootDirectory;
-            PrintFullPath = printFullPath;
+            MessagePathFormat = messagePathFormat;
         }
 
         public FileInfo FileInfo { get; private set; }
         public DirectoryInfo RootDirectory { get; private set; }
-        public bool PrintFullPath { get; private set; }
+        public PathFormat MessagePathFormat { get; private set; }
 
         public string FilePath {
-            get { return PrintFullPath ? FileInfo.FullName : FileInfo.RelativeTo(RootDirectory); }
+            get {
+                switch (MessagePathFormat) {
+                    case PathFormat.Absolute:
+                        return FileInfo.FullName;
+                    case PathFormat.Relative:
+                        return FileInfo.RelativeTo(RootDirectory);
+                    case PathFormat.URI:
+                        return new Uri(FileInfo.FullName).AbsoluteUri;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
         }
 
         public override string ToString() {
@@ -23,7 +34,7 @@ namespace MoaiUtils.CreateApiDescription {
         }
 
         protected string FileDescription {
-            get { return string.Format("file '{0}'", FilePath); }
+            get { return string.Format("file {0}", FilePath); }
         }
 
         #region Equality members
@@ -47,7 +58,7 @@ namespace MoaiUtils.CreateApiDescription {
 
     public class TypePosition : FilePosition {
         public TypePosition(FilePosition filePosition, string typeName)
-            : base(filePosition.FileInfo, filePosition.RootDirectory, filePosition.PrintFullPath) {
+            : base(filePosition.FileInfo, filePosition.RootDirectory, filePosition.MessagePathFormat) {
             TypeName = typeName;
         }
 

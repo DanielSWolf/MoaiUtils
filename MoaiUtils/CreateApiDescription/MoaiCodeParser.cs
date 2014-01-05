@@ -15,7 +15,7 @@ namespace MoaiUtils.CreateApiDescription {
 
         private Dictionary<string, MoaiType> typesByName;
 
-        public void Parse(DirectoryInfo moaiSourceDirectory, bool fullPathInMessages) {
+        public void Parse(DirectoryInfo moaiSourceDirectory, PathFormat messagePathFormat) {
             // Check that the input directory looks like the Moai src directory
             if (!moaiSourceDirectory.GetDirectoryInfo("moai-core").Exists) {
                 throw new ApplicationException(string.Format("Path '{0}' does not appear to be the 'src' directory of a Moai source copy.", moaiSourceDirectory));
@@ -30,12 +30,12 @@ namespace MoaiUtils.CreateApiDescription {
 
             // Parse Moai types and store them by type name
             log.Info("Parsing Moai types.");
-            ParseMoaiCodeFiles(moaiSourceDirectory, fullPathInMessages);
+            ParseMoaiCodeFiles(moaiSourceDirectory, messagePathFormat);
 
             // MOAILuaObject is not documented, probably because it would mess up
             // the Doxygen-generated documentation. Use dummy code instead.
             log.Info("Adding hard-coded documentation for MoaiLuaObject base class.");
-            FilePosition dummyFilePosition = new FilePosition(new FileInfo("MoaiLuaObject dummy code"), new DirectoryInfo("."), printFullPath: false);
+            FilePosition dummyFilePosition = new FilePosition(new FileInfo("MoaiLuaObject dummy code"), new DirectoryInfo("."), messagePathFormat);
             ParseMoaiFile(MoaiLuaObject.DummyCode, dummyFilePosition);
 
             // Make sure every class directly or indirectly inherits from MOAILuaObject
@@ -138,14 +138,14 @@ namespace MoaiUtils.CreateApiDescription {
             }
         }
 
-        private void ParseMoaiCodeFiles(DirectoryInfo moaiSourceDirectory, bool fullPathInMessages) {
+        private void ParseMoaiCodeFiles(DirectoryInfo moaiSourceDirectory, PathFormat messagePathFormat) {
             IEnumerable<FileInfo> codeFiles = Directory
                 .EnumerateFiles(moaiSourceDirectory.FullName, "*.*", SearchOption.AllDirectories)
                 .Where(name => name.EndsWith(".cpp") || name.EndsWith(".h"))
                 .Select(name => new FileInfo(name));
 
             foreach (var codeFile in codeFiles) {
-                FilePosition filePosition = new FilePosition(codeFile, moaiSourceDirectory, fullPathInMessages);
+                FilePosition filePosition = new FilePosition(codeFile, moaiSourceDirectory, messagePathFormat);
                 ParseMoaiCodeFile(codeFile, filePosition);
             }
         }

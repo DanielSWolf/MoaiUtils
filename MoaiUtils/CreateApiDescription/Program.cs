@@ -33,7 +33,7 @@ namespace MoaiUtils.CreateApiDescription {
 
                 // Parse Moai code
                 var parser = new MoaiCodeParser();
-                parser.Parse(new DirectoryInfo(configuration.InputDirectory), configuration.FullPathInMessages);
+                parser.Parse(new DirectoryInfo(configuration.InputDirectory), configuration.MessagePathFormat);
 
                 var methods = parser.DocumentedTypes
                     .SelectMany(type => type.Members.OfType<MoaiMethod>())
