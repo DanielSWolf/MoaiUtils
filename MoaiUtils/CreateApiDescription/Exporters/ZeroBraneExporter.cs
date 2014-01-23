@@ -37,7 +37,7 @@ namespace MoaiUtils.CreateApiDescription.Exporters {
             return new LuaTable {
                 { "type", "class" },
                 { "description", ConvertString(type.Description) },
-                { "childs", CreateMemberListTable(type) }
+                { "childs" /* sic */, CreateMemberListTable(type) }
             };
         }
 
