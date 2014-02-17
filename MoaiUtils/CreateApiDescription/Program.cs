@@ -43,7 +43,17 @@ namespace MoaiUtils.CreateApiDescription {
                     .OrderByDescending(method => method.Overloads.Aggregate(0, (count, o) => o.InParameters.Count + count));
 
                 // Export API description
-                IApiExporter exporter = new ZeroBraneExporter();
+                IApiExporter exporter;
+                switch (configuration.ExportFormat) {
+                    case ExportFormat.ZeroBrane:
+                        exporter = new ZeroBraneExporter();
+                        break;
+                    case ExportFormat.SublimeText:
+                        exporter = new SublimeTextExporter();
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
                 exporter.Export(parser.DocumentedTypes, new DirectoryInfo(configuration.OutputDirectory));
 
                 return 0;

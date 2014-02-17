@@ -10,6 +10,10 @@ namespace MoaiUtils.CreateApiDescription {
             HelpText = "The output directory where the code completion file(s) will be created")]
         public string OutputDirectory { get; set; }
 
+        [Option('f', "format",
+            HelpText = "The export format. Valid options are ZeroBrane (default) or SublimeText.")]
+        public ExportFormat ExportFormat { get; set; }
+
         [Option("pathFormat",
             HelpText = "Determines how file paths will be displayed in messages. Valid options are Absolute (default), Relative (shorter), or URI (for clickable links in some editors).")]
         public PathFormat MessagePathFormat { get; set; }

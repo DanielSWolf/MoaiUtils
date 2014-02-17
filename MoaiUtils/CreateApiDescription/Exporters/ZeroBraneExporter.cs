@@ -13,15 +13,21 @@ using MoaiUtils.Tools;
 namespace MoaiUtils.CreateApiDescription.Exporters {
     public class ZeroBraneExporter : IApiExporter {
         public void Export(IEnumerable<MoaiType> types, DirectoryInfo outputDirectory) {
-            LuaTable typeListTable = CreateTypeListTable(types);
-            var targetFileInfo = outputDirectory.GetFileInfo("moai.lua");
+            // Create head comment
             var commentLines = new[] {
                 "Documentation of the Moai SDK (http://getmoai.com/)",
                 string.Format(CultureInfo.InvariantCulture, "Generated on {0:d} by {1}", DateTime.Now, CurrentUtility.Signature),
                 CurrentUtility.MoaiUtilsHint
             };
             var headComment = new LuaComment(commentLines, blankLineAfter: true);
-            LuaTableWriter.Write(typeListTable, targetFileInfo, headComment);
+
+
+            // Create contents
+            LuaTable typeListTable = CreateTypeListTable(types);
+
+            // Write to file
+            var targetFileInfo = outputDirectory.GetFileInfo("moai.lua");
+            LuaTableWriter.Write(typeListTable, targetFileInfo, headComment: headComment);
         }
 
         private LuaTable CreateTypeListTable(IEnumerable<MoaiType> types) {

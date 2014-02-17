@@ -57,6 +57,8 @@
     </Compile>
     <Compile Include="Annotation.cs" />
     <Compile Include="Configuration.cs" />
+    <Compile Include="Exporters\SublimeTextExporter.cs" />
+    <Compile Include="ExportFormat.cs" />
     <Compile Include="FilePosition.cs" />
     <Compile Include="Exporters\ZeroBraneExporter.cs" />
     <Compile Include="CodeGraph\INamedEntity.cs" />
