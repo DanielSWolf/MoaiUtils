@@ -10,20 +10,20 @@ using MoaiUtils.Tools;
 
 namespace MoaiUtils.LuaIO {
     public class LuaTableWriter {
-        public static void Write(LuaTable table, FileInfo fileInfo, LuaComment headComment = null) {
+        public static void Write(LuaTable table, FileInfo fileInfo, bool returnStatement = true, LuaComment headComment = null) {
             using (var file = fileInfo.CreateText()) {
-                Write(table, file, headComment);
+                Write(table, file, returnStatement, headComment);
             }
         }
 
-        public static string ToString(LuaTable table, LuaComment headComment = null) {
+        public static string ToString(LuaTable table, bool returnStatement = true, LuaComment headComment = null) {
             using (var stringWriter = new StringWriter()) {
-                Write(table, stringWriter, headComment);
+                Write(table, stringWriter, returnStatement, headComment);
                 return stringWriter.ToString();
             }
         }
 
-        public static void Write(LuaTable table, TextWriter textWriter, LuaComment headComment = null) {
+        public static void Write(LuaTable table, TextWriter textWriter, bool returnStatement = true, LuaComment headComment = null) {
             if (table == null) throw new ArgumentNullException("table");
             if (textWriter == null) throw new ArgumentNullException("textWriter");
 
@@ -31,7 +31,9 @@ namespace MoaiUtils.LuaIO {
                 if (headComment != null) {
                     Write(headComment, indentedTextWriter);
                 }
-                indentedTextWriter.Write("return ");
+                if (returnStatement) {
+                    indentedTextWriter.Write("return ");
+                }
                 Write(table, indentedTextWriter);
             }
         }
