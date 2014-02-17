@@ -30,6 +30,9 @@ namespace MoaiUtils.CreateApiDescription {
                         current => HelpText.DefaultParsingErrorsHandler(configuration, current)));
                     return 1;
                 }
+                if (!Directory.Exists(configuration.OutputDirectory)) {
+                    throw new ApplicationException(string.Format("Output directory '{0}' does not exist.", configuration.OutputDirectory));
+                }
 
                 // Parse Moai code
                 var parser = new MoaiCodeParser();
