@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("MoaiUtils")]
-[assembly: AssemblyCopyright("Copyright © 2013 Daniel Wolf  ")]
+[assembly: AssemblyCopyright("Copyright © 2014 Daniel Wolf  ")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
