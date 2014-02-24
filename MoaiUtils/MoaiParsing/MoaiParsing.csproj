@@ -66,6 +66,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{BA167A20-C6AA-4E0A-AF61-F54744D0ADF9}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Tools\Tools.csproj">
       <Project>{63cb06a7-298f-411c-b010-c13bd1e612ec}</Project>
       <Name>Tools</Name>

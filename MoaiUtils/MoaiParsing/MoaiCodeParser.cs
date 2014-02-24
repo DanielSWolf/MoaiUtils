@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using MoaiUtils.Common;
 using MoaiUtils.MoaiParsing.CodeGraph;
 using MoaiUtils.Tools;
 using MoreLinq;
@@ -21,7 +22,7 @@ namespace MoaiUtils.MoaiParsing {
         public void Parse(DirectoryInfo moaiSourceDirectory) {
             // Check that the input directory looks like the Moai src directory
             if (!moaiSourceDirectory.GetDirectoryInfo("moai-core").Exists) {
-                throw new ApplicationException(string.Format("Path '{0}' does not appear to be the 'src' directory of a Moai source copy.", moaiSourceDirectory));
+                throw new PlainTextException(string.Format("Path '{0}' does not appear to be the 'src' directory of a Moai source copy.", moaiSourceDirectory));
             }
 
             // Initialize warning list
