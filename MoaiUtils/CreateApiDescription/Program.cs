@@ -3,11 +3,6 @@ using System.IO;
 using System.Linq;
 using CommandLine;
 using CommandLine.Text;
-using log4net;
-using log4net.Appender;
-using log4net.Config;
-using log4net.Core;
-using log4net.Layout;
 using MoaiUtils.Common;
 using MoaiUtils.CreateApiDescription.Exporters;
 using MoaiUtils.MoaiParsing;
@@ -15,14 +10,11 @@ using MoaiUtils.MoaiParsing.CodeGraph;
 
 namespace MoaiUtils.CreateApiDescription {
     class Program {
-        private static readonly ILog log = LogManager.GetLogger(typeof(Program).Assembly.GetName().Name);
-
         static int Main(string[] args) {
             // Configure log4net
-            BasicConfigurator.Configure(new ConsoleAppender { Layout = new SimpleLayout() });
-
-            log.Info(CurrentUtility.Signature);
-            log.Info(CurrentUtility.MoaiUtilsHint);
+            Console.WriteLine(CurrentUtility.Signature);
+            Console.WriteLine(CurrentUtility.MoaiUtilsHint);
+            Console.WriteLine();
 
             try {
                 // Parse command line arguments
@@ -37,12 +29,12 @@ namespace MoaiUtils.CreateApiDescription {
                 }
 
                 // Parse Moai code
-                var parser = new MoaiCodeParser(statusCallback: message => log.Info(message));
+                var parser = new MoaiCodeParser(statusCallback: Console.WriteLine);
                 parser.Parse(new DirectoryInfo(configuration.InputDirectory), configuration.MessagePathFormat);
 
                 // Show warning count
                 if (parser.Warnings.Any()) {
-                    log.WarnFormat("Parsing resulted in {0} warnings.", parser.Warnings.Count);
+                    Console.WriteLine("Parsing resulted in {0} warnings.", parser.Warnings.Count);
                 }
 
                 var methods = parser.DocumentedTypes
@@ -65,7 +57,8 @@ namespace MoaiUtils.CreateApiDescription {
 
                 return 0;
             } catch (Exception e) {
-                log.Fatal(e.Message, e);
+                Console.WriteLine(e);
+                Console.WriteLine("Terminating application.");
                 return 1;
             }
         }
