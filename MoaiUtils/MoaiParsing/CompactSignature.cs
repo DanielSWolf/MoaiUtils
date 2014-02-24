@@ -5,7 +5,7 @@ using System.Linq;
 using MoaiUtils.Tools;
 using MoreLinq;
 
-namespace MoaiUtils.CreateApiDescription {
+namespace MoaiUtils.MoaiParsing {
     /// <summary>
     /// Utility class to create a shorthand signature that represents multiple overloads
     /// (something like "number radius | (number innerRadius, number outerRadius)")

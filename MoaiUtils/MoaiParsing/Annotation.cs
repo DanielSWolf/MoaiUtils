@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 using log4net;
 using MoaiUtils.Tools;
 
-namespace MoaiUtils.CreateApiDescription {
+namespace MoaiUtils.MoaiParsing {
     public abstract class Annotation {
         protected static readonly ILog log = LogManager.GetLogger(typeof(Annotation));
 

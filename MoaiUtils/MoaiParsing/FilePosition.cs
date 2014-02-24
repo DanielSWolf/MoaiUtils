@@ -2,7 +2,7 @@
 using System.IO;
 using MoaiUtils.Tools;
 
-namespace MoaiUtils.CreateApiDescription {
+namespace MoaiUtils.MoaiParsing {
     public class FilePosition : IComparable {
         public FilePosition(FileInfo fileInfo, DirectoryInfo rootDirectory, PathFormat messagePathFormat) {
             FileInfo = fileInfo;

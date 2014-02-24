@@ -1,4 +1,4 @@
-﻿namespace MoaiUtils.CreateApiDescription {
+﻿namespace MoaiUtils.MoaiParsing {
     public static class MoaiLuaObject {
         public const string DummyCode = @"
 /** @name   MOAILuaObject

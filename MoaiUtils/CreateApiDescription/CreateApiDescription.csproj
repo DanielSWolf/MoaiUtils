@@ -13,6 +13,7 @@
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -37,8 +38,9 @@
     <Reference Include="CommandLine">
       <HintPath>..\packages\CommandLineParser.1.9.71\lib\net40\CommandLine.dll</HintPath>
     </Reference>
-    <Reference Include="log4net">
-      <HintPath>..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
+    <Reference Include="log4net, Version=1.2.13.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\log4net.2.0.3\lib\net40-client\log4net.dll</HintPath>
     </Reference>
     <Reference Include="MoreLinq">
       <HintPath>..\packages\morelinq.1.0.16006\lib\net35\MoreLinq.dll</HintPath>
@@ -55,31 +57,16 @@
     <Compile Include="..\Common\Properties\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Annotation.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="Exporters\SublimeTextExporter.cs" />
     <Compile Include="ExportFormat.cs" />
-    <Compile Include="FilePosition.cs" />
     <Compile Include="Exporters\ZeroBraneExporter.cs" />
-    <Compile Include="CodeGraph\INamedEntity.cs" />
     <Compile Include="Exporters\IApiExporter.cs" />
-    <Compile Include="CodeGraph\MoaiParameter.cs" />
-    <Compile Include="MoaiCodeParser.cs" />
-    <Compile Include="CodeGraph\MoaiType.cs" />
-    <Compile Include="CodeGraph\MoaiTypeMember.cs" />
-    <Compile Include="CodeGraph\MoaiField.cs" />
-    <Compile Include="CodeGraph\IDocumentedEntity.cs" />
-    <Compile Include="CodeGraph\MoaiMethod.cs" />
-    <Compile Include="CodeGraph\MoaiMethodOverload.cs" />
-    <Compile Include="CodeGraph\MoaiInParameter.cs" />
-    <Compile Include="CodeGraph\MoaiOutParameter.cs" />
-    <Compile Include="MoaiLuaObject.cs" />
-    <Compile Include="PathFormat.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="CompactSignature.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -90,6 +77,10 @@
     <ProjectReference Include="..\LuaIO\LuaIO.csproj">
       <Project>{d1933642-5fa7-4ea6-831f-52721ab6073d}</Project>
       <Name>LuaIO</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MoaiParsing\MoaiParsing.csproj">
+      <Project>{1cad4e0c-7c86-4027-92fd-df78cf823b39}</Project>
+      <Name>MoaiParsing</Name>
     </ProjectReference>
     <ProjectReference Include="..\Tools\Tools.csproj">
       <Project>{63cb06a7-298f-411c-b010-c13bd1e612ec}</Project>

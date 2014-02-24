@@ -2,7 +2,7 @@
 using System.Linq;
 using MoaiUtils.Tools;
 
-namespace MoaiUtils.CreateApiDescription.CodeGraph {
+namespace MoaiUtils.MoaiParsing.CodeGraph {
     public class MoaiType : INamedEntity, IDocumentedEntity {
         public MoaiType() {
             Members = new List<MoaiTypeMember>();

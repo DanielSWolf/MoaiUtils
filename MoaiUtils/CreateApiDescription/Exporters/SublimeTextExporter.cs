@@ -4,8 +4,8 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using MoaiUtils.Common;
-using MoaiUtils.CreateApiDescription.CodeGraph;
 using MoaiUtils.LuaIO;
+using MoaiUtils.MoaiParsing.CodeGraph;
 using MoaiUtils.Tools;
 
 namespace MoaiUtils.CreateApiDescription.Exporters {

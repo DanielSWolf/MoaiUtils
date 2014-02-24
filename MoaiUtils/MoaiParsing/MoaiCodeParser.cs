@@ -5,11 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using log4net;
-using MoaiUtils.CreateApiDescription.CodeGraph;
+using MoaiUtils.MoaiParsing.CodeGraph;
 using MoaiUtils.Tools;
 using MoreLinq;
 
-namespace MoaiUtils.CreateApiDescription {
+namespace MoaiUtils.MoaiParsing {
     public class MoaiCodeParser {
         private static readonly ILog log = LogManager.GetLogger(typeof(MoaiCodeParser));
 

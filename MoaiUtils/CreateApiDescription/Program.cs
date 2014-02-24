@@ -8,8 +8,9 @@ using log4net.Appender;
 using log4net.Config;
 using log4net.Layout;
 using MoaiUtils.Common;
-using MoaiUtils.CreateApiDescription.CodeGraph;
 using MoaiUtils.CreateApiDescription.Exporters;
+using MoaiUtils.MoaiParsing;
+using MoaiUtils.MoaiParsing.CodeGraph;
 
 namespace MoaiUtils.CreateApiDescription {
     class Program {

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.20827.3
+VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreateApiDescription", "CreateApiDescription\CreateApiDescription.csproj", "{1EF1CDF5-48D3-4D02-895B-9648F62606C5}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tools", "Tools\Tools.csproj", "{63CB06A7-298F-411C-B010-C13BD1E612EC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{BA167A20-C6AA-4E0A-AF61-F54744D0ADF9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoaiParsing", "MoaiParsing\MoaiParsing.csproj", "{1CAD4E0C-7C86-4027-92FD-DF78CF823B39}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{BA167A20-C6AA-4E0A-AF61-F54744D0ADF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BA167A20-C6AA-4E0A-AF61-F54744D0ADF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BA167A20-C6AA-4E0A-AF61-F54744D0ADF9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1CAD4E0C-7C86-4027-92FD-DF78CF823B39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CAD4E0C-7C86-4027-92FD-DF78CF823B39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CAD4E0C-7C86-4027-92FD-DF78CF823B39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CAD4E0C-7C86-4027-92FD-DF78CF823B39}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

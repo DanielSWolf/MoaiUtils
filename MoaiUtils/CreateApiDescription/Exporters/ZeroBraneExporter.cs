@@ -6,8 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using MoaiUtils.Common;
-using MoaiUtils.CreateApiDescription.CodeGraph;
 using MoaiUtils.LuaIO;
+using MoaiUtils.MoaiParsing;
+using MoaiUtils.MoaiParsing.CodeGraph;
 using MoaiUtils.Tools;
 
 namespace MoaiUtils.CreateApiDescription.Exporters {
