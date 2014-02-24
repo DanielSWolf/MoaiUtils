@@ -2,24 +2,30 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using log4net;
 using MoaiUtils.MoaiParsing.CodeGraph;
 using MoaiUtils.Tools;
 using MoreLinq;
 
 namespace MoaiUtils.MoaiParsing {
     public class MoaiCodeParser {
-        private static readonly ILog log = LogManager.GetLogger(typeof(MoaiCodeParser));
-
+        private Action<string> statusCallback;
         private Dictionary<string, MoaiType> typesByName;
+
+        public MoaiCodeParser(Action<string> statusCallback) {
+            this.statusCallback = statusCallback;
+        }
+        
+        public WarningList Warnings { get; private set; }
 
         public void Parse(DirectoryInfo moaiSourceDirectory, PathFormat messagePathFormat) {
             // Check that the input directory looks like the Moai src directory
             if (!moaiSourceDirectory.GetDirectoryInfo("moai-core").Exists) {
                 throw new ApplicationException(string.Format("Path '{0}' does not appear to be the 'src' directory of a Moai source copy.", moaiSourceDirectory));
             }
+
+            // Initialize warning list
+            Warnings = new WarningList();
 
             // Initialize type list with primitive types
             typesByName = new Dictionary<string, MoaiType>();
@@ -29,12 +35,12 @@ namespace MoaiUtils.MoaiParsing {
             }
 
             // Parse Moai types and store them by type name
-            log.Info("Parsing Moai types.");
+            statusCallback("Parsing Moai types.");
             ParseMoaiCodeFiles(moaiSourceDirectory, messagePathFormat);
 
             // MOAILuaObject is not documented, probably because it would mess up
             // the Doxygen-generated documentation. Use dummy code instead.
-            log.Info("Adding hard-coded documentation for MoaiLuaObject base class.");
+            statusCallback("Adding hard-coded documentation for MoaiLuaObject base class.");
             FilePosition dummyFilePosition = new FilePosition(new FileInfo("MoaiLuaObject dummy code"), new DirectoryInfo("."), messagePathFormat);
             ParseMoaiFile(MoaiLuaObject.DummyCode, dummyFilePosition);
 
@@ -53,11 +59,12 @@ namespace MoaiUtils.MoaiParsing {
                 WarnIfSpeculative(type);
             }
 
-            log.Info("Creating compact method signatures.");
+            statusCallback("Creating compact method signatures.");
             foreach (MoaiType type in typesByName.Values) {
                 foreach (MoaiMethod method in type.Members.OfType<MoaiMethod>()) {
                     if (!method.Overloads.Any()) {
-                        log.WarnFormat("No method documentation found. [{0}]", method.MethodPosition);
+                        Warnings.Add(method.MethodPosition, WarningType.MissingAnnotation,
+                            "No method documentation found.");
                         continue;
                     }
 
@@ -65,9 +72,17 @@ namespace MoaiUtils.MoaiParsing {
                         method.InParameterSignature = GetCompactSignature(method.Overloads.Select(overload => overload.InParameters.ToArray()));
                         method.OutParameterSignature = GetCompactSignature(method.Overloads.Select(overload => overload.OutParameters.ToArray()));
                     } catch (Exception e) {
-                        log.WarnFormat("Error determining method signature. {0} [{1}]", e.Message, method.MethodPosition);
+                        Warnings.Add(method.MethodPosition, WarningType.ToolLimitation,
+                            "Error determining method signature. {0}", e.Message);
                     }
                 }
+            }
+        }
+
+        public IEnumerable<MoaiType> DocumentedTypes {
+            get {
+                return typesByName.Values
+                    .Where(type => type.IsDocumented);
             }
         }
 
@@ -101,17 +116,14 @@ namespace MoaiUtils.MoaiParsing {
                     }
                 }
 
-                StringBuilder message = new StringBuilder();
-                message.AppendFormat("Documentation mentions missing or undocumented type '{0}'.", type.Name);
-                if (nameProposal != null) {
-                    message.AppendFormat(" Should this be '{0}'?", nameProposal);
-                }
-                message.AppendLine();
                 foreach (FilePosition referencingFilePosition in type.DocumentationReferences) {
-                    message.AppendFormat("> {0}", referencingFilePosition);
-                    message.AppendLine();
+                    string message = string.Format(
+                        "Documentation mentions missing or undocumented type '{0}'.", type.Name);
+                    if (nameProposal != null) {
+                        message += string.Format(" Should this be '{0}'?", nameProposal);
+                    }
+                    Warnings.Add(referencingFilePosition, WarningType.UnexpectedValue, message);
                 }
-                log.WarnFormat(message.ToString());
             }
         }
 
@@ -131,13 +143,6 @@ namespace MoaiUtils.MoaiParsing {
 
         private static IEnumerable<Parameter> ConvertOverload(IEnumerable<MoaiParameter> overload) {
             return overload.Select(parameter => new Parameter { Name = parameter.Name, Type = parameter.Type.Name, ShowName = true });
-        }
-
-        public IEnumerable<MoaiType> DocumentedTypes {
-            get {
-                return typesByName.Values
-                    .Where(type => type.IsDocumented);
-            }
         }
 
         private void ParseMoaiCodeFiles(DirectoryInfo moaiSourceDirectory, PathFormat messagePathFormat) {
@@ -205,10 +210,11 @@ namespace MoaiUtils.MoaiParsing {
                 // Parse annotations, filtering out unknown ones
                 Annotation[] annotations = match.Groups["annotation"].Captures
                     .Cast<Capture>()
-                    .Select(capture => Annotation.Create(capture.Value, documentationPosition))
+                    .Select(capture => Annotation.Create(capture.Value, documentationPosition, Warnings))
                     .ToArray();
                 foreach (var unknownAnnotation in annotations.OfType<UnknownAnnotation>()) {
-                    log.WarnFormat("Unknown annotation command '{0}'. [{1}]", unknownAnnotation.Command, documentationPosition);
+                    Warnings.Add(documentationPosition, WarningType.UnexpectedAnnotation,
+                        "Unknown annotation command '{0}'.", unknownAnnotation.Command);
                 }
                 annotations = annotations
                     .Where(annotation => !(annotation is UnknownAnnotation))
@@ -231,26 +237,26 @@ namespace MoaiUtils.MoaiParsing {
 
                     var typePosition = (TypePosition) documentationPosition;
                     type.TypePosition = typePosition;
-                    ParseTypeDocumentation(type, annotations, baseTypes, typePosition);
+                    ParseTypeDocumentation(type, annotations, baseTypes, typePosition, Warnings);
                 }
             }
         }
 
-        private void ParseTypeDocumentation(MoaiType type, Annotation[] annotations, MoaiType[] baseTypes, TypePosition typePosition) {
+        private void ParseTypeDocumentation(MoaiType type, Annotation[] annotations, MoaiType[] baseTypes, TypePosition typePosition, WarningList warnings) {
             // Check that there is a single @name annotation
             int nameAnnotationCount = annotations.OfType<NameAnnotation>().Count();
             if (nameAnnotationCount == 0) {
-                log.WarnFormat("Missing @name annotation. [{0}].", typePosition);
+                warnings.Add(typePosition, WarningType.MissingAnnotation, "Missing @name annotation.");
             } else if (nameAnnotationCount > 1) {
-                log.WarnFormat("Multiple @name annotations. [{0}]", typePosition);
+                warnings.Add(typePosition, WarningType.UnexpectedAnnotation, "Multiple @name annotations.");
             }
 
             // Check that there is a single @text annotation
             int textAnnotationCount = annotations.OfType<TextAnnotation>().Count();
             if (textAnnotationCount == 0) {
-                log.WarnFormat("Missing @text annotation. [{0}]", typePosition);
+                warnings.Add(typePosition, WarningType.MissingAnnotation, "Missing @text annotation.");
             } else if (textAnnotationCount > 1) {
-                log.WarnFormat("Multiple @text annotations. [{0}]", typePosition);
+                warnings.Add(typePosition, WarningType.UnexpectedAnnotation, "Multiple @text annotations.");
             }
 
             // Store base types
@@ -262,7 +268,8 @@ namespace MoaiUtils.MoaiParsing {
                     // Nothing to do. Name is already set. Just make sure the annotation is correct.
                     var nameAnnotation = (NameAnnotation) annotation;
                     if (nameAnnotation.Value != type.Name) {
-                        log.WarnFormat("@name annotation has inconsistent value '{0}'. [{1}]", nameAnnotation.Value, typePosition);
+                        warnings.Add(typePosition, WarningType.UnexpectedValue,
+                            "@name annotation has inconsistent value '{0}'. Expected '{1}'.", nameAnnotation.Value, type.Name);
                     }
                 } else if (annotation is TextAnnotation) {
                     // Set type description
@@ -278,7 +285,8 @@ namespace MoaiUtils.MoaiParsing {
                     field.Description = fieldAnnotation.Description;
                     type.Members.Add(field);
                 } else {
-                    log.WarnFormat("Unexpected {0} annotation. [{1}]", annotation.Command, typePosition);
+                    warnings.Add(typePosition, WarningType.UnexpectedAnnotation,
+                        "Unexpected {0} annotation.", annotation.Command);
                 }
             }
         }
@@ -287,44 +295,44 @@ namespace MoaiUtils.MoaiParsing {
             // Check that there is a single @name annotation and that it isn't a duplicate. Otherwise exit.
             int nameAnnotationCount = annotations.OfType<NameAnnotation>().Count();
             if (nameAnnotationCount == 0) {
-                log.WarnFormat("Missing @name annotation. [{0}]", methodPosition);
+                Warnings.Add(methodPosition, WarningType.MissingAnnotation, "Missing @name annotation.");
                 return;
             }
             if (nameAnnotationCount > 1) {
-                log.WarnFormat("Multiple @name annotations. [{0}]", methodPosition);
+                Warnings.Add(methodPosition, WarningType.UnexpectedAnnotation, "Multiple @name annotations.");
             }
             var nameAnnotation = annotations.OfType<NameAnnotation>().Single();
             if (type.Members.Any(member => member.Name == nameAnnotation.Value)) {
-                log.WarnFormat("Multiple members with name '{0}'. [{1}]", nameAnnotation.Value, methodPosition);
+                Warnings.Add(methodPosition, WarningType.UnexpectedValue,
+                    "There is already a member with name '{0}'.", nameAnnotation.Value);
                 return;
             }
 
             // Check that @name annotation sticks to convention
             if (!methodPosition.NativeMethodName.StartsWith("_")) {
-                log.WarnFormat(
-                    "Unexpected C++ method name '{0}'. By convention, the name of a Lua method implementation shold start with an underscore. [{1}]",
-                    methodPosition.NativeMethodName, methodPosition);
+                Warnings.Add(methodPosition, WarningType.UnexpectedValue,
+                    "Unexpected C++ method name '{0}'. By convention, the name of a Lua method implementation shold start with an underscore.",
+                    methodPosition.NativeMethodName);
             }
             string expectedName = methodPosition.NativeMethodName.Substring(1);
             if (nameAnnotation.Value != expectedName) {
-                log.WarnFormat(
-                    "@name annotation has unexpected value '{0}'. By convention expected '{1}'. [{2}]",
-                    nameAnnotation.Value, expectedName, methodPosition);
+                Warnings.Add(methodPosition, WarningType.UnexpectedValue,
+                    "@name annotation has unexpected value '{0}'. By convention expected '{1}'.",
+                    nameAnnotation.Value, expectedName);
             }
 
             // Check that there is a single @text annotation
             int textAnnotationCount = annotations.OfType<TextAnnotation>().Count();
             if (textAnnotationCount == 0) {
-                log.WarnFormat("Missing @text annotation. [{0}]", methodPosition);
+                Warnings.Add(methodPosition, WarningType.MissingAnnotation, "Missing @text annotation.");
             } else if (textAnnotationCount > 1) {
-                log.WarnFormat("Multiple @text annotations. [{0}]", methodPosition);
+                Warnings.Add(methodPosition, WarningType.UnexpectedAnnotation, "Multiple @text annotations.");
             }
 
             // Check that there is at least one @out annotation
             if (!annotations.OfType<OutParameterAnnotation>().Any()) {
-                log.WarnFormat(
-                    "Missing @out annotation. Even for void methods, an @out annotation with type nil is expected. [{0}]",
-                    methodPosition);
+                Warnings.Add(methodPosition, WarningType.MissingAnnotation,
+                    "Missing @out annotation. Even for void methods, an @out annotation with type nil is expected.");
             }
 
             // Parse annotations
@@ -356,7 +364,8 @@ namespace MoaiUtils.MoaiParsing {
                     if (annotation is InParameterAnnotation | annotation is OptionalInParameterAnnotation) {
                         // Add input parameter
                         if (currentOverload.InParameters.Any(param => param.Name == paramName)) {
-                            log.WarnFormat("Multiple '{0}' params for single overload. [{1}]", paramName, methodPosition);
+                            Warnings.Add(methodPosition, WarningType.UnexpectedValue,
+                                "Found multiple params with name '{0}' for single overload.", paramName);
                         }
                         var inParameter = new MoaiInParameter {
                             Name = paramName,
@@ -378,7 +387,8 @@ namespace MoaiUtils.MoaiParsing {
                     // Let the next parameter annotation start a new override
                     currentOverload = null;
                 } else {
-                    log.WarnFormat("Unexpected {0} annotation. [{1}]", annotation.Command, methodPosition);
+                    Warnings.Add(methodPosition, WarningType.UnexpectedAnnotation,
+                        "Unexpected {0} annotation. [{1}]", annotation.Command);
                 }
             }
         }

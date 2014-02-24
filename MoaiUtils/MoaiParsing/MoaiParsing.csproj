@@ -31,9 +31,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="log4net">
-      <HintPath>..\packages\log4net.2.0.3\lib\net40-client\log4net.dll</HintPath>
-    </Reference>
     <Reference Include="MoreLinq">
       <HintPath>..\packages\morelinq.1.0.16006\lib\net35\MoreLinq.dll</HintPath>
     </Reference>
@@ -64,6 +61,7 @@
     <Compile Include="FilePosition.cs" />
     <Compile Include="MoaiCodeParser.cs" />
     <Compile Include="MoaiLuaObject.cs" />
+    <Compile Include="Warning.cs" />
     <Compile Include="PathFormat.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

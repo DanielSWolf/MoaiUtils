@@ -6,6 +6,7 @@ using CommandLine.Text;
 using log4net;
 using log4net.Appender;
 using log4net.Config;
+using log4net.Core;
 using log4net.Layout;
 using MoaiUtils.Common;
 using MoaiUtils.CreateApiDescription.Exporters;
@@ -36,8 +37,13 @@ namespace MoaiUtils.CreateApiDescription {
                 }
 
                 // Parse Moai code
-                var parser = new MoaiCodeParser();
+                var parser = new MoaiCodeParser(statusCallback: message => log.Info(message));
                 parser.Parse(new DirectoryInfo(configuration.InputDirectory), configuration.MessagePathFormat);
+
+                // Show warning count
+                if (parser.Warnings.Any()) {
+                    log.WarnFormat("Parsing resulted in {0} warnings.", parser.Warnings.Count);
+                }
 
                 var methods = parser.DocumentedTypes
                     .SelectMany(type => type.Members.OfType<MoaiMethod>())
