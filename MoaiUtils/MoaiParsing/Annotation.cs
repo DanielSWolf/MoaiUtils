@@ -205,7 +205,7 @@ namespace MoaiUtils.MoaiParsing {
             : base(text, filePosition, warnings) {
             if (Name == null) {
                 warnings.Add(filePosition, WarningType.IncompleteAnnotation,
-                    "{0} annotation with type '{1}' is missing its name (2nd word). [{2}]", Command, Type);
+                    "{0} annotation with type '{1}' is missing its name (2nd word).", Command, Type);
             }
             // Let's not insist on a description for well-named parameters.
         }

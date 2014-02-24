@@ -1,5 +1,4 @@
 ﻿using CommandLine;
-using MoaiUtils.MoaiParsing;
 
 namespace MoaiUtils.CreateApiDescription {
     public class Configuration {

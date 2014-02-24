@@ -18,7 +18,9 @@ namespace MoaiUtils.MoaiParsing {
         }
 
         protected string GetFileDescription(bool pathAsUri) {
-            return string.Format("file {0}", pathAsUri ? new Uri(FileInfo.FullName).AbsoluteUri : FileInfo.FullName);
+            return pathAsUri
+                ? new Uri(FileInfo.FullName).AbsoluteUri
+                : FileInfo.FullName;
         }
 
         #region Equality members
@@ -49,7 +51,7 @@ namespace MoaiUtils.MoaiParsing {
         public string TypeName { get; private set; }
 
         public override string ToString(bool pathAsUri) {
-            return string.Format("type {0} in {1}", TypeName, GetFileDescription(pathAsUri));
+            return string.Format("{0}, type {1}", GetFileDescription(pathAsUri), TypeName);
         }
     }
 
@@ -65,7 +67,7 @@ namespace MoaiUtils.MoaiParsing {
         public string NativeMethodName { get; private set; }
 
         public override string ToString(bool pathAsUri) {
-            return string.Format("{0}.{1}() in {2}", TypeName, NativeMethodName, pathAsUri);
+            return string.Format("{0}, {1}::{2}()", GetFileDescription(pathAsUri), TypeName, NativeMethodName);
         }
     }
 

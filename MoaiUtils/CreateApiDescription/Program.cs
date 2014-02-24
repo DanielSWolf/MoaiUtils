@@ -24,7 +24,7 @@ namespace MoaiUtils.CreateApiDescription {
             if (parser.Warnings.Any()) {
                 Console.WriteLine("\nParsing resulted in {0} warnings.", parser.Warnings.Count);
             }
-            //throw new AbandonedMutexException("test");
+
             // Export API description
             IApiExporter exporter;
             switch (configuration.ExportFormat) {
@@ -38,8 +38,6 @@ namespace MoaiUtils.CreateApiDescription {
                     throw new ArgumentOutOfRangeException();
             }
             exporter.Export(parser.DocumentedTypes, new DirectoryInfo(configuration.OutputDirectory));
-
-            Console.WriteLine("\nDone.");
         }
     }
 }

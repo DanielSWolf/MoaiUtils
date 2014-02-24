@@ -388,7 +388,7 @@ namespace MoaiUtils.MoaiParsing {
                     currentOverload = null;
                 } else {
                     Warnings.Add(methodPosition, WarningType.UnexpectedAnnotation,
-                        "Unexpected {0} annotation. [{1}]", annotation.Command);
+                        "Unexpected {0} annotation.", annotation.Command);
                 }
             }
         }

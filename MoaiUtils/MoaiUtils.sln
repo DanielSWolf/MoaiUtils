@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoaiParsing", "MoaiParsing\MoaiParsing.csproj", "{1CAD4E0C-7C86-4027-92FD-DF78CF823B39}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DocLint", "DocLint\DocLint.csproj", "{4369CB5A-CD93-4260-8669-8BE826D7A3B7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{1CAD4E0C-7C86-4027-92FD-DF78CF823B39}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1CAD4E0C-7C86-4027-92FD-DF78CF823B39}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1CAD4E0C-7C86-4027-92FD-DF78CF823B39}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4369CB5A-CD93-4260-8669-8BE826D7A3B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4369CB5A-CD93-4260-8669-8BE826D7A3B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4369CB5A-CD93-4260-8669-8BE826D7A3B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4369CB5A-CD93-4260-8669-8BE826D7A3B7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

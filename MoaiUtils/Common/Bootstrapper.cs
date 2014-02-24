@@ -25,6 +25,7 @@ namespace MoaiUtils.Common {
                 // Start application
                 main(configuration);
 
+                Console.WriteLine("\nDone.");
                 return 0;
             } catch (Exception e) {
                 string message = e is PlainTextException ? e.Message : e.ToString();
