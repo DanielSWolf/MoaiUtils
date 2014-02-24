@@ -30,7 +30,7 @@ namespace MoaiUtils.CreateApiDescription {
 
                 // Parse Moai code
                 var parser = new MoaiCodeParser(statusCallback: Console.WriteLine);
-                parser.Parse(new DirectoryInfo(configuration.InputDirectory), configuration.MessagePathFormat);
+                parser.Parse(new DirectoryInfo(configuration.InputDirectory));
 
                 // Show warning count
                 if (parser.Warnings.Any()) {

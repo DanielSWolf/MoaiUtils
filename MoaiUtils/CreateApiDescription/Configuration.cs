@@ -14,9 +14,5 @@ namespace MoaiUtils.CreateApiDescription {
         [Option('f', "format",
             HelpText = "The export format. Valid options are ZeroBrane (default) or SublimeText.")]
         public ExportFormat ExportFormat { get; set; }
-
-        [Option("pathFormat",
-            HelpText = "Determines how file paths will be displayed in messages. Valid options are Absolute (default), Relative (shorter), or URI (for clickable links in some editors).")]
-        public PathFormat MessagePathFormat { get; set; }
     }
 }

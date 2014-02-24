@@ -1,40 +1,24 @@
 ﻿using System;
 using System.IO;
-using MoaiUtils.Tools;
 
 namespace MoaiUtils.MoaiParsing {
     public class FilePosition : IComparable {
-        public FilePosition(FileInfo fileInfo, DirectoryInfo rootDirectory, PathFormat messagePathFormat) {
+        public FilePosition(FileInfo fileInfo) {
             FileInfo = fileInfo;
-            RootDirectory = rootDirectory;
-            MessagePathFormat = messagePathFormat;
         }
 
         public FileInfo FileInfo { get; private set; }
-        public DirectoryInfo RootDirectory { get; private set; }
-        public PathFormat MessagePathFormat { get; private set; }
-
-        public string FilePath {
-            get {
-                switch (MessagePathFormat) {
-                    case PathFormat.Absolute:
-                        return FileInfo.FullName;
-                    case PathFormat.Relative:
-                        return FileInfo.RelativeTo(RootDirectory);
-                    case PathFormat.URI:
-                        return new Uri(FileInfo.FullName).AbsoluteUri;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
-        }
 
         public override string ToString() {
-            return FileDescription;
+            return ToString(pathAsUri: false);
         }
 
-        protected string FileDescription {
-            get { return string.Format("file {0}", FilePath); }
+        public virtual string ToString(bool pathAsUri) {
+            return GetFileDescription(pathAsUri);
+        }
+
+        protected string GetFileDescription(bool pathAsUri) {
+            return string.Format("file {0}", pathAsUri ? new Uri(FileInfo.FullName).AbsoluteUri : FileInfo.FullName);
         }
 
         #region Equality members
@@ -58,14 +42,14 @@ namespace MoaiUtils.MoaiParsing {
 
     public class TypePosition : FilePosition {
         public TypePosition(FilePosition filePosition, string typeName)
-            : base(filePosition.FileInfo, filePosition.RootDirectory, filePosition.MessagePathFormat) {
+            : base(filePosition.FileInfo) {
             TypeName = typeName;
         }
 
         public string TypeName { get; private set; }
 
-        public override string ToString() {
-            return string.Format("type {0} in {1}", TypeName, FileDescription);
+        public override string ToString(bool pathAsUri) {
+            return string.Format("type {0} in {1}", TypeName, GetFileDescription(pathAsUri));
         }
     }
 
@@ -80,8 +64,8 @@ namespace MoaiUtils.MoaiParsing {
 
         public string NativeMethodName { get; private set; }
 
-        public override string ToString() {
-            return string.Format("{0}.{1}() in {2}", TypeName, NativeMethodName, FileDescription);
+        public override string ToString(bool pathAsUri) {
+            return string.Format("{0}.{1}() in {2}", TypeName, NativeMethodName, pathAsUri);
         }
     }
 
