@@ -8,7 +8,7 @@ using MoaiUtils.MoaiParsing;
 using MoaiUtils.MoaiParsing.CodeGraph;
 using MoaiUtils.Tools;
 
-namespace MoaiUtils.CreateApiDescription.Exporters {
+namespace MoaiUtils.DocExport.Exporters {
     public class ZeroBraneExporter : IApiExporter {
         public void Export(IEnumerable<MoaiType> types, string header, DirectoryInfo outputDirectory) {
             // Create contents

@@ -6,7 +6,7 @@ using MoaiUtils.LuaIO;
 using MoaiUtils.MoaiParsing.CodeGraph;
 using MoaiUtils.Tools;
 
-namespace MoaiUtils.CreateApiDescription.Exporters {
+namespace MoaiUtils.DocExport.Exporters {
     public class SublimeTextExporter : IApiExporter {
         public void Export(IEnumerable<MoaiType> types, string header, DirectoryInfo outputDirectory) {
             // Create contents

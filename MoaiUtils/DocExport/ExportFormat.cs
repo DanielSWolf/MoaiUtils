@@ -1,4 +1,4 @@
-﻿namespace MoaiUtils.CreateApiDescription {
+﻿namespace MoaiUtils.DocExport {
     public enum ExportFormat {
         ZeroBrane,
         SublimeText

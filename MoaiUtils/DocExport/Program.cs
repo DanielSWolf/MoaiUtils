@@ -3,10 +3,10 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using MoaiUtils.Common;
-using MoaiUtils.CreateApiDescription.Exporters;
+using MoaiUtils.DocExport.Exporters;
 using MoaiUtils.MoaiParsing;
 
-namespace MoaiUtils.CreateApiDescription {
+namespace MoaiUtils.DocExport {
     class Program {
         private static int Main(string[] args) {
             return Bootstrapper.Start<Configuration>(args, Main);

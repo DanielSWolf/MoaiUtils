@@ -1,6 +1,6 @@
 ﻿using CommandLine;
 
-namespace MoaiUtils.CreateApiDescription {
+namespace MoaiUtils.DocExport {
     public class Configuration {
         [Option('i', "input", Required = true,
             HelpText = "The Moai base directory")]

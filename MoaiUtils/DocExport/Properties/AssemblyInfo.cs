@@ -1,4 +1,4 @@
 ﻿using System.Reflection;
 
-[assembly: AssemblyTitle("CreateApiDescription")]
+[assembly: AssemblyTitle("DocExport")]
 [assembly: AssemblyDescription("")]
