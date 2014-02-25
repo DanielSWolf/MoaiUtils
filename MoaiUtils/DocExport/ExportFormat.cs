@@ -1,6 +1,7 @@
 ﻿namespace MoaiUtils.DocExport {
     public enum ExportFormat {
         ZeroBrane,
-        SublimeText
+        SublimeText,
+        XML
     }
 }

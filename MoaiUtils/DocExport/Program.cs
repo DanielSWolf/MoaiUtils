@@ -40,6 +40,9 @@ namespace MoaiUtils.DocExport {
                 case ExportFormat.SublimeText:
                     exporter = new SublimeTextExporter();
                     break;
+                case ExportFormat.XML:
+                    exporter = new XmlExporter();
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }

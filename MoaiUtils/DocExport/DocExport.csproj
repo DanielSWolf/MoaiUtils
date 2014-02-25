@@ -55,6 +55,7 @@
     </Compile>
     <Compile Include="Configuration.cs" />
     <Compile Include="Exporters\SublimeTextExporter.cs" />
+    <Compile Include="Exporters\XmlExporter.cs" />
     <Compile Include="ExportFormat.cs" />
     <Compile Include="Exporters\ZeroBraneExporter.cs" />
     <Compile Include="Exporters\IApiExporter.cs" />

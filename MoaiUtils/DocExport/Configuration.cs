@@ -10,8 +10,8 @@ namespace MoaiUtils.DocExport {
             HelpText = "The output directory where the code completion file(s) will be created")]
         public string OutputDirectory { get; set; }
 
-        [Option('f', "format",
-            HelpText = "The export format. Valid options are ZeroBrane (default) or SublimeText.")]
+        [Option('f', "format", Required = true,
+            HelpText = "The export format. Valid options are ZeroBrane, SublimeText, or XML.")]
         public ExportFormat ExportFormat { get; set; }
     }
 }
