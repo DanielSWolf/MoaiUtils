@@ -20,10 +20,10 @@ namespace MoaiUtils.MoaiParsing {
 
         public WarningList Warnings { get; private set; }
 
-        public void Parse(DirectoryInfo moaiSourceDirectory) {
-            // Check that the input directory looks like the Moai src directory
-            if (!moaiSourceDirectory.GetDirectoryInfo("moai-core").Exists) {
-                throw new PlainTextException(string.Format("Path '{0}' does not appear to be the 'src' directory of a Moai source copy.", moaiSourceDirectory));
+        public void Parse(DirectoryInfo moaiDirectory) {
+            // Check that the input directory looks like the Moai main directory
+            if (!moaiDirectory.GetDirectoryInfo(@"src\moai-core").Exists) {
+                throw new PlainTextException(string.Format("Path '{0}' does not appear to be the base directory of a Moai source copy.", moaiDirectory));
             }
 
             // Initialize warning list
@@ -38,7 +38,7 @@ namespace MoaiUtils.MoaiParsing {
 
             // Parse Moai types and store them by type name
             statusCallback("Parsing Moai types.");
-            ParseMoaiCodeFiles(moaiSourceDirectory);
+            ParseMoaiCodeFiles(moaiDirectory);
 
             // MOAILuaObject is not documented, probably because it would mess up
             // the Doxygen-generated documentation. Use dummy code instead.
@@ -169,9 +169,9 @@ namespace MoaiUtils.MoaiParsing {
             return overload.Select(parameter => new Parameter { Name = parameter.Name, Type = parameter.Type.Name, ShowName = true });
         }
 
-        private void ParseMoaiCodeFiles(DirectoryInfo moaiSourceDirectory) {
+        private void ParseMoaiCodeFiles(DirectoryInfo moaiDirectory) {
             IEnumerable<FileInfo> codeFiles = Directory
-                .EnumerateFiles(moaiSourceDirectory.FullName, "*.*", SearchOption.AllDirectories)
+                .EnumerateFiles(moaiDirectory.GetDirectoryInfo("src").FullName, "*.*", SearchOption.AllDirectories)
                 .Where(name => name.EndsWith(".cpp") || name.EndsWith(".h"))
                 .Select(name => new FileInfo(name));
 

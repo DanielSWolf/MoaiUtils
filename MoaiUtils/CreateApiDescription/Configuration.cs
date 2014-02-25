@@ -3,7 +3,7 @@
 namespace MoaiUtils.CreateApiDescription {
     public class Configuration {
         [Option('i', "input", Required = true,
-            HelpText = "The Moai src directory")]
+            HelpText = "The Moai base directory")]
         public string InputDirectory { get; set; }
 
         [Option('o', "output", Required = true,
