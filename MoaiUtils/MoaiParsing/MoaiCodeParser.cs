@@ -426,6 +426,14 @@ namespace MoaiUtils.MoaiParsing {
                 }
             }
 
+            // Make sure that no required parameter follows an optional one
+            foreach (MoaiMethodOverload overload in method.Overloads) {
+                if (overload.InParameters.Pairwise().Any(pair => pair.Item1.IsOptional && !pair.Item2.IsOptional)) {
+                    Warnings.Add(methodPosition, WarningType.UnexpectedAnnotation,
+                        "Required params (@in) are not allowed after optional params (@opt).");
+                }
+            }
+
             // Analyze body to find undocumented overloads
             var matches = paramAccessRegex.Matches(methodBody);
             foreach (Match match in matches) {
