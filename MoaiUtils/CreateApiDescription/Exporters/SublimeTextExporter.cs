@@ -1,24 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using MoaiUtils.Common;
 using MoaiUtils.LuaIO;
 using MoaiUtils.MoaiParsing.CodeGraph;
 using MoaiUtils.Tools;
 
 namespace MoaiUtils.CreateApiDescription.Exporters {
     public class SublimeTextExporter : IApiExporter {
-        public void Export(IEnumerable<MoaiType> types, DirectoryInfo outputDirectory) {
-            // Create head comment
-            var commentLines = new[] {
-                "Documentation of the Moai SDK (http://getmoai.com/)",
-                string.Format(CultureInfo.InvariantCulture, "Generated on {0:d} by {1}", DateTime.Now, CurrentUtility.Signature),
-                CurrentUtility.MoaiUtilsHint
-            };
-            var headComment = new LuaComment(commentLines, blankLineAfter: true);
-
+        public void Export(IEnumerable<MoaiType> types, string header, DirectoryInfo outputDirectory) {
             // Create contents
             LuaTable contentsTable = new LuaTable {
                 { "scope", "source.lua" },
@@ -27,7 +17,8 @@ namespace MoaiUtils.CreateApiDescription.Exporters {
 
             // Write to file
             var targetFileInfo = outputDirectory.GetFileInfo("moai_lua.sublime-completions");
-            LuaTableWriter.Write(contentsTable, targetFileInfo, returnStatement: false, headComment: headComment);
+            LuaTableWriter.Write(contentsTable, targetFileInfo, returnStatement: false,
+                headComment: new LuaComment(header, blankLineAfter: true));
         }
 
         private LuaTable CreateCompletionListTable(IEnumerable<MoaiType> types) {

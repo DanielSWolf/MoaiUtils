@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using MoaiUtils.Common;
 using MoaiUtils.LuaIO;
 using MoaiUtils.MoaiParsing;
 using MoaiUtils.MoaiParsing.CodeGraph;
@@ -13,22 +10,14 @@ using MoaiUtils.Tools;
 
 namespace MoaiUtils.CreateApiDescription.Exporters {
     public class ZeroBraneExporter : IApiExporter {
-        public void Export(IEnumerable<MoaiType> types, DirectoryInfo outputDirectory) {
-            // Create head comment
-            var commentLines = new[] {
-                "Documentation of the Moai SDK (http://getmoai.com/)",
-                string.Format(CultureInfo.InvariantCulture, "Generated on {0:d} by {1}", DateTime.Now, CurrentUtility.Signature),
-                CurrentUtility.MoaiUtilsHint
-            };
-            var headComment = new LuaComment(commentLines, blankLineAfter: true);
-
-
+        public void Export(IEnumerable<MoaiType> types, string header, DirectoryInfo outputDirectory) {
             // Create contents
             LuaTable typeListTable = CreateTypeListTable(types);
 
             // Write to file
             var targetFileInfo = outputDirectory.GetFileInfo("moai.lua");
-            LuaTableWriter.Write(typeListTable, targetFileInfo, headComment: headComment);
+            LuaTableWriter.Write(typeListTable, targetFileInfo,
+                headComment: new LuaComment(header, blankLineAfter: true));
         }
 
         private LuaTable CreateTypeListTable(IEnumerable<MoaiType> types) {

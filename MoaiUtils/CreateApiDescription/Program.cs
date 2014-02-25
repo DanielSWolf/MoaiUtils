@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using MoaiUtils.Common;
@@ -22,10 +23,15 @@ namespace MoaiUtils.CreateApiDescription {
 
             // Show warning count
             if (parser.Warnings.Any()) {
-                Console.WriteLine("\nParsing resulted in {0} warnings.", parser.Warnings.Count);
+                Console.WriteLine("\nParsing resulted in {0} warnings. For more information, run DocLint.", parser.Warnings.Count);
             }
 
             // Export API description
+            string header = string.Format(CultureInfo.InvariantCulture,
+                "Documentation for {0} (http://getmoai.com/)\n"
+                + "Generated on {1:yyyy-MM-dd} by {2}.\n"
+                + CurrentUtility.MoaiUtilsHint,
+                parser.MoaiVersionInfo, DateTime.Now, CurrentUtility.Signature);
             IApiExporter exporter;
             switch (configuration.ExportFormat) {
                 case ExportFormat.ZeroBrane:
@@ -37,7 +43,11 @@ namespace MoaiUtils.CreateApiDescription {
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-            exporter.Export(parser.DocumentedTypes, new DirectoryInfo(configuration.OutputDirectory));
+            DirectoryInfo outputDirectory = new DirectoryInfo(configuration.OutputDirectory);
+            exporter.Export(parser.DocumentedTypes, header, outputDirectory);
+
+            Console.WriteLine("\nGenerated Moai documentation in {0} format in '{1}'.",
+                configuration.ExportFormat, outputDirectory.FullName);
         }
     }
 }

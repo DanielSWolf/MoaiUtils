@@ -19,6 +19,7 @@ namespace MoaiUtils.MoaiParsing {
         }
 
         public WarningList Warnings { get; private set; }
+        public string MoaiVersionInfo { get; private set; }
 
         public void Parse(DirectoryInfo moaiDirectory) {
             // Check that the input directory looks like the Moai main directory
@@ -28,6 +29,10 @@ namespace MoaiUtils.MoaiParsing {
 
             // Initialize warning list
             Warnings = new WarningList();
+
+            // Get Moai version
+            MoaiVersionInfo = GetMoaiVersionInfo(moaiDirectory);
+            statusCallback(string.Format("Found {0}.", MoaiVersionInfo));
 
             // Initialize type list with primitive types
             typesByName = new Dictionary<string, MoaiType>();
@@ -85,6 +90,34 @@ namespace MoaiUtils.MoaiParsing {
             get {
                 return typesByName.Values
                     .Where(type => type.IsDocumented);
+            }
+        }
+
+        private string GetMoaiVersionInfo(DirectoryInfo moaiDirectory) {
+            var versionFileInfo = moaiDirectory.GetFileInfo(@"src\config-default\moai_version.h");
+            try {
+                // Read version file
+                string versionText = File.ReadAllText(versionFileInfo.FullName);
+
+                // Extract version, revision, and author
+                string version = Regex.Match(versionText, @"MOAI_SDK_VERSION_MAJOR_MINOR\s+([0-9.]+)").Groups[1].Value;
+                int revision = int.Parse(Regex.Match(versionText, @"MOAI_SDK_VERSION_REVISION\s+(-?[0-9]+)").Groups[1].Value, CultureInfo.InvariantCulture);
+                string author = Regex.Match(versionText, @"MOAI_SDK_VERSION_AUTHOR\s+""(.*?)""").Groups[1].Value;
+
+                // Build version string
+                string result = string.Format("Moai SDK {0}", version);
+                if (revision >= 0) {
+                    result += string.Format(" revision {0}", revision);
+                }
+                if (author != string.Empty) {
+                    result += string.Format(revision > 1 ? " ({0})" : " (interim version by {0})", author);
+                }
+
+                return result;
+            } catch (Exception e) {
+                Warnings.Add(new FilePosition(versionFileInfo), WarningType.ToolLimitation,
+                    "Error determining Moai version: {0}", e.Message);
+                return "Moai SDK (unknown version)";
             }
         }
 
