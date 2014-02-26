@@ -467,6 +467,22 @@ namespace MoaiUtils.MoaiParsing {
                 }
             }
 
+            // Check 'self' params
+            foreach (var overload in method.Overloads) {
+                if (overload.InParameters.Skip(1).Any(param => param.Name == "self")) {
+                    Warnings.Add(methodPosition, WarningType.UnexpectedValue,
+                        "'self' param must be at index 1.");
+                }
+                var firstInParam = overload.InParameters.FirstOrDefault();
+                if (firstInParam != null && firstInParam.Name == "self") {
+                    if (firstInParam.Type != method.OwningType) {
+                        Warnings.Add(methodPosition, WarningType.UnexpectedValue,
+                            "'self' param is of type {0}. Expected {1}.",
+                            firstInParam.Type != null ? firstInParam.Type.Name : "unknown", method.OwningType.Name);
+                    }
+                }
+            }
+
             // Analyze body to find undocumented overloads
             var matches = paramAccessRegex.Matches(methodBody);
             foreach (Match match in matches) {
