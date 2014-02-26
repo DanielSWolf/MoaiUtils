@@ -16,8 +16,7 @@ namespace MoaiUtils.DocExport.Exporters {
 
             // Write to file
             var targetFileInfo = outputDirectory.GetFileInfo("moai.lua");
-            LuaTableWriter.Write(typeListTable, targetFileInfo,
-                headComment: new LuaComment(header, blankLineAfter: true));
+            LuaTableWriter.Write(typeListTable, targetFileInfo, new LuaComment(header, blankLineAfter: true));
         }
 
         private LuaTable CreateTypeListTable(IEnumerable<MoaiType> types) {

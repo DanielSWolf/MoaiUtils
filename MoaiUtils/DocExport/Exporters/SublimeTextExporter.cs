@@ -17,8 +17,7 @@ namespace MoaiUtils.DocExport.Exporters {
 
             // Write to file
             var targetFileInfo = outputDirectory.GetFileInfo("moai_lua.sublime-completions");
-            LuaTableWriter.Write(contentsTable, targetFileInfo, returnStatement: false,
-                headComment: new LuaComment(header, blankLineAfter: true));
+            LuaTableWriter.Write(contentsTable, targetFileInfo, new LuaComment(header, blankLineAfter: true));
         }
 
         private LuaTable CreateCompletionListTable(IEnumerable<MoaiType> types) {
