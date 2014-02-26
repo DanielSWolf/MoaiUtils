@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -17,7 +18,14 @@ namespace MoaiUtils.DocExport.Exporters {
 
             // Write to file
             string targetFileName = Path.Combine(outputDirectory.FullName, "moai_lua.sublime-completions");
-            File.WriteAllText(targetFileName, contentsObject.ToString());
+            using (var file = File.CreateText(targetFileName)) {
+                string comment = header.SplitIntoLines()
+                    .Select(line => "// " + line)
+                    .Join(Environment.NewLine);
+                file.WriteLine(comment);
+                file.WriteLine();
+                file.WriteLine(contentsObject);
+            }
         }
 
         private JArray CreateCompletionListTable(IEnumerable<MoaiType> types) {
