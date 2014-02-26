@@ -235,7 +235,7 @@ namespace MoaiUtils.MoaiParsing {
                 # Method definition
                 int\s+(?<className>[A-Za-z0-9_]+)\s*::\s*(?<methodName>[A-Za-z0-9_]+)\s*\([^)]*\)\s*
                 (
-                    \{(?<methodBody>[\s\S]*?)^\}
+                    \{(?<methodBody>[\s\S]*?)(^\}|//-----------------------------)
                 )?
             )", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.ExplicitCapture | RegexOptions.Compiled);
 
