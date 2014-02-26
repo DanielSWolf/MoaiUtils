@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using MoaiUtils.MoaiParsing.CodeGraph;
+using MoaiUtils.Tools;
 using Newtonsoft.Json.Linq;
 
 namespace MoaiUtils.DocExport.Exporters {
@@ -37,11 +39,50 @@ namespace MoaiUtils.DocExport.Exporters {
                     .OfType<MoaiMethod>()
                     .OrderBy(method => method.Name);
                 foreach (var method in methods) {
-                    completionList.Add(string.Format("{0}.{1}( )", type.Name, method.Name));
+                    foreach (var overload in method.Overloads) {
+                        string trigger = string.Format("{0}.{1}{2}",
+                            type.Name, method.Name, FormatTriggerParams(overload.InParameters));
+                        string contents = overload.IsStatic
+                            ? string.Format("{0}.{1}{2}", type.Name, method.Name, FormatReplacementParams(overload.InParameters))
+                            : string.Format("{0}{1}", method.Name, FormatReplacementParams(overload.InParameters.Skip(1).ToList()));
+                        completionList.Add(new JObject {
+                            { "trigger", trigger },
+                            { "contents", contents }
+                        });
+                    }
                 }
             }
 
             return completionList;
         }
+
+        private string FormatTriggerParams(List<MoaiInParameter> parameters) {
+            if (!parameters.Any()) return "( )";
+
+            StringBuilder result = new StringBuilder("( ");
+            bool optional = false;
+            for (int i = 0; i < parameters.Count; i++) {
+                var parameter = parameters[i];
+                if (parameter.IsOptional && !optional) {
+                    result.Append("[");
+                    optional = true;
+                }
+                result.Append(parameter.Name);
+                if (i < parameters.Count - 1) result.Append(", ");
+            }
+            if (optional) result.Append("]");
+            result.Append(" )");
+
+            return result.ToString();
+        }
+
+        private string FormatReplacementParams(List<MoaiInParameter> parameters) {
+            if (!parameters.Any()) return "( )";
+
+            var paramStrings = parameters
+                .Select((parameter, index) => string.Format("${{{0}:{1}}}", index + 1, parameter.Name));
+            return string.Format("( {0} )", paramStrings.Join(", "));
+        }
+
     }
 }
