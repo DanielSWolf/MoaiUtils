@@ -8,6 +8,7 @@ namespace MoaiUtils.MoaiParsing.CodeGraph {
         }
 
         public MoaiMethod OwningMethod { get; set; }
+        public bool IsStatic { get; set; }
         public List<MoaiInParameter> InParameters { get; private set; }
         public List<MoaiOutParameter> OutParameters { get; private set; }
     }

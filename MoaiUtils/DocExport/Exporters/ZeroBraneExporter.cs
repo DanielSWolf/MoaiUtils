@@ -83,7 +83,7 @@ namespace MoaiUtils.DocExport.Exporters {
             }
 
             var memberTable = new LuaTable {
-                { "type", method.IsStatic ? "function" : "method" },
+                { "type", method.Overloads.Any(overload => overload.IsStatic) ? "function" : "method" },
                 { "description", ConvertString(description.ToString().Trim()) },
                 { "args", method.InParameterSignature != null ? method.InParameterSignature.ToString(SignatureGrouping.Any) : null },
                 { "returns", method.OutParameterSignature != null ? method.OutParameterSignature.ToString(SignatureGrouping.Any) : null },

@@ -56,7 +56,6 @@ namespace MoaiUtils.DocExport.Exporters {
         private XElement CreateMemberElement(MoaiMethod method) {
             return new XElement("method",
                 new XAttribute("name", method.Name),
-                new XAttribute("static", method.IsStatic),
                 new XElement("description", method.Description),
                 new XElement("overloads", method.Overloads.Select(CreateOverloadElement)),
                 new XElement("compactSignature",
@@ -68,6 +67,7 @@ namespace MoaiUtils.DocExport.Exporters {
 
         private XElement CreateOverloadElement(MoaiMethodOverload overload) {
             return new XElement("overload",
+                new XAttribute("static", overload.IsStatic),
                 new XElement("inParams", overload.InParameters.Select(CreateInParamElement)),
                 new XElement("outParams", overload.OutParameters.Select(CreateOutParamElement))
             );

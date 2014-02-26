@@ -397,15 +397,10 @@ namespace MoaiUtils.MoaiParsing {
             }
 
             // Parse annotations
-            // Guess if the method is static
-            bool isStatic = annotations
-                .OfType<InParameterAnnotation>()
-                .All(param => param.Name != "self");
             var method = new MoaiMethod {
                 MethodPosition = methodPosition,
                 Name = nameAnnotation.Value,
                 OwningType = type,
-                IsStatic = isStatic
             };
             type.Members.Add(method);
             MoaiMethodOverload currentOverload = null;
@@ -451,6 +446,12 @@ namespace MoaiUtils.MoaiParsing {
                     Warnings.Add(methodPosition, WarningType.UnexpectedAnnotation,
                         "Unexpected {0} annotation.", annotation.Command);
                 }
+            }
+
+            // Determine if overloads are static
+            foreach (MoaiMethodOverload overload in method.Overloads) {
+                var firstInParam = overload.InParameters.FirstOrDefault();
+                overload.IsStatic = firstInParam == null || firstInParam.Name != "self";
             }
 
             // Check that there is at least one @out annotation per overload
