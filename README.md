@@ -24,7 +24,7 @@ If you're on something other than Windows (i.e., Linux or OS X), you can run the
 
 #### ZeroBrane Studio
 
-DocExport can create code-completion files for [ZeroBrane Studio](http://studio.zerobrane.com/), the free Lua IDE. This gives ZeroBrane Studio full access to all of Moai's classes, fields and methods, along with overloads, return values, and full documentation. For some screenshots, see this (otherwise dated) [Moai forum entry]( http://getmoai.com/forums/moaiutils-1-0-better-code-completion-in-zerobrane-t2473/#p12878) for MoaiTools 1.0.
+DocExport can create code-completion files for [ZeroBrane Studio](http://studio.zerobrane.com/), a great Lua IDE (donationware). This gives ZeroBrane Studio full access to all of Moai's classes, fields and methods, along with overloads, return values, and full documentation. For some screenshots, see this (otherwise dated) [Moai forum entry]( http://getmoai.com/forums/moaiutils-1-0-better-code-completion-in-zerobrane-t2473/#p12878) for MoaiTools 1.0.
 
 ##### How to use
 
@@ -34,11 +34,11 @@ _Tip:_ By default, ZeroBrane Studio only shows the first few lines of the help t
 
 #### Sublime Text
 
-Sublime Text is a powerful text editor, but no IDE. Thus, support for Sublime Text is limited to simple code completion for class, field and method names.
+[Sublime Text](http://www.sublimetext.com/) is a powerful text editor, but has no understanding of Lua code. Thus, code completion in Sublime Text is rather limited compared to ZeroBrane Studio.
 
 ##### How to use
 
-Place the generated `moai_lua.sublime-completions` file anywhere in your `Packages` folder, ideally inside of `/Lua`. You can open the packages folder from Sublime Text via the "Browse Packages" menu option. Depending on the version of Sublime Text and your OS, the location of the `/Lua` folder may vary.
+Place the generated `moai_lua.sublime-completions` file anywhere in your `Packages` folder, ideally inside of `/Lua`. You can open the packages folder from Sublime Text via the menu option "Preferences"  >"Browse Packages". Depending on the version of Sublime Text and your OS, the location of the `/Lua` folder may vary.
 
 #### XML
 
