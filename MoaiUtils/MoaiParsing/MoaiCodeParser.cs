@@ -396,12 +396,6 @@ namespace MoaiUtils.MoaiParsing {
                 Warnings.Add(methodPosition, WarningType.UnexpectedAnnotation, "Multiple @text annotations.");
             }
 
-            // Check that there is at least one @out annotation
-            if (!annotations.OfType<OutParameterAnnotation>().Any()) {
-                Warnings.Add(methodPosition, WarningType.MissingAnnotation,
-                    "Missing @out annotation. Even for void methods, an @out annotation with type nil is expected.");
-            }
-
             // Parse annotations
             // Guess if the method is static
             bool isStatic = annotations
@@ -456,6 +450,14 @@ namespace MoaiUtils.MoaiParsing {
                 } else {
                     Warnings.Add(methodPosition, WarningType.UnexpectedAnnotation,
                         "Unexpected {0} annotation.", annotation.Command);
+                }
+            }
+
+            // Check that there is at least one @out annotation per overload
+            foreach (MoaiMethodOverload overload in method.Overloads) {
+                if (!overload.OutParameters.Any()) {
+                    Warnings.Add(methodPosition, WarningType.MissingAnnotation,
+                        "Missing @out annotation. Even for void methods, an @out annotation with type nil is expected.");
                 }
             }
 
