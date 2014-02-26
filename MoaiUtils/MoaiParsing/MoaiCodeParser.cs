@@ -239,6 +239,13 @@ namespace MoaiUtils.MoaiParsing {
                 )?
             )", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.ExplicitCapture | RegexOptions.Compiled);
 
+        private static readonly Regex undocumentedLuaMethodRegex = new Regex(@"
+            # No documentation preceding
+            (?<!\*/\s*)
+            # Lua method definition
+            int\s+(?<className>[A-Za-z0-9_]+)\s*::\s*(?<methodName>_[A-Za-z0-9_]+)\s*\(
+            ", RegexOptions.IgnorePatternWhitespace | RegexOptions.ExplicitCapture | RegexOptions.Compiled);
+
         private MoaiType GetOrCreateType(string typeName, FilePosition documentationPosition) {
             MoaiType result = typesByName.ContainsKey(typeName)
                 ? typesByName[typeName]
@@ -302,6 +309,19 @@ namespace MoaiUtils.MoaiParsing {
                     type.TypePosition = typePosition;
                     ParseTypeDocumentation(type, annotations, baseTypes, typePosition, Warnings);
                 }
+            }
+
+            WarnForUndocumentedLuaMethods(code, filePosition);
+        }
+
+        private void WarnForUndocumentedLuaMethods(string code, FilePosition filePosition) {
+            var matches = undocumentedLuaMethodRegex.Matches(code);
+            foreach (Match match in matches) {
+                string typeName = match.Groups["className"].Value;
+                string methodName = match.Groups["methodName"].Value;
+                MethodPosition methodPosition = new MethodPosition(new TypePosition(filePosition, typeName), methodName);
+                Warnings.Add(methodPosition, WarningType.MissingAnnotation,
+                    "Missing method documentation.");
             }
         }
 
