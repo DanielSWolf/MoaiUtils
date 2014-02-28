@@ -5,3 +5,4 @@ obj
 
 *.suo
 packages
+/MoaiUtils/dist/MoaiUtils.zip
