@@ -7,7 +7,7 @@ MoaiUtils is open source; a pre-compiled version can be downloaded on the [relea
 
 ## DocExport
 
-DocExport analyzes Moai's C++ source code and extracts the code comments documenting the Lua API. This information can then be exported to a number of formats, usually to create code-completion files for text editors.
+DocExport is a tool for generating code-completion files for the Moai SDK. This gives you a better coding experience in ZeroBrane Studio and Sublime Text. DocExport analyzes Moai's C++ source code and extracts the code comments documenting the Lua API. This information can then be exported to a number of formats.
 
 ### Creating a documentation file
 
@@ -26,19 +26,31 @@ If you're on something other than Windows (i.e., Linux or OS X), you can run the
 
 DocExport can create code-completion files for [ZeroBrane Studio](http://studio.zerobrane.com/), a great Lua IDE (donationware). This gives ZeroBrane Studio full access to all of Moai's classes, fields and methods, along with overloads, return values, and full documentation. For some screenshots, see this (otherwise dated) [Moai forum entry]( http://getmoai.com/forums/moaiutils-1-0-better-code-completion-in-zerobrane-t2473/#p12878) for MoaiTools 1.0.
 
-##### How to use
+##### How to install code completion
 
 ZeroBrane Studio already ships with a `moai.lua` file in `ZeroBraneStudio\api\lua`. Just replace it with the new one.
 
-_Tip:_ By default, ZeroBrane Studio only shows the first few lines of the help text. To see the entire documentation, press `Ctrl+T` (as in tooltip).
+##### How to use
+
+Make sure you're in Moai mode ("Project" > "Lua Interpreter" > "Moai"). As you type, ZeroBrane will show a little popup with completion suggestions. You can accept a suggestion by selecting it with the arrow keys and hitting Tab or Enter.
+
+Whenever you type the opening parenthesis for a method call, ZeroBrane will show you a popup with the method's documentation. By default, this popup will be limited to the first few lines of the help text. To see the entire documentation, press `Ctrl+T` (as in tooltip). If you always want to see the full text, go to "Edit" > "Preferences" > "Settings: User" and add the line `acandtip.shorttip = false`, then restart.
 
 #### Sublime Text
 
-[Sublime Text](http://www.sublimetext.com/) is a powerful text editor, but has no understanding of Lua code. Thus, code completion in Sublime Text is rather limited compared to ZeroBrane Studio.
+[Sublime Text](http://www.sublimetext.com/) is a powerful text editor. Once you learn how to use its code completion facilities, it'll let you write Moai code quickly.
+
+##### How to install code completion
+
+Place the generated `moai_lua.sublime-completions` file anywhere in your `Packages` folder, ideally inside of `/Lua`. You can open the packages folder from Sublime Text via the menu option "Preferences"  > "Browse Packages". Depending on the version of Sublime Text and your OS, the location of the `/Lua` folder may vary.
 
 ##### How to use
 
-Place the generated `moai_lua.sublime-completions` file anywhere in your `Packages` folder, ideally inside of `/Lua`. You can open the packages folder from Sublime Text via the menu option "Preferences"  >"Browse Packages". Depending on the version of Sublime Text and your OS, the location of the `/Lua` folder may vary.
+As you type, Sublime Text will show a popup with suggestions. To accept a suggestion, press Enter, Tab, or any punctuation key. Sublime Text's suggestions use a fuzzy compare algorithm based on the current word. So, to quickly enter `MOAIGridSpace.TILE_TOP_CENTER`, enter something like "gridsptile", then accept the suggestion. Make sure not to type a dot between class name and member (e.g., "gridsp.tile"), or ZeroBrane will interpret the dot as your accepting whatever it was suggesting at this point.
+
+To call a static method like `MOAISim.openWindow()`, type somethin like "simop", and accept the suggestion. ZeroBrane will expand this to `MOAISim.openWindow( title, width, height )` and select the first argument, `title`. Just type what you want to pass as title, then hit Tab to enter the next argument.
+
+Calling a non-static method requires two steps. Let's assume you want to call `myProp:setDeck( myDeck )`. First, enter `myProp:`. Then, to tell ZeroBrane that you want to call the method `MOAIProp.setDeck()`, enter something like "propsetd" and accept. Because that method isn't static, ZeroBrane will omit the class name and replace the part after the colon with `setDeck( deck )`. Again, as with static methods, it'll then allow you to replace the argument `deck` with your actual value.
 
 #### XML
 
@@ -46,15 +58,15 @@ DocExport can generate XML files containing all extracted API information. This 
 
 ## DocLint
 
-DocLint analyzes Moai's API documentation and prints useful warnings if there may be problems. This is very useful when extending Moai with your own classes and methods. It's easy to get the documentation format wrong. Doxygen won't complain but silently generate false HTML documentation.
+When you extend the Moai SDK and expose your own classes and methods to Lua, DocLint helps you to make sure your API documentation is correct. If it isn't, Doxygen won't complain but silently generate false HTML documentation.
+DocLint works by analyzing your code comments and comparing them to what the C++ code actually does. Whenever there is a problem with the code comments, DocLint prints a warning. 
 
 DocLint finds all kinds of documentaion problems, including:
 * Misspelled types
 * Syntax errors in your annotations
 * Missing or multiple annotations
 * Logical errors, such as impossible method signatures
-
-DocLint will even analyze your method implementations and warn you if a method accesses an undocumented parameter.
+* undocumented methods or parameters.
 
 ### Running DocLint
 
