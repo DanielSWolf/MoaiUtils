@@ -34,8 +34,8 @@ namespace MoaiUtils.DocExport.Exporters {
                 // Add class name
                 completionList.Add(type.Name);
 
-                // Add fields (skip inherited ones)
-                var fields = type.Members
+                // Add fields
+                var fields = type.AllMembers
                     .OfType<MoaiField>()
                     .OrderBy(field => field.Name);
                 foreach (var field in fields) {
