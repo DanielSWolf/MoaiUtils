@@ -13,6 +13,7 @@ namespace MoaiUtils.MoaiParsing.CodeGraph {
         public TypePosition TypePosition { get; set; }
         public string Name { get; set; }
         public bool IsPrimitive { get; set; }
+        public bool IsRegistered { get; set; }
         public string Description { get; set; }
         public List<MoaiTypeMember> Members { get; private set; }
         public List<MoaiType> BaseTypes { get; private set; }

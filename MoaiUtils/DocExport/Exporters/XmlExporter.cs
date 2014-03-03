@@ -31,6 +31,7 @@ namespace MoaiUtils.DocExport.Exporters {
         private XElement CreateTypeElement(MoaiType type) {
             return new XElement("type",
                 new XAttribute("name", type.Name),
+                new XAttribute("registered", type.IsRegistered),
                 new XElement("baseTypes",
                     type.BaseTypes.Select(baseType => new XElement("baseType", baseType.Name))
                 ),

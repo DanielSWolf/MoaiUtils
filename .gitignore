@@ -6,3 +6,4 @@ obj
 *.suo
 packages
 /MoaiUtils/dist/MoaiUtils.zip
+/MoaiUtils/dist/MoaiUtils

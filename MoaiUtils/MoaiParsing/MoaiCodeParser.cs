@@ -59,6 +59,10 @@ namespace MoaiUtils.MoaiParsing {
                 }
             }
 
+            // Mark registered classes as scriptable
+            statusCallback("Checking which types are registered to be scriptable from Lua.");
+            MarkScriptableClasses(moaiDirectory);
+
             // Check if we have information on all referenced classes
             IEnumerable<MoaiType> typesReferencedInDocumentation = typesByName.Values
                 .Where(type => type.DocumentationReferences.Any());
@@ -203,8 +207,9 @@ namespace MoaiUtils.MoaiParsing {
         }
 
         private void ParseMoaiCodeFiles(DirectoryInfo moaiDirectory) {
-            IEnumerable<FileInfo> codeFiles = Directory
-                .EnumerateFiles(moaiDirectory.GetDirectoryInfo("src").FullName, "*.*", SearchOption.AllDirectories)
+            // Parse .cpp and .h files in src
+            string srcDirPath = moaiDirectory.GetDirectoryInfo("src").FullName;
+            IEnumerable<FileInfo> codeFiles = Directory.EnumerateFiles(srcDirPath, "*.*", SearchOption.AllDirectories)
                 .Where(name => name.EndsWith(".cpp") || name.EndsWith(".h"))
                 .Select(name => new FileInfo(name));
 
@@ -262,6 +267,11 @@ namespace MoaiUtils.MoaiParsing {
         }
 
         private void ParseMoaiCodeFile(string code, FilePosition filePosition) {
+            ParseDocumentationBlocks(code, filePosition);
+            WarnForUndocumentedLuaMethods(code, filePosition);
+        }
+
+        private void ParseDocumentationBlocks(string code, FilePosition filePosition) {
             // Find all documentation blocks
             var matches = documentationRegex.Matches(code);
 
@@ -310,8 +320,6 @@ namespace MoaiUtils.MoaiParsing {
                     ParseTypeDocumentation(type, annotations, baseTypes, typePosition, Warnings);
                 }
             }
-
-            WarnForUndocumentedLuaMethods(code, filePosition);
         }
 
         private void WarnForUndocumentedLuaMethods(string code, FilePosition filePosition) {
@@ -525,5 +533,37 @@ namespace MoaiUtils.MoaiParsing {
                 }
             }
         }
+
+        private static readonly Regex classRegistrationInLuaRegex = new Regex(
+           @"\.extend\s*\(\s*['""](?<className>[A-Za-z0-9_]+)['""]\s*,",
+           RegexOptions.ExplicitCapture | RegexOptions.Compiled);
+
+        private static readonly Regex classRegistrationInCPlusPlusRegex = new Regex(
+            @"(?<!//\s*)REGISTER_LUA_CLASS\s*\(\s*(?<className>[A-Za-z0-9_]+)\s*\)",
+            RegexOptions.ExplicitCapture | RegexOptions.Compiled);
+
+        private void MarkScriptableClasses(DirectoryInfo moaiDirectory) {
+            IEnumerable<string> fileNames = Directory.EnumerateFiles(moaiDirectory.FullName, "*.*", SearchOption.AllDirectories);
+            foreach (string fileName in fileNames) {
+                // Determine file type
+                Regex registrationRegex;
+                if (fileName.EndsWith(".cpp") || fileName.EndsWith(".h") || fileName.EndsWith(".mm")) {
+                    registrationRegex = classRegistrationInCPlusPlusRegex;
+                } else if (fileName.EndsWith(".lua")) {
+                    registrationRegex = classRegistrationInLuaRegex;
+                } else {
+                    continue;
+                }
+
+                // Search file for type registrations
+                var matches = registrationRegex.Matches(File.ReadAllText(fileName));
+                foreach (Match match in matches) {
+                    string typeName = match.Groups["className"].Value;
+                    MoaiType type = GetOrCreateType(typeName, new FilePosition(new FileInfo(fileName)));
+                    type.IsScriptable = true;
+                }
+            }
+        }
+
     }
 }
