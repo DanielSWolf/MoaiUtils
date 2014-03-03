@@ -12,7 +12,7 @@ namespace MoaiUtils.DocExport.Exporters {
     public class ZeroBraneExporter : IApiExporter {
         public void Export(IEnumerable<MoaiType> types, string header, DirectoryInfo outputDirectory) {
             // Create contents
-            LuaTable typeListTable = CreateTypeListTable(types);
+            LuaTable typeListTable = CreateTypeListTable(types.Where(type => type.IsScriptable));
 
             // Write to file
             var targetFileInfo = outputDirectory.GetFileInfo("moai.lua");

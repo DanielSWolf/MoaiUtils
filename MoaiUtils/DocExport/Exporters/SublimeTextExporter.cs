@@ -13,7 +13,7 @@ namespace MoaiUtils.DocExport.Exporters {
             // Create contents
             JObject contentsObject = new JObject {
                 { "scope", "source.lua" },
-                { "completions", CreateCompletionListTable(types) }
+                { "completions", CreateCompletionListTable(types.Where(type => type.IsScriptable)) }
             };
 
             // Write to file
