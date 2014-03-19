@@ -59,9 +59,13 @@
     <Compile Include="CodeGraph\MoaiTypeMember.cs" />
     <Compile Include="CompactSignature.cs" />
     <Compile Include="FilePosition.cs" />
-    <Compile Include="MoaiCodeParser.cs" />
+    <Compile Include="MoaiFileParser.cs" />
+    <Compile Include="MoaiMethodParser.cs" />
+    <Compile Include="MoaiParser.cs" />
     <Compile Include="MoaiLuaObject.cs" />
     <Compile Include="MoaiTypeCollection.cs" />
+    <Compile Include="MoaiTypeParser.cs" />
+    <Compile Include="MoaiVersionInfo.cs" />
     <Compile Include="Warning.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

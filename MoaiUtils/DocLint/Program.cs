@@ -12,7 +12,7 @@ namespace MoaiUtils.DocLint {
 
         private static void Main(Configuration configuration) {
             // Parse Moai code
-            var parser = new MoaiCodeParser(statusCallback: s => Console.WriteLine("[] {0}", s));
+            var parser = new MoaiParser(statusCallback: s => Console.WriteLine("[] {0}", s));
             parser.Parse(new DirectoryInfo(configuration.InputDirectory));
 
             // Show warnings
