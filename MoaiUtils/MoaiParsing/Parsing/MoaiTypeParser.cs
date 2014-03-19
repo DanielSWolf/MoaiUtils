@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using MoaiUtils.MoaiParsing.CodeGraph;
 
-namespace MoaiUtils.MoaiParsing {
+namespace MoaiUtils.MoaiParsing.Parsing {
     public static class MoaiTypeParser {
         
         public static void ParseTypeDocumentation(MoaiType type, Annotation[] annotations, MoaiType[] baseTypes, TypePosition typePosition, WarningList warnings) {

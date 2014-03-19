@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using MoaiUtils.MoaiParsing.CodeGraph;
 
-namespace MoaiUtils.MoaiParsing {
+namespace MoaiUtils.MoaiParsing.Parsing {
     public class MoaiFileParser {
 
         public static void ParseMoaiCodeFile(FileInfo codeFile, FilePosition filePosition, MoaiTypeCollection types, WarningList warnings) {
@@ -13,7 +13,6 @@ namespace MoaiUtils.MoaiParsing {
 
         public static void ParseMoaiCodeFile(string code, FilePosition filePosition, MoaiTypeCollection types, WarningList warnings) {
             ParseDocumentationBlocks(code, filePosition, types, warnings);
-            WarnForUndocumentedLuaMethods(code, filePosition, warnings);
         }
 
         private static readonly Regex documentationRegex = new Regex(@"
@@ -90,24 +89,6 @@ namespace MoaiUtils.MoaiParsing {
                     type.TypePosition = typePosition;
                     MoaiTypeParser.ParseTypeDocumentation(type, annotations, baseTypes, typePosition, warnings);
                 }
-            }
-        }
-
-        private static readonly Regex undocumentedLuaMethodRegex = new Regex(@"
-            # No documentation preceding
-            (?<!\*/\s*)
-            # Lua method definition
-            int\s+(?<className>[A-Za-z0-9_]+)\s*::\s*(?<methodName>_[A-Za-z0-9_]+)\s*\(
-            ", RegexOptions.IgnorePatternWhitespace | RegexOptions.ExplicitCapture | RegexOptions.Compiled);
-
-        private static void WarnForUndocumentedLuaMethods(string code, FilePosition filePosition, WarningList warnings) {
-            var matches = undocumentedLuaMethodRegex.Matches(code);
-            foreach (Match match in matches) {
-                string typeName = match.Groups["className"].Value;
-                string methodName = match.Groups["methodName"].Value;
-                MethodPosition methodPosition = new MethodPosition(new TypePosition(filePosition, typeName), methodName);
-                warnings.Add(methodPosition, WarningType.MissingAnnotation,
-                    "Missing method documentation.");
             }
         }
 

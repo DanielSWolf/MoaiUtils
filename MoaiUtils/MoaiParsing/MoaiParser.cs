@@ -4,7 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using MoaiUtils.Common;
+using MoaiUtils.MoaiParsing.Checks;
 using MoaiUtils.MoaiParsing.CodeGraph;
+using MoaiUtils.MoaiParsing.Parsing;
 using MoaiUtils.Tools;
 
 namespace MoaiUtils.MoaiParsing {
@@ -57,15 +59,30 @@ namespace MoaiUtils.MoaiParsing {
             statusCallback("Checking which types are registered to be scriptable from Lua.");
             MarkScriptableClasses(moaiDirectory);
 
-            // Check if we have information on all referenced classes
-            IEnumerable<MoaiType> typesReferencedInDocumentation = types
-                .Where(type => type.DocumentationReferences.Any());
-            foreach (MoaiType type in typesReferencedInDocumentation.ToArray()) {
-                WarnIfSpeculative(type);
-            }
+            // Perform additional checks that do not alter the code graph
+            var checks = GetChecks();
+            statusCallback(string.Format("Performing {0} additional code checks.", checks.Length));
+            PerformChecks(checks, moaiDirectory);
+        }
 
-            statusCallback("Creating compact method signatures.");
-            CreateCompactMethodSignatures();
+        private CheckBase[] GetChecks() {
+            // Find all classes derived from CheckBase
+            return GetType().Assembly.GetTypes()
+                .Where(type => typeof (CheckBase).IsAssignableFrom(type))
+                .Where(type => !type.IsAbstract)
+                .Select(type => (CheckBase) Activator.CreateInstance(type))
+                .ToArray();
+        }
+
+        private void PerformChecks(IEnumerable<CheckBase> checks, DirectoryInfo moaiDirectory) {
+            GetChecks();
+            foreach (CheckBase check in checks) {
+                check.MoaiDirectory = moaiDirectory;
+                check.Types = types;
+                check.Warnings = Warnings;
+
+                check.Run();
+            }
         }
 
         public IEnumerable<MoaiType> DocumentedTypes {
@@ -74,76 +91,12 @@ namespace MoaiUtils.MoaiParsing {
 
         private void ParseMoaiCodeFiles(DirectoryInfo moaiDirectory) {
             // Parse .cpp and .h files in src
-            string srcDirPath = moaiDirectory.GetDirectoryInfo("src").FullName;
-            IEnumerable<FileInfo> codeFiles = Directory.EnumerateFiles(srcDirPath, "*.*", SearchOption.AllDirectories)
-                .Where(name => name.EndsWith(".cpp") || name.EndsWith(".h"))
-                .Select(name => new FileInfo(name));
+            DirectoryInfo srcDirectory = moaiDirectory.GetDirectoryInfo("src");
+            IEnumerable<FileInfo> codeFiles = srcDirectory.GetFilesRecursively(".cpp", ".h");
 
             foreach (var codeFile in codeFiles) {
                 MoaiFileParser.ParseMoaiCodeFile(codeFile, new FilePosition(codeFile), types, Warnings);
             }
-        }
-
-        private void WarnIfSpeculative(MoaiType type) {
-            if (type.Name == "...") return;
-
-            if (type.Name.EndsWith("...")) {
-                type = types.GetOrCreate(type.Name.Substring(0, type.Name.Length - 3), null);
-            }
-
-            if (!type.IsDocumented && !type.IsPrimitive) {
-                // Make an educated guess as to what type was meant.
-                MoaiType typeProposal = types.Find(type.Name,
-                    MatchMode.FindSynonyms | MatchMode.FindSimilar,
-                    t => t.IsDocumented || t.IsPrimitive);
-
-                foreach (FilePosition referencingFilePosition in type.DocumentationReferences) {
-                    string message = string.Format(
-                        "Documentation mentions missing or undocumented type '{0}'.", type.Name);
-                    if (typeProposal != null) {
-                        message += string.Format(" Should this be '{0}'?", typeProposal.Name);
-                    }
-                    Warnings.Add(referencingFilePosition, WarningType.UnexpectedValue, message);
-                }
-            }
-        }
-
-        private void CreateCompactMethodSignatures() {
-            foreach (MoaiType type in types) {
-                foreach (MoaiMethod method in type.Members.OfType<MoaiMethod>()) {
-                    if (!method.Overloads.Any()) {
-                        Warnings.Add(method.MethodPosition, WarningType.MissingAnnotation,
-                            "No method documentation found.");
-                        continue;
-                    }
-
-                    try {
-                        method.InParameterSignature = GetCompactSignature(method.Overloads.Select(overload => overload.InParameters.ToArray()));
-                        method.OutParameterSignature = GetCompactSignature(method.Overloads.Select(overload => overload.OutParameters.ToArray()));
-                    } catch (Exception e) {
-                        Warnings.Add(method.MethodPosition, WarningType.ToolLimitation,
-                            "Error determining method signature. {0}", e.Message);
-                    }
-                }
-            }
-        }
-
-        private static ISignature GetCompactSignature(IEnumerable<MoaiParameter[]> overloads) {
-            List<Parameter[]> parameterOverloads = new List<Parameter[]>();
-            foreach (MoaiParameter[] overload in overloads) {
-                // Input parameters may be optional. In these cases, create multiple overloads.
-                for (int index = overload.Length - 1;
-                    index >= 0 && overload[index] is MoaiInParameter && ((MoaiInParameter) overload[index]).IsOptional;
-                    index--) {
-                    parameterOverloads.Add(ConvertOverload(overload.Take(index)).ToArray());
-                }
-                parameterOverloads.Add(ConvertOverload(overload).ToArray());
-            }
-            return CompactSignature.FromOverloads(parameterOverloads.ToArray());
-        }
-
-        private static IEnumerable<Parameter> ConvertOverload(IEnumerable<MoaiParameter> overload) {
-            return overload.Select(parameter => new Parameter { Name = parameter.Name, Type = parameter.Type.Name, ShowName = true });
         }
 
         private static readonly Regex classRegistrationInLuaRegex = new Regex(

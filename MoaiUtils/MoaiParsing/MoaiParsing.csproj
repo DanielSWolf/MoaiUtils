@@ -47,6 +47,9 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Annotation.cs" />
+    <Compile Include="Checks\CheckThatLuaMethodsAreDocumented.cs" />
+    <Compile Include="Checks\CheckThatReferencedTypesAreKnown.cs" />
+    <Compile Include="Checks\CheckBase.cs" />
     <Compile Include="CodeGraph\IDocumentedEntity.cs" />
     <Compile Include="CodeGraph\INamedEntity.cs" />
     <Compile Include="CodeGraph\MoaiField.cs" />
@@ -59,12 +62,12 @@
     <Compile Include="CodeGraph\MoaiTypeMember.cs" />
     <Compile Include="CompactSignature.cs" />
     <Compile Include="FilePosition.cs" />
-    <Compile Include="MoaiFileParser.cs" />
-    <Compile Include="MoaiMethodParser.cs" />
+    <Compile Include="Parsing\MoaiFileParser.cs" />
+    <Compile Include="Parsing\MoaiMethodParser.cs" />
     <Compile Include="MoaiParser.cs" />
     <Compile Include="MoaiLuaObject.cs" />
     <Compile Include="MoaiTypeCollection.cs" />
-    <Compile Include="MoaiTypeParser.cs" />
+    <Compile Include="Parsing\MoaiTypeParser.cs" />
     <Compile Include="MoaiVersionInfo.cs" />
     <Compile Include="Warning.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

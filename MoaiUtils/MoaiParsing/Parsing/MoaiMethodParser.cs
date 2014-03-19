@@ -1,15 +1,26 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using MoaiUtils.MoaiParsing.CodeGraph;
 using MoaiUtils.Tools;
 
-namespace MoaiUtils.MoaiParsing {
+namespace MoaiUtils.MoaiParsing.Parsing {
     public static class MoaiMethodParser {
 
         public static void ParseMethodDocumentation(MoaiType type, Annotation[] annotations, string methodBody, MethodPosition methodPosition, MoaiTypeCollection types, WarningList warnings) {
             MoaiMethod method = CreateMethod(type, annotations, methodPosition, types, warnings);
             if (method == null) return;
+
+            // Make sure the method has at least one overload
+            if (!method.Overloads.Any()) {
+                warnings.Add(method.MethodPosition, WarningType.MissingAnnotation,
+                    "No documentation with method signature found.");
+            }
+
+            // Create compact method signature
+            CreateCompactSignature(method, warnings);
 
             // Determine if overloads are static
             foreach (MoaiMethodOverload overload in method.Overloads) {
@@ -68,6 +79,37 @@ namespace MoaiUtils.MoaiParsing {
                         "Missing documentation for parameter #{0} of type {1}.", index, paramTypeName);
                 }
             }
+        }
+
+        private static void CreateCompactSignature(MoaiMethod method, WarningList warnings) {
+            try {
+                method.InParameterSignature = GetCompactSignature(method.Overloads.Select(overload => overload.InParameters.ToArray()));
+                method.OutParameterSignature = GetCompactSignature(method.Overloads.Select(overload => overload.OutParameters.ToArray()));
+            } catch (Exception e) {
+                warnings.Add(method.MethodPosition, WarningType.ToolLimitation,
+                    "Error determining method signature. {0}", e.Message);
+            }
+        }
+
+        private static ISignature GetCompactSignature(IEnumerable<MoaiParameter[]> overloads) {
+            List<Parameter[]> parameterOverloads = new List<Parameter[]>();
+            foreach (MoaiParameter[] overload in overloads) {
+                // Input parameters may be optional. In these cases, create multiple overloads.
+                for (int index = overload.Length - 1;
+                    index >= 0 && overload[index] is MoaiInParameter && ((MoaiInParameter) overload[index]).IsOptional;
+                    index--) {
+                    parameterOverloads.Add(ConvertOverload(overload.Take(index)).ToArray());
+                }
+                parameterOverloads.Add(ConvertOverload(overload).ToArray());
+            }
+
+            return parameterOverloads.Any()
+                ? CompactSignature.FromOverloads(parameterOverloads.ToArray())
+                : new Sequence();
+        }
+
+        private static IEnumerable<Parameter> ConvertOverload(IEnumerable<MoaiParameter> overload) {
+            return overload.Select(parameter => new Parameter { Name = parameter.Name, Type = parameter.Type.Name, ShowName = true });
         }
 
         private static MoaiMethod CreateMethod(MoaiType type, Annotation[] annotations, MethodPosition methodPosition, MoaiTypeCollection types, WarningList warnings) {
