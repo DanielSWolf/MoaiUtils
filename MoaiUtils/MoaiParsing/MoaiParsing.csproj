@@ -61,6 +61,7 @@
     <Compile Include="FilePosition.cs" />
     <Compile Include="MoaiCodeParser.cs" />
     <Compile Include="MoaiLuaObject.cs" />
+    <Compile Include="MoaiTypeCollection.cs" />
     <Compile Include="Warning.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

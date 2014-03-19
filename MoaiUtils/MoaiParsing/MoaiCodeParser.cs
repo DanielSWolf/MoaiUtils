@@ -7,12 +7,11 @@ using System.Text.RegularExpressions;
 using MoaiUtils.Common;
 using MoaiUtils.MoaiParsing.CodeGraph;
 using MoaiUtils.Tools;
-using MoreLinq;
 
 namespace MoaiUtils.MoaiParsing {
     public class MoaiCodeParser {
         private readonly Action<string> statusCallback;
-        private Dictionary<string, MoaiType> typesByName;
+        private MoaiTypeCollection types;
 
         public MoaiCodeParser(Action<string> statusCallback) {
             this.statusCallback = statusCallback;
@@ -35,11 +34,7 @@ namespace MoaiUtils.MoaiParsing {
             statusCallback(string.Format("Found {0}.", MoaiVersionInfo));
 
             // Initialize type list with primitive types
-            typesByName = new Dictionary<string, MoaiType>();
-            var primitiveTypeNames = new[] { "nil", "boolean", "number", "string", "userdata", "function", "thread", "table" };
-            foreach (string primitiveTypeName in primitiveTypeNames) {
-                typesByName[primitiveTypeName] = new MoaiType { Name = primitiveTypeName, IsPrimitive = true };
-            }
+            types = new MoaiTypeCollection(initializeWithPrimitives: true);
 
             // Parse Moai types and store them by type name
             statusCallback("Parsing Moai types.");
@@ -52,8 +47,8 @@ namespace MoaiUtils.MoaiParsing {
             ParseMoaiCodeFile(MoaiLuaObject.DummyCode, dummyFilePosition);
 
             // Make sure every class directly or indirectly inherits from MOAILuaObject
-            MoaiType moaiLuaObjectType = GetOrCreateType("MOAILuaObject", null);
-            foreach (MoaiType type in typesByName.Values) {
+            MoaiType moaiLuaObjectType = types.GetOrCreate("MOAILuaObject", null);
+            foreach (MoaiType type in types) {
                 if (!(type.AncestorTypes.Contains(moaiLuaObjectType)) && type != moaiLuaObjectType) {
                     type.BaseTypes.Add(moaiLuaObjectType);
                 }
@@ -64,14 +59,14 @@ namespace MoaiUtils.MoaiParsing {
             MarkScriptableClasses(moaiDirectory);
 
             // Check if we have information on all referenced classes
-            IEnumerable<MoaiType> typesReferencedInDocumentation = typesByName.Values
+            IEnumerable<MoaiType> typesReferencedInDocumentation = types
                 .Where(type => type.DocumentationReferences.Any());
             foreach (MoaiType type in typesReferencedInDocumentation.ToArray()) {
                 WarnIfSpeculative(type);
             }
 
             statusCallback("Creating compact method signatures.");
-            foreach (MoaiType type in typesByName.Values) {
+            foreach (MoaiType type in types) {
                 foreach (MoaiMethod method in type.Members.OfType<MoaiMethod>()) {
                     if (!method.Overloads.Any()) {
                         Warnings.Add(method.MethodPosition, WarningType.MissingAnnotation,
@@ -91,10 +86,7 @@ namespace MoaiUtils.MoaiParsing {
         }
 
         public IEnumerable<MoaiType> DocumentedTypes {
-            get {
-                return typesByName.Values
-                    .Where(type => type.IsDocumented);
-            }
+            get { return types.Where(type => type.IsDocumented); }
         }
 
         private string GetMoaiVersionInfo(DirectoryInfo moaiDirectory) {
@@ -125,63 +117,24 @@ namespace MoaiUtils.MoaiParsing {
             }
         }
 
-        private readonly Dictionary<string, string> luaTypeNames = new Dictionary<string, string> {
-            // Synonyms for boolean
-            { "bool", "boolean" },
-            { "cpBool", "boolean" },
-
-            // Synonyms for number
-            { "num", "number" },
-            { "int", "number" },
-            { "u8", "number" },
-            { "u16", "number" },
-            { "u32", "number" },
-            { "u64", "number" },
-            { "s8", "number" },
-            { "s16", "number" },
-            { "s32", "number" },
-            { "s64", "number" },
-            { "integer", "number" },
-            { "float", "number" },
-            { "double", "number" },
-            { "cpFloat", "number" },
-            { "size_t", "number" },
-            { "cpCollisionType", "number" },
-            { "cpGroup", "number" },
-            { "cpLayers", "number" },
-            { "cpTimestamp", "number" },
-
-            // Synonyms for string
-            { "cc8*", "string" }
-        };
-
         private void WarnIfSpeculative(MoaiType type) {
             if (type.Name == "...") return;
 
             if (type.Name.EndsWith("...")) {
-                type = GetOrCreateType(type.Name.Substring(0, type.Name.Length - 3), null);
+                type = types.GetOrCreate(type.Name.Substring(0, type.Name.Length - 3), null);
             }
 
             if (!type.IsDocumented && !type.IsPrimitive) {
                 // Make an educated guess as to what type was meant.
-                string nameProposal;
-                if (luaTypeNames.ContainsKey(type.Name)) {
-                    nameProposal = luaTypeNames[type.Name];
-                } else {
-                    nameProposal = typesByName
-                        .Where(pair => pair.Value.IsDocumented || pair.Value.IsPrimitive)
-                        .Select(pair => pair.Key)
-                        .MinBy(name => Levenshtein.Distance(name, type.Name));
-                    if (Levenshtein.Similarity(nameProposal, type.Name) < 0.6) {
-                        nameProposal = null;
-                    }
-                }
+                MoaiType typeProposal = types.Find(type.Name,
+                    MatchMode.FindSynonyms | MatchMode.FindSimilar,
+                    t => t.IsDocumented || t.IsPrimitive);
 
                 foreach (FilePosition referencingFilePosition in type.DocumentationReferences) {
                     string message = string.Format(
                         "Documentation mentions missing or undocumented type '{0}'.", type.Name);
-                    if (nameProposal != null) {
-                        message += string.Format(" Should this be '{0}'?", nameProposal);
+                    if (typeProposal != null) {
+                        message += string.Format(" Should this be '{0}'?", typeProposal.Name);
                     }
                     Warnings.Add(referencingFilePosition, WarningType.UnexpectedValue, message);
                 }
@@ -251,16 +204,6 @@ namespace MoaiUtils.MoaiParsing {
             int\s+(?<className>[A-Za-z0-9_]+)\s*::\s*(?<methodName>_[A-Za-z0-9_]+)\s*\(
             ", RegexOptions.IgnorePatternWhitespace | RegexOptions.ExplicitCapture | RegexOptions.Compiled);
 
-        private MoaiType GetOrCreateType(string typeName, FilePosition documentationPosition) {
-            MoaiType result = typesByName.ContainsKey(typeName)
-                ? typesByName[typeName]
-                : typesByName[typeName] = new MoaiType { Name = typeName };
-            if (documentationPosition != null) {
-                result.DocumentationReferences.Add(documentationPosition);
-            }
-            return result;
-        }
-
         private void ParseMoaiCodeFile(FileInfo codeFile, FilePosition filePosition) {
             string code = File.ReadAllText(codeFile.FullName);
             ParseMoaiCodeFile(code, filePosition);
@@ -297,7 +240,7 @@ namespace MoaiUtils.MoaiParsing {
                     .ToArray();
 
                 // Parse annotation block
-                MoaiType type = GetOrCreateType(typeName, documentationPosition);
+                MoaiType type = types.GetOrCreate(typeName, documentationPosition);
                 if (documentationPosition is MethodPosition) {
                     // The documentation was attached to a method definition
 
@@ -312,7 +255,7 @@ namespace MoaiUtils.MoaiParsing {
                     MoaiType[] baseTypes = match.Groups["baseClassName"].Captures
                         .Cast<Capture>()
                         .Where(capture => !capture.Value.Contains("<"))
-                        .Select(capture => GetOrCreateType(capture.Value, null))
+                        .Select(capture => types.GetOrCreate(capture.Value, null))
                         .ToArray();
 
                     var typePosition = (TypePosition) documentationPosition;
@@ -454,7 +397,7 @@ namespace MoaiUtils.MoaiParsing {
                         var inParameter = new MoaiInParameter {
                             Name = paramName,
                             Description = parameterAnnotation.Description,
-                            Type = GetOrCreateType(parameterAnnotation.Type, methodPosition),
+                            Type = types.GetOrCreate(parameterAnnotation.Type, methodPosition),
                             IsOptional = annotation is OptionalInParameterAnnotation
                         };
                         currentOverload.InParameters.Add(inParameter);
@@ -462,7 +405,7 @@ namespace MoaiUtils.MoaiParsing {
                         // Add output parameter
                         var outParameter = new MoaiOutParameter {
                             Name = paramName,
-                            Type = GetOrCreateType(parameterAnnotation.Type, methodPosition),
+                            Type = types.GetOrCreate(parameterAnnotation.Type, methodPosition),
                             Description = parameterAnnotation.Description
                         };
                         currentOverload.OutParameters.Add(outParameter);
@@ -517,10 +460,11 @@ namespace MoaiUtils.MoaiParsing {
             // Analyze body to find undocumented overloads
             var matches = paramAccessRegex.Matches(methodBody);
             foreach (Match match in matches) {
+                // Find the Lua name for the param name
                 string paramTypeName = match.Groups["type"].Value;
-                if (luaTypeNames.ContainsKey(paramTypeName)) {
-                    paramTypeName = luaTypeNames[paramTypeName];
-                }
+                MoaiType paramType = types.Find(paramTypeName, MatchMode.FindSynonyms, t => t.IsDocumented | t.IsPrimitive);
+                if (paramType != null) paramTypeName = paramType.Name;
+
                 int index = int.Parse(match.Groups["index"].Value, CultureInfo.InvariantCulture);
                 bool isDocumented = method.Overloads.Any(overload => {
                     if (overload.InParameters.Count < index) return false;
@@ -559,7 +503,7 @@ namespace MoaiUtils.MoaiParsing {
                 var matches = registrationRegex.Matches(File.ReadAllText(fileName));
                 foreach (Match match in matches) {
                     string typeName = match.Groups["className"].Value;
-                    MoaiType type = GetOrCreateType(typeName, new FilePosition(new FileInfo(fileName)));
+                    MoaiType type = types.GetOrCreate(typeName, new FilePosition(new FileInfo(fileName)));
                     type.IsScriptable = true;
                 }
             }
