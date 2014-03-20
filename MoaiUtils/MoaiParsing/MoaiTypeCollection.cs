@@ -38,7 +38,7 @@ namespace MoaiUtils.MoaiParsing {
             return result;
         }
 
-        public MoaiType Find(string typeName, MatchMode matchMode, Predicate<MoaiType> allow = null) {
+        public MoaiType Find(string typeName, MatchMode matchMode = MatchMode.Strict, Predicate<MoaiType> allow = null) {
             if (allow == null) allow = type => true;
 
             if (typesByName.ContainsKey(typeName)) {

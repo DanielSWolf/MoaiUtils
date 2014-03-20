@@ -2,12 +2,13 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using MoaiUtils.MoaiParsing.CodeGraph;
+using MoaiUtils.Tools;
 
 namespace MoaiUtils.MoaiParsing.Parsing {
     public class MoaiFileParser {
 
         public static void ParseMoaiCodeFile(FileInfo codeFile, FilePosition filePosition, MoaiTypeCollection types, WarningList warnings) {
-            string code = File.ReadAllText(codeFile.FullName);
+            string code = codeFile.ReadAllText();
             ParseMoaiCodeFile(code, filePosition, types, warnings);
         }
 
@@ -37,7 +38,7 @@ namespace MoaiUtils.MoaiParsing.Parsing {
                 # Method definition
                 int\s+(?<className>[A-Za-z0-9_]+)\s*::\s*(?<methodName>[A-Za-z0-9_]+)\s*\([^)]*\)\s*
                 (
-                    \{(?<methodBody>[\s\S]*?)(^\}|//-----------------------------)
+                    \{(?<methodBody>[\s\S]*?)(^\}|\}\s*//-----------------------------)
                 )?
             )", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.ExplicitCapture | RegexOptions.Compiled);
 

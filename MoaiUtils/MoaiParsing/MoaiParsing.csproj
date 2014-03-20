@@ -50,7 +50,8 @@
     <Compile Include="Checks\CheckThatAllOverloadsAreDocumented.cs" />
     <Compile Include="Checks\CheckThatLuaMethodsAreDocumented.cs" />
     <Compile Include="Checks\CheckThatMethodNamesFollowConvention.cs" />
-    <Compile Include="Checks\CheckThatMethodOverlaysAreValid.cs" />
+    <Compile Include="Checks\CheckThatMethodOverloadsAreValid.cs" />
+    <Compile Include="Checks\CheckThatMethodsAreRegisteredCorrectly.cs" />
     <Compile Include="Checks\CheckThatReferencedTypesAreKnown.cs" />
     <Compile Include="Checks\CheckBase.cs" />
     <Compile Include="CodeGraph\IDocumentedEntity.cs" />

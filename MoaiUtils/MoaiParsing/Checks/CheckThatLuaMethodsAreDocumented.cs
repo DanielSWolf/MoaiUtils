@@ -9,7 +9,7 @@ namespace MoaiUtils.MoaiParsing.Checks {
             IEnumerable<FileInfo> codeFiles = MoaiSrcDirectory.GetFilesRecursively(".cpp", ".h");
 
             foreach (var codeFile in codeFiles) {
-                string code = File.ReadAllText(codeFile.FullName);
+                string code = codeFile.ReadAllText();
                 WarnForUndocumentedLuaMethods(code, new FilePosition(codeFile));
             }
         }

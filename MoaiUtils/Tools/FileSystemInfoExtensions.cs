@@ -26,5 +26,8 @@ namespace MoaiUtils.Tools {
                 .Select(name => new FileInfo(name));
         }
 
+        public static string ReadAllText(this FileInfo fileInfo) {
+            return File.ReadAllText(fileInfo.FullName);
+        }
     }
 }

@@ -39,6 +39,9 @@ namespace MoaiUtils.MoaiParsing {
         // Documentation looks suspicious without necessarily being wrong
         HeuristicWarning,
 
+        // There is an error with the way a Lua methd is registered
+        IncorrectMethodRegistration,
+
         // MoaiUtils couldn't handle a particular case
         ToolLimitation
     }

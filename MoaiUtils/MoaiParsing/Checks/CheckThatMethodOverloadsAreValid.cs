@@ -3,7 +3,7 @@ using MoaiUtils.MoaiParsing.CodeGraph;
 using MoaiUtils.Tools;
 
 namespace MoaiUtils.MoaiParsing.Checks {
-    public class CheckThatMethodOverlaysAreValid : CheckBase {
+    public class CheckThatMethodOverloadsAreValid : CheckBase {
 
         public override void Run() {
             foreach (MoaiMethod method in Methods) {

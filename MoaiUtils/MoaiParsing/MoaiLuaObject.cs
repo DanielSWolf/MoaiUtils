@@ -8,17 +8,23 @@ class MOAILuaObject {}
 
 /** @name   getClass
 */
-int MOAILuaObject::_getClass(lua_State* L) {}
+int MOAILuaObject::_getClass(lua_State* L) {
+    ...
+}
 
 /** @name   getClassName
     @text   Return the class name for the current object.
     
     @out    string
 */
-int MOAILuaObject::_getClassName(lua_State* L) {}
+int MOAILuaObject::_getClassName(lua_State* L) {
+    ...
+}
 
 /** @name   setInterface
 */
-int MOAILuaObject::_setInterface(lua_State* L) {}";
+int MOAILuaObject::_setInterface(lua_State* L) {
+    ...
+}";
     }
 }
