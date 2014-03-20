@@ -47,7 +47,10 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Annotation.cs" />
+    <Compile Include="Checks\CheckThatAllOverloadsAreDocumented.cs" />
     <Compile Include="Checks\CheckThatLuaMethodsAreDocumented.cs" />
+    <Compile Include="Checks\CheckThatMethodNamesFollowConvention.cs" />
+    <Compile Include="Checks\CheckThatMethodOverlaysAreValid.cs" />
     <Compile Include="Checks\CheckThatReferencedTypesAreKnown.cs" />
     <Compile Include="Checks\CheckBase.cs" />
     <Compile Include="CodeGraph\IDocumentedEntity.cs" />

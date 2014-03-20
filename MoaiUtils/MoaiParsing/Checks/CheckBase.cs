@@ -1,4 +1,7 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using MoaiUtils.MoaiParsing.CodeGraph;
 using MoaiUtils.Tools;
 
 namespace MoaiUtils.MoaiParsing.Checks {
@@ -11,6 +14,10 @@ namespace MoaiUtils.MoaiParsing.Checks {
 
         protected DirectoryInfo MoaiSrcDirectory {
             get { return MoaiDirectory.GetDirectoryInfo("src"); }
+        }
+
+        protected IEnumerable<MoaiMethod> Methods {
+            get { return Types.SelectMany(type => type.Members).OfType<MoaiMethod>(); }
         }
     }
 }

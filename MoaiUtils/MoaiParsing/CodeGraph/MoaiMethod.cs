@@ -10,6 +10,7 @@ namespace MoaiUtils.MoaiParsing.CodeGraph {
         public List<MoaiMethodOverload> Overloads { get; private set; }
         public ISignature InParameterSignature { get; set; }
         public ISignature OutParameterSignature { get; set; }
+        public string Body { get; set; }
 
         public override string ToString() {
             return base.ToString() + "()";
