@@ -60,7 +60,6 @@ namespace MoaiUtils.MoaiParsing.Checks {
                 .Where(registration => !registration.RegisteredAsStatic)
                 .ToArray();
 
-            // Check static registrations
             if (method.Overloads.Any(overload => overload.IsStatic)) {
                 // Make sure the method is registered as static
                 if (!staticRegistrations.Any()) {
@@ -73,9 +72,14 @@ namespace MoaiUtils.MoaiParsing.Checks {
                     Warnings.Add(staticRegistrations.Last().MethodPosition, WarningType.IncorrectMethodRegistration,
                         "Method {0} is registered more than once in RegisterLuaClass().", fullMethodName);
                 }
+            } else if (method.Overloads.Any()) {
+                // Check that instance-only methods are not registered as static
+                if (staticRegistrations.Any()) {
+                    Warnings.Add(staticRegistrations.First().MethodPosition, WarningType.IncorrectMethodRegistration,
+                        "Method {0} has only non-static overloads but is registered in RegisterLuaClass().", fullMethodName);
+                }
             }
 
-            // Check non-static registrations
             if (method.Overloads.Any(overload => !overload.IsStatic)) {
                 // Make sure the method is registered as non-static
                 if (!instanceRegistrations.Any()) {
@@ -88,18 +92,12 @@ namespace MoaiUtils.MoaiParsing.Checks {
                     Warnings.Add(instanceRegistrations.Last().MethodPosition, WarningType.IncorrectMethodRegistration,
                         "Method {0} is registered more than once in RegisterLuaFuncs().", fullMethodName);
                 }
-            }
-
-            // Check that static-only methods are not registered as non-static
-            if (method.Overloads.All(overload => overload.IsStatic) && instanceRegistrations.Any()) {
-                Warnings.Add(instanceRegistrations.First().MethodPosition, WarningType.IncorrectMethodRegistration,
-                    "Method {0} has only static overloads but is registered in RegisterLuaFuncs().", fullMethodName);
-            }
-
-            // Check that instance-only methods are not registered as static
-            if (method.Overloads.All(overload => !overload.IsStatic) && staticRegistrations.Any()) {
-                Warnings.Add(staticRegistrations.First().MethodPosition, WarningType.IncorrectMethodRegistration,
-                    "Method {0} has only non-static overloads but is registered in RegisterLuaClass().", fullMethodName);
+            } else if (method.Overloads.Any()) {
+                // Check that static-only methods are not registered as non-static
+                if (instanceRegistrations.Any()) {
+                    Warnings.Add(instanceRegistrations.First().MethodPosition, WarningType.IncorrectMethodRegistration,
+                        "Method {0} has only static overloads but is registered in RegisterLuaFuncs().", fullMethodName);
+                }
             }
 
             // Make sure the Lua name matches
