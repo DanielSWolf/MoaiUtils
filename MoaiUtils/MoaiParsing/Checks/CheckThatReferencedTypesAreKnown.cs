@@ -22,8 +22,7 @@ namespace MoaiUtils.MoaiParsing.Checks {
             if (!type.IsDocumented && !type.IsPrimitive) {
                 // Make an educated guess as to what type was meant.
                 MoaiType typeProposal = Types.Find(type.Name,
-                    MatchMode.FindSynonyms | MatchMode.FindSimilar,
-                    t => t.IsDocumented || t.IsPrimitive);
+                    MatchMode.FindSynonyms, t => t.IsDocumented || t.IsPrimitive);
 
                 foreach (FilePosition referencingFilePosition in type.DocumentationReferences) {
                     string message = string.Format(
