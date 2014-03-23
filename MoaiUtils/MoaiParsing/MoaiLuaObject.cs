@@ -14,6 +14,7 @@ int MOAILuaObject::_getClass(lua_State* L) {
 
 /** @name   getClassName
     @text   Return the class name for the current object.
+    @in     MOAILuaObject self
     
     @out    string
 */
