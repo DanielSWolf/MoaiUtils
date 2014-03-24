@@ -78,8 +78,8 @@ namespace MoaiUtils.MoaiParsing {
                 .MinBy(type => Levenshtein.Distance(type.Name, typeName));
 
             // Return type only if its name is reasonably similar
-            double similarity = Levenshtein.Similarity(closestType.Name, typeName);
-            return (similarity >= 0.6) ? closestType : null;
+            int distance = Levenshtein.Distance(closestType.Name, typeName);
+            return (distance <= 1) ? closestType : null;
         }
 
         private IType GetBySynonym(string typeName) {

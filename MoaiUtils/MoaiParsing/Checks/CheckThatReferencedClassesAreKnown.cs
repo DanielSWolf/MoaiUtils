@@ -16,7 +16,7 @@ namespace MoaiUtils.MoaiParsing.Checks {
             if (moaiClass.IsConfirmed) return;
 
             // Make an educated guess as to what type was meant.
-            IType typeProposal = Types.Find(moaiClass.Name, MatchMode.FindSynonyms, t => t.IsConfirmed);
+            IType typeProposal = Types.Find(moaiClass.Name, MatchMode.FindSynonyms | MatchMode.FindSimilar, t => t.IsConfirmed);
 
             foreach (FilePosition referencingFilePosition in moaiClass.DocumentationReferences) {
                 string message = string.Format(
