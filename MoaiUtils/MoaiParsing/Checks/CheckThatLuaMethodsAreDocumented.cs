@@ -24,9 +24,9 @@ namespace MoaiUtils.MoaiParsing.Checks {
         private void WarnForUndocumentedLuaMethods(string code, FilePosition filePosition) {
             var matches = undocumentedLuaMethodRegex.Matches(code);
             foreach (Match match in matches) {
-                string typeName = match.Groups["className"].Value;
+                string className = match.Groups["className"].Value;
                 string methodName = match.Groups["methodName"].Value;
-                MethodPosition methodPosition = new MethodPosition(new TypePosition(filePosition, typeName), methodName);
+                MethodPosition methodPosition = new MethodPosition(new ClassPosition(filePosition, className), methodName);
                 Warnings.Add(methodPosition, WarningType.MissingAnnotation,
                     "Missing method documentation.");
             }

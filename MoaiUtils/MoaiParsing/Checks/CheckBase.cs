@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using MoaiUtils.MoaiParsing.CodeGraph;
+using MoaiUtils.MoaiParsing.CodeGraph.Types;
 using MoaiUtils.Tools;
 
 namespace MoaiUtils.MoaiParsing.Checks {
@@ -16,8 +17,12 @@ namespace MoaiUtils.MoaiParsing.Checks {
             get { return MoaiDirectory.GetDirectoryInfo("src"); }
         }
 
+        protected IEnumerable<MoaiClass> Classes {
+            get { return Types.OfType<MoaiClass>(); }
+        }
+
         protected IEnumerable<Method> Methods {
-            get { return Types.SelectMany(type => type.Members).OfType<Method>(); }
+            get { return Classes.SelectMany(c => c.Members).OfType<Method>(); }
         }
     }
 }

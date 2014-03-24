@@ -1,22 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 using MoaiUtils.MoaiParsing;
 using MoaiUtils.MoaiParsing.CodeGraph;
+using MoaiUtils.MoaiParsing.CodeGraph.Types;
 using MoaiUtils.Tools;
 using Attribute = MoaiUtils.MoaiParsing.CodeGraph.Attribute;
-using Type = MoaiUtils.MoaiParsing.CodeGraph.Type;
 
 namespace MoaiUtils.DocExport.Exporters {
     public class XmlExporter : IApiExporter {
-        public void Export(IEnumerable<Type> types, string header, DirectoryInfo outputDirectory) {
+        public void Export(IEnumerable<MoaiClass> classes, string header, DirectoryInfo outputDirectory) {
             // Create XML DOM
             var document = new XDocument(
                 new XComment(header),
-                new XElement("types", types.Select(CreateTypeElement))
+                new XElement("types", classes.Select(CreateClassElement))
             );
 
             // Save it
@@ -30,15 +29,15 @@ namespace MoaiUtils.DocExport.Exporters {
             }
         }
 
-        private XElement CreateTypeElement(Type type) {
+        private XElement CreateClassElement(MoaiClass moaiClass) {
             return new XElement("type",
-                new XAttribute("name", type.Name),
-                new XAttribute("scriptable", type.IsScriptable),
+                new XAttribute("name", moaiClass.Name),
+                new XAttribute("scriptable", moaiClass.IsScriptable),
                 new XElement("baseTypes",
-                    type.BaseTypes.Select(baseType => new XElement("baseType", baseType.Name))
+                    moaiClass.BaseClasses.Select(baseClass => new XElement("baseType", baseClass.Name))
                 ),
-                new XElement("description", type.Description),
-                new XElement("members", type.Members.Select(member => (XElement) CreateMemberElement((dynamic) member)))
+                new XElement("description", moaiClass.Description),
+                new XElement("members", moaiClass.Members.Select(member => (XElement) CreateMemberElement((dynamic) member)))
             );
         }
 

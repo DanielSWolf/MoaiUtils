@@ -9,7 +9,7 @@ namespace MoaiUtils.MoaiParsing.Checks {
     public class CheckThatMethodsAreRegisteredCorrectly : CheckBase {
 
         private static readonly Regex registrationMethodRegex = new Regex(@"
-            void\s+(?<type>[A-Za-z0-9_]+)\s*::\s*(?<registrationMethod>RegisterLuaFuncs|RegisterLuaClass)\s*
+            void\s+(?<class>[A-Za-z0-9_]+)\s*::\s*(?<registrationMethod>RegisterLuaFuncs|RegisterLuaClass)\s*
             \(\s*MOAILuaState[^}]+?
             luaL_Reg.+?=\s*\{\s*
             (?<registrations>[\s\S]*?)
@@ -22,19 +22,19 @@ namespace MoaiUtils.MoaiParsing.Checks {
 
         public override void Run() {
             // Get all method registrations
-            Dictionary<string, List<MethodRegistration>> registrationsByType = ParseMethodRegistrations()
-                .GroupBy(registration => registration.TypeName)
-                .ToDictionary(typeGroup => typeGroup.Key, typeGroup => typeGroup.ToList());
+            Dictionary<string, List<MethodRegistration>> registrationsByClass = ParseMethodRegistrations()
+                .GroupBy(registration => registration.ClassName)
+                .ToDictionary(classGroup => classGroup.Key, classGroup => classGroup.ToList());
 
             // Check that all methods are registered as expected
             foreach (Method method in Methods) {
-                CheckMethodRegistration(method, registrationsByType);
+                CheckMethodRegistration(method, registrationsByClass);
             }
         }
 
         private void CheckMethodRegistration(Method method, Dictionary<string, List<MethodRegistration>> registrationsByType) {
             var methodRegistrations = FindMethodRegistrations(method, registrationsByType).ToArray();
-            string fullMethodName = string.Format("{0}::{1}()", method.OwningType.Name, method.MethodPosition.NativeMethodName);
+            string fullMethodName = string.Format("{0}::{1}()", method.OwningClass.Name, method.MethodPosition.NativeMethodName);
 
             bool bodyIsEmpty = string.IsNullOrWhiteSpace(method.Body);
             if (bodyIsEmpty) {
@@ -109,9 +109,9 @@ namespace MoaiUtils.MoaiParsing.Checks {
             }
         }
 
-        private IEnumerable<MethodRegistration> FindMethodRegistrations(Method method, Dictionary<string, List<MethodRegistration>> registrationsByType) {
+        private IEnumerable<MethodRegistration> FindMethodRegistrations(Method method, Dictionary<string, List<MethodRegistration>> registrationsByClass) {
             List<MethodRegistration> methodRegistrations;
-            if (!registrationsByType.TryGetValue(method.OwningType.Name, out methodRegistrations)) {
+            if (!registrationsByClass.TryGetValue(method.OwningClass.Name, out methodRegistrations)) {
                 return Enumerable.Empty<MethodRegistration>();
             }
 
@@ -126,7 +126,7 @@ namespace MoaiUtils.MoaiParsing.Checks {
                 string code = fileInfo.ReadAllText();
                 var registrationMethodMatches = registrationMethodRegex.Matches(code);
                 foreach (Match registrationMethodMatch in registrationMethodMatches) {
-                    string typeName = registrationMethodMatch.Groups["type"].Value;
+                    string className = registrationMethodMatch.Groups["class"].Value;
                     string registrationMethodName = registrationMethodMatch.Groups["registrationMethod"].Value;
                     string registrations = registrationMethodMatch.Groups["registrations"].Value;
                     var registrationMatches = registrationRegex.Matches(registrations);
@@ -134,22 +134,22 @@ namespace MoaiUtils.MoaiParsing.Checks {
                         string luaMethodName = registrationMatch.Groups["luaName"].Value;
                         string nativeMethodName = registrationMatch.Groups["nativeName"].Value;
                         yield return new MethodRegistration(
-                            typeName, luaMethodName, nativeMethodName, registrationMethodName, filePosition);
+                            className, luaMethodName, nativeMethodName, registrationMethodName, filePosition);
                     }
                 }
             }
         }
 
         private class MethodRegistration {
-            public MethodRegistration(string typeName, string luaMethodName, string nativeMethodName, string registrationMethodName, FilePosition filePosition) {
-                TypeName = typeName;
+            public MethodRegistration(string className, string luaMethodName, string nativeMethodName, string registrationMethodName, FilePosition filePosition) {
+                ClassName = className;
                 LuaMethodName = luaMethodName;
                 NativeMethodName = nativeMethodName;
                 RegistrationMethodName = registrationMethodName;
-                MethodPosition = new MethodPosition(filePosition, typeName, registrationMethodName);
+                MethodPosition = new MethodPosition(filePosition, className, registrationMethodName);
             }
 
-            public string TypeName { get; private set; }
+            public string ClassName { get; private set; }
             public string LuaMethodName { get; private set; }
             public string NativeMethodName { get; private set; }
             public string RegistrationMethodName { get; private set; }

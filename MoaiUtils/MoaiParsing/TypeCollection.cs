@@ -2,10 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using MoaiUtils.MoaiParsing.CodeGraph;
+using MoaiUtils.MoaiParsing.CodeGraph.Types;
 using MoaiUtils.Tools;
 using MoreLinq;
-using Type = MoaiUtils.MoaiParsing.CodeGraph.Type;
 
 namespace MoaiUtils.MoaiParsing {
     [Flags]
@@ -15,51 +14,65 @@ namespace MoaiUtils.MoaiParsing {
         FindSynonyms = 2
     }
 
-    public class TypeCollection : IEnumerable<Type> {
-        private readonly Dictionary<string, Type> typesByName = new Dictionary<string, Type>();
+    public class TypeCollection : IEnumerable<IType> {
+        private readonly Dictionary<string, IType> typesByName = new Dictionary<string, IType>();
 
-        public TypeCollection(bool initializeWithPrimitives) {
-            if (initializeWithPrimitives) {
+        public TypeCollection(bool includePrimitives, bool includeVariant) {
+            if (includePrimitives) {
                 var primitiveTypeNames = new[] {
                     "nil", "boolean", "number", "string", "userdata", "function", "thread", "table"
                 };
                 foreach (string primitiveTypeName in primitiveTypeNames) {
-                    GetOrCreate(primitiveTypeName, null).IsPrimitive = true;
+                    typesByName[primitiveTypeName] = new PrimitiveLuaType(primitiveTypeName);
                 }
+            }
+            if (includeVariant) {
+                typesByName["variant"] = Variant.Instance;
             }
         }
 
-        public Type GetOrCreate(string typeName, FilePosition documentationPosition) {
-            Type result = typesByName.ContainsKey(typeName)
+        public IType GetOrCreate(string typeName, FilePosition documentationPosition) {
+            if (typeName == "...") {
+                return new Ellipsis(Variant.Instance);
+            }
+            if (typeName.EndsWith("...")) {
+                return new Ellipsis(GetOrCreate(typeName.Substring(0, typeName.Length - 3), documentationPosition));
+            }
+
+            IType result = typesByName.ContainsKey(typeName)
                 ? typesByName[typeName]
-                : typesByName[typeName] = new Type { Name = typeName };
-            if (documentationPosition != null) {
-                result.DocumentationReferences.Add(documentationPosition);
+                : typesByName[typeName] = new MoaiClass { Name = typeName };
+            if (documentationPosition != null && result is MoaiClass) {
+                ((MoaiClass) result).DocumentationReferences.Add(documentationPosition);
             }
             return result;
         }
 
-        public Type Find(string typeName, MatchMode matchMode = MatchMode.Strict, Predicate<Type> allow = null) {
+        public MoaiClass GetOrCreateClass(string className, FilePosition documentationPosition) {
+            return GetOrCreate(className, documentationPosition) as MoaiClass;
+        }
+
+        public IType Find(string typeName, MatchMode matchMode = MatchMode.Strict, Predicate<IType> allow = null) {
             if (allow == null) allow = type => true;
 
             if (typesByName.ContainsKey(typeName)) {
-                Type result = typesByName[typeName];
+                IType result = typesByName[typeName];
                 if (allow(result)) return result;
             }
             if (matchMode.HasFlag(MatchMode.FindSynonyms)) {
-                Type result = GetBySynonym(typeName);
+                IType result = GetBySynonym(typeName);
                 if (result != null && allow(result)) return result;
             }
             if (matchMode.HasFlag(MatchMode.FindSimilar)) {
-                Type result = GetFuzzy(typeName, allow);
+                IType result = GetFuzzy(typeName, allow);
                 if (result != null) return result;
             }
             return null;
         }
 
-        private Type GetFuzzy(string typeName, Predicate<Type> allow) {
+        private IType GetFuzzy(string typeName, Predicate<IType> allow) {
             // Find type with closest name
-            Type closestType = typesByName
+            IType closestType = typesByName
                 .Where(pair => allow(pair.Value))
                 .Select(pair => pair.Value)
                 .MinBy(type => Levenshtein.Distance(type.Name, typeName));
@@ -69,7 +82,7 @@ namespace MoaiUtils.MoaiParsing {
             return (similarity >= 0.6) ? closestType : null;
         }
 
-        private Type GetBySynonym(string typeName) {
+        private IType GetBySynonym(string typeName) {
             if (booleanSynonyms.Contains(typeName)) {
                 return typesByName["boolean"];
             }
@@ -81,8 +94,8 @@ namespace MoaiUtils.MoaiParsing {
             }
             return null;
         }
-        
-        IEnumerator<Type> IEnumerable<Type>.GetEnumerator() {
+
+        IEnumerator<IType> IEnumerable<IType>.GetEnumerator() {
             return typesByName.Values.GetEnumerator();
         }
 

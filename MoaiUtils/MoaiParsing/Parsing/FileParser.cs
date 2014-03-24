@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using MoaiUtils.MoaiParsing.CodeGraph;
+using MoaiUtils.MoaiParsing.CodeGraph.Types;
 using MoaiUtils.Tools;
 
 namespace MoaiUtils.MoaiParsing.Parsing {
@@ -48,11 +48,11 @@ namespace MoaiUtils.MoaiParsing.Parsing {
 
             // Parse documentation blocks
             foreach (Match match in matches) {
-                // A documentation block may be attached to a type or to a method.
-                string typeName = match.Groups["className"].Value;
+                // A documentation block may be attached to a class or to a method.
+                string className = match.Groups["className"].Value;
                 FilePosition documentationPosition = match.Groups["methodName"].Success
-                    ? new MethodPosition(filePosition, typeName, match.Groups["methodName"].Value)
-                    : new TypePosition(filePosition, typeName);
+                    ? new MethodPosition(filePosition, className, match.Groups["methodName"].Value)
+                    : new ClassPosition(filePosition, className);
 
                 // Parse annotations, filtering out unknown ones
                 Annotation[] annotations = match.Groups["annotation"].Captures
@@ -68,27 +68,27 @@ namespace MoaiUtils.MoaiParsing.Parsing {
                     .ToArray();
 
                 // Parse annotation block
-                Type type = types.GetOrCreate(typeName, documentationPosition);
+                MoaiClass moaiClass = types.GetOrCreateClass(className, documentationPosition);
                 if (documentationPosition is MethodPosition) {
                     // The documentation was attached to a method definition
 
                     // Get method body
                     string methodBody = match.Groups["methodBody"].Value;
 
-                    MethodParser.ParseMethodDocumentation(type, annotations, methodBody, (MethodPosition) documentationPosition, types, warnings);
+                    MethodParser.ParseMethodDocumentation(moaiClass, annotations, methodBody, (MethodPosition) documentationPosition, types, warnings);
                 } else {
-                    // The documentation was attached to a type definition
+                    // The documentation was attached to a class definition
 
-                    // Get base type names, ignoring all template classes
-                    Type[] baseTypes = match.Groups["baseClassName"].Captures
+                    // Get base class names, ignoring all template classes
+                    MoaiClass[] baseClasses = match.Groups["baseClassName"].Captures
                         .Cast<Capture>()
                         .Where(capture => !capture.Value.Contains("<"))
-                        .Select(capture => types.GetOrCreate(capture.Value, null))
+                        .Select(capture => types.GetOrCreateClass(capture.Value, null))
                         .ToArray();
 
-                    var typePosition = (TypePosition) documentationPosition;
-                    type.TypePosition = typePosition;
-                    TypeParser.ParseTypeDocumentation(type, annotations, baseTypes, typePosition, warnings);
+                    var classPosition = (ClassPosition) documentationPosition;
+                    moaiClass.ClassPosition = classPosition;
+                    ClassParser.ParseClassDocumentation(moaiClass, annotations, baseClasses, classPosition, warnings);
                 }
             }
         }

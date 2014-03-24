@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using MoaiUtils.MoaiParsing.CodeGraph;
-using Type = MoaiUtils.MoaiParsing.CodeGraph.Type;
+using MoaiUtils.MoaiParsing.CodeGraph.Types;
 
 namespace MoaiUtils.MoaiParsing.Parsing {
     public static class MethodParser {
-        public static void ParseMethodDocumentation(Type type, Annotation[] annotations, string methodBody, MethodPosition methodPosition, TypeCollection types, WarningList warnings) {
-            Method method = CreateMethod(type, annotations, methodPosition, types, warnings);
+        public static void ParseMethodDocumentation(MoaiClass moaiClass, Annotation[] annotations, string methodBody, MethodPosition methodPosition, TypeCollection types, WarningList warnings) {
+            Method method = CreateMethod(moaiClass, annotations, methodPosition, types, warnings);
             if (method == null) return;
 
             // Fill method body
@@ -54,9 +54,9 @@ namespace MoaiUtils.MoaiParsing.Parsing {
             return overload.Select(parameter => new Parameter { Name = parameter.Name, Type = parameter.Type.Name, ShowName = true });
         }
 
-        private static Method CreateMethod(Type type, Annotation[] annotations, MethodPosition methodPosition, TypeCollection types, WarningList warnings) {
+        private static Method CreateMethod(MoaiClass moaiClass, Annotation[] annotations, MethodPosition methodPosition, TypeCollection types, WarningList warnings) {
             // Get @name annotation
-            var nameAnnotation = GetNameAnnotation(type, annotations, methodPosition, warnings);
+            var nameAnnotation = GetNameAnnotation(moaiClass, annotations, methodPosition, warnings);
             if (nameAnnotation == null) return null;
 
             // Check that there is a single @text annotation
@@ -66,9 +66,9 @@ namespace MoaiUtils.MoaiParsing.Parsing {
             var method = new Method {
                 MethodPosition = methodPosition,
                 Name = nameAnnotation.Value,
-                OwningType = type,
+                OwningClass = moaiClass,
             };
-            type.Members.Add(method);
+            moaiClass.Members.Add(method);
             MethodOverload currentOverload = null;
             foreach (var annotation in annotations) {
                 if (annotation is NameAnnotation) {
@@ -125,7 +125,7 @@ namespace MoaiUtils.MoaiParsing.Parsing {
             }
         }
 
-        private static NameAnnotation GetNameAnnotation(Type type, Annotation[] annotations, MethodPosition methodPosition, WarningList warnings) {
+        private static NameAnnotation GetNameAnnotation(MoaiClass moaiClass, Annotation[] annotations, MethodPosition methodPosition, WarningList warnings) {
             // Check that there is a single @name annotation and that it isn't a duplicate. Otherwise exit.
             int nameAnnotationCount = annotations.OfType<NameAnnotation>().Count();
             if (nameAnnotationCount == 0) {
@@ -136,7 +136,7 @@ namespace MoaiUtils.MoaiParsing.Parsing {
                 warnings.Add(methodPosition, WarningType.UnexpectedAnnotation, "Multiple @name annotations.");
             }
             var nameAnnotation = annotations.OfType<NameAnnotation>().Single();
-            if (type.Members.Any(member => member.Name == nameAnnotation.Value)) {
+            if (moaiClass.Members.Any(member => member.Name == nameAnnotation.Value)) {
                 warnings.Add(methodPosition, WarningType.UnexpectedValue,
                     "There is already a member with name '{0}'.", nameAnnotation.Value);
                 return null;

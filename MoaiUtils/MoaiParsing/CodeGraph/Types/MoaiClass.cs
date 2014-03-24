@@ -2,48 +2,52 @@
 using System.Linq;
 using MoaiUtils.Tools;
 
-namespace MoaiUtils.MoaiParsing.CodeGraph {
-    public class Type {
-        public Type() {
-            Members = new List<TypeMember>();
-            BaseTypes = new List<Type>();
+namespace MoaiUtils.MoaiParsing.CodeGraph.Types {
+    public class MoaiClass : IType {
+        public MoaiClass() {
+            Members = new List<ClassMember>();
+            BaseClasses = new List<MoaiClass>();
             DocumentationReferences = new SortedSet<FilePosition>();
         }
 
-        public TypePosition TypePosition { get; set; }
         public string Name { get; set; }
-        public bool IsPrimitive { get; set; }
-        public bool IsScriptable { get; set; }
         public string Description { get; set; }
-        public List<TypeMember> Members { get; private set; }
-        public List<Type> BaseTypes { get; private set; }
+        public ClassPosition ClassPosition { get; set; }
+        public bool IsScriptable { get; set; }
+
+        public List<ClassMember> Members { get; private set; }
+        public List<MoaiClass> BaseClasses { get; private set; }
         public SortedSet<FilePosition> DocumentationReferences { get; private set; }
 
         public string Signature {
             get {
                 return string.Format(
-                    BaseTypes.Any() ? "class {0} : {1}" : "class {0}",
-                    Name, BaseTypes.Select(type => type.Name).Join(", "));
+                    BaseClasses.Any() ? "class {0} : {1}" : "class {0}",
+                    Name, BaseClasses.Select(c => c.Name).Join(", "));
             }
         }
 
-        public IEnumerable<TypeMember> InheritedMembers {
+        public bool IsConfirmed {
+            get { return IsDocumented; }
+        }
+
+        public IEnumerable<ClassMember> InheritedMembers {
             get {
-                return BaseTypes
+                return BaseClasses
                     .SelectMany(baseType => baseType.AllMembers)
                     .Distinct(MemberNameEqualityComparer.Instance)
                     .Except(Members, MemberNameEqualityComparer.Instance);
             }
         }
 
-        public IEnumerable<TypeMember> AllMembers {
+        public IEnumerable<ClassMember> AllMembers {
             get { return Members.Concat(InheritedMembers); }
         }
 
-        public IEnumerable<Type> AncestorTypes {
+        public IEnumerable<MoaiClass> AncestorClasses {
             get {
-                return BaseTypes
-                    .Concat(BaseTypes.SelectMany(baseType => baseType.AncestorTypes))
+                return BaseClasses
+                    .Concat(BaseClasses.SelectMany(c => c.AncestorClasses))
                     .Distinct();
             }
         }
@@ -56,16 +60,16 @@ namespace MoaiUtils.MoaiParsing.CodeGraph {
             get { return Description != null || Members.Any(); }
         }
 
-        private class MemberNameEqualityComparer : IEqualityComparer<TypeMember> {
+        private class MemberNameEqualityComparer : IEqualityComparer<ClassMember> {
             public static readonly MemberNameEqualityComparer Instance = new MemberNameEqualityComparer();
 
-            private MemberNameEqualityComparer() {}
+            private MemberNameEqualityComparer() { }
 
-            public bool Equals(TypeMember x, TypeMember y) {
+            public bool Equals(ClassMember x, ClassMember y) {
                 return x.Name == y.Name;
             }
 
-            public int GetHashCode(TypeMember obj) {
+            public int GetHashCode(ClassMember obj) {
                 return obj.Name.GetHashCode();
             }
         }

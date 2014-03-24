@@ -6,51 +6,52 @@ using System.Text.RegularExpressions;
 using MoaiUtils.LuaIO;
 using MoaiUtils.MoaiParsing;
 using MoaiUtils.MoaiParsing.CodeGraph;
+using MoaiUtils.MoaiParsing.CodeGraph.Types;
 using MoaiUtils.Tools;
 using Parameter = MoaiUtils.MoaiParsing.CodeGraph.Parameter;
 
 namespace MoaiUtils.DocExport.Exporters {
     public class ZeroBraneExporter : IApiExporter {
-        public void Export(IEnumerable<Type> types, string header, DirectoryInfo outputDirectory) {
+        public void Export(IEnumerable<MoaiClass> classes, string header, DirectoryInfo outputDirectory) {
             // Create contents
-            LuaTable typeListTable = CreateTypeListTable(types.Where(type => type.IsScriptable));
+            LuaTable typeListTable = CreateTypeListTable(classes.Where(moaiClass => moaiClass.IsScriptable));
 
             // Write to file
             var targetFileInfo = outputDirectory.GetFileInfo("moai.lua");
             LuaTableWriter.Write(typeListTable, targetFileInfo, new LuaComment(header, blankLineAfter: true));
         }
 
-        private LuaTable CreateTypeListTable(IEnumerable<Type> types) {
+        private LuaTable CreateTypeListTable(IEnumerable<MoaiClass> classes) {
             var typeListTable = new LuaTable();
-            foreach (Type type in types.OrderBy(t => t.Name)) {
-                typeListTable.Add(new LuaComment(type.Signature, blankLineBefore: typeListTable.Any()));
-                typeListTable.Add(type.Name, CreateTypeTable(type));
+            foreach (MoaiClass moaiClass in classes.OrderBy(c => c.Name)) {
+                typeListTable.Add(new LuaComment(moaiClass.Signature, blankLineBefore: typeListTable.Any()));
+                typeListTable.Add(moaiClass.Name, CreateTypeTable(moaiClass));
             }
             return typeListTable;
         }
 
-        private LuaTable CreateTypeTable(Type type) {
+        private LuaTable CreateTypeTable(MoaiClass moaiClass) {
             return new LuaTable {
                 { "type", "class" },
-                { "description", ConvertString(type.Description) },
-                { "childs" /* sic */, CreateMemberListTable(type) }
+                { "description", ConvertString(moaiClass.Description) },
+                { "childs" /* sic */, CreateMemberListTable(moaiClass) }
             };
         }
 
-        private LuaTable CreateMemberListTable(Type type) {
+        private LuaTable CreateMemberListTable(MoaiClass moaiClass) {
             var memberListTable = new LuaTable();
 
             memberListTable.Add(new LuaComment("Direct members"));
-            IEnumerable<TypeMember> directMembers = type.Members
+            IEnumerable<ClassMember> directMembers = moaiClass.Members
                 .OrderBy(member => member.GetType().Name) // Attribute, then Constant, Flag, Method
                 .ThenBy(member => member.Name);
             foreach (var member in directMembers) {
                 memberListTable.Add(member.Name, CreateMemberTable((dynamic) member));
             }
 
-            if (type.InheritedMembers.Any()) {
+            if (moaiClass.InheritedMembers.Any()) {
                 memberListTable.Add(new LuaComment("Inherited members", blankLineBefore: true));
-                var inheritedMembers = type.InheritedMembers
+                var inheritedMembers = moaiClass.InheritedMembers
                     .OrderBy(member => member.GetType().Name)
                     .ThenBy(member => member.Name);
                 foreach (var member in inheritedMembers) {

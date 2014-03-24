@@ -47,7 +47,7 @@ namespace MoaiUtils.DocExport {
                     throw new ArgumentOutOfRangeException();
             }
             DirectoryInfo outputDirectory = new DirectoryInfo(configuration.OutputDirectory);
-            exporter.Export(parser.DocumentedTypes, header, outputDirectory);
+            exporter.Export(parser.DocumentedClasses, header, outputDirectory);
 
             Console.WriteLine("\nGenerated Moai documentation in {0} format in '{1}'.",
                 configuration.ExportFormat, outputDirectory.FullName);

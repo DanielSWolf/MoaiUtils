@@ -1,53 +1,54 @@
 ﻿using System.Linq;
 using MoaiUtils.MoaiParsing.CodeGraph;
+using MoaiUtils.MoaiParsing.CodeGraph.Types;
 
 namespace MoaiUtils.MoaiParsing.Parsing {
-    public static class TypeParser {
+    public static class ClassParser {
         
-        public static void ParseTypeDocumentation(Type type, Annotation[] annotations, Type[] baseTypes, TypePosition typePosition, WarningList warnings) {
+        public static void ParseClassDocumentation(MoaiClass moaiClass, Annotation[] annotations, MoaiClass[] baseClasses, ClassPosition classPosition, WarningList warnings) {
             // Check that there is a single @name annotation
             int nameAnnotationCount = annotations.OfType<NameAnnotation>().Count();
             if (nameAnnotationCount == 0) {
-                warnings.Add(typePosition, WarningType.MissingAnnotation, "Missing @name annotation.");
+                warnings.Add(classPosition, WarningType.MissingAnnotation, "Missing @name annotation.");
             } else if (nameAnnotationCount > 1) {
-                warnings.Add(typePosition, WarningType.UnexpectedAnnotation, "Multiple @name annotations.");
+                warnings.Add(classPosition, WarningType.UnexpectedAnnotation, "Multiple @name annotations.");
             }
 
             // Check that there is a single @text annotation
             int textAnnotationCount = annotations.OfType<TextAnnotation>().Count();
             if (textAnnotationCount == 0) {
-                warnings.Add(typePosition, WarningType.MissingAnnotation, "Missing @text annotation.");
+                warnings.Add(classPosition, WarningType.MissingAnnotation, "Missing @text annotation.");
             } else if (textAnnotationCount > 1) {
-                warnings.Add(typePosition, WarningType.UnexpectedAnnotation, "Multiple @text annotations.");
+                warnings.Add(classPosition, WarningType.UnexpectedAnnotation, "Multiple @text annotations.");
             }
 
-            // Store base types
-            type.BaseTypes.AddRange(baseTypes);
+            // Store base classes
+            moaiClass.BaseClasses.AddRange(baseClasses);
 
             // Parse annotations
             foreach (var annotation in annotations) {
                 if (annotation is NameAnnotation) {
                     // Nothing to do. Name is already set. Just make sure the annotation is correct.
                     var nameAnnotation = (NameAnnotation) annotation;
-                    if (nameAnnotation.Value != type.Name) {
-                        warnings.Add(typePosition, WarningType.UnexpectedValue,
-                            "@name annotation has inconsistent value '{0}'. Expected '{1}'.", nameAnnotation.Value, type.Name);
+                    if (nameAnnotation.Value != moaiClass.Name) {
+                        warnings.Add(classPosition, WarningType.UnexpectedValue,
+                            "@name annotation has inconsistent value '{0}'. Expected '{1}'.", nameAnnotation.Value, moaiClass.Name);
                     }
                 } else if (annotation is TextAnnotation) {
-                    // Set type description
-                    type.Description = ((TextAnnotation) annotation).Value;
+                    // Set class description
+                    moaiClass.Description = ((TextAnnotation) annotation).Value;
                 } else if (annotation is FieldAnnotation) {
                     // Add field (constant, flag, or attribute)
                     var fieldAnnotation = (FieldAnnotation) annotation;
                     Field field = (annotation is ConstantAnnotation) ? new Constant()
                         : (annotation is FlagAnnotation) ? (Field) new Flag()
                         : new Attribute();
-                    field.OwningType = type;
+                    field.OwningClass = moaiClass;
                     field.Name = fieldAnnotation.Name;
                     field.Description = fieldAnnotation.Description;
-                    type.Members.Add(field);
+                    moaiClass.Members.Add(field);
                 } else {
-                    warnings.Add(typePosition, WarningType.UnexpectedAnnotation,
+                    warnings.Add(classPosition, WarningType.UnexpectedAnnotation,
                         "Unexpected {0} annotation.", annotation.Command);
                 }
             }

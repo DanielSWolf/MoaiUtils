@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 
 namespace MoaiUtils.MoaiParsing.CodeGraph {
-    public class Method : TypeMember {
+    public class Method : ClassMember {
         public Method() {
             Overloads = new List<MethodOverload>();
         }

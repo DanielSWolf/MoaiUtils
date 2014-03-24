@@ -42,32 +42,32 @@ namespace MoaiUtils.MoaiParsing {
         #endregion
     }
 
-    public class TypePosition : FilePosition {
-        public TypePosition(FilePosition filePosition, string typeName)
+    public class ClassPosition : FilePosition {
+        public ClassPosition(FilePosition filePosition, string className)
             : base(filePosition.FileInfo) {
-            TypeName = typeName;
+            ClassName = className;
         }
 
-        public string TypeName { get; private set; }
+        public string ClassName { get; private set; }
 
         public override string ToString(bool pathAsUri) {
-            return string.Format("{0}, type {1}", GetFileDescription(pathAsUri), TypeName);
+            return string.Format("{0}, type {1}", GetFileDescription(pathAsUri), ClassName);
         }
     }
 
-    public class MethodPosition : TypePosition {
-        public MethodPosition(FilePosition filePosition, string typeName, string nativeMethodName)
-            : base(filePosition, typeName) {
+    public class MethodPosition : ClassPosition {
+        public MethodPosition(FilePosition filePosition, string className, string nativeMethodName)
+            : base(filePosition, className) {
             NativeMethodName = nativeMethodName;
         }
 
-        public MethodPosition(TypePosition typePosition, string memberName)
-            : this(typePosition, typePosition.TypeName, memberName) {}
+        public MethodPosition(ClassPosition classPosition, string memberName)
+            : this(classPosition, classPosition.ClassName, memberName) {}
 
         public string NativeMethodName { get; private set; }
 
         public override string ToString(bool pathAsUri) {
-            return string.Format("{0}, {1}::{2}()", GetFileDescription(pathAsUri), TypeName, NativeMethodName);
+            return string.Format("{0}, {1}::{2}()", GetFileDescription(pathAsUri), ClassName, NativeMethodName);
         }
     }
 

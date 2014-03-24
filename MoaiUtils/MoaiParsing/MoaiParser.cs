@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using MoaiUtils.Common;
 using MoaiUtils.MoaiParsing.Checks;
+using MoaiUtils.MoaiParsing.CodeGraph.Types;
 using MoaiUtils.MoaiParsing.Parsing;
 using MoaiUtils.Tools;
-using Type = MoaiUtils.MoaiParsing.CodeGraph.Type;
 
 namespace MoaiUtils.MoaiParsing {
     public class MoaiParser {
@@ -35,10 +35,10 @@ namespace MoaiUtils.MoaiParsing {
             statusCallback(string.Format("Found {0}.", MoaiVersionInfo));
 
             // Initialize type list with primitive types
-            types = new TypeCollection(initializeWithPrimitives: true);
+            types = new TypeCollection(includePrimitives: true, includeVariant: true);
 
-            // Parse Moai types and store them by type name
-            statusCallback("Parsing Moai types.");
+            // Parse Moai classes and store them by class name
+            statusCallback("Parsing Moai classes.");
             ParseMoaiCodeFiles(moaiDirectory);
 
             // MOAILuaObject is not documented, probably because it would mess up
@@ -48,15 +48,15 @@ namespace MoaiUtils.MoaiParsing {
             FileParser.ParseMoaiCodeFile(MOAILuaObject.DummyCode, dummyFilePosition, types, Warnings);
 
             // Make sure every class directly or indirectly inherits from MOAILuaObject
-            Type luaObjectType = types.GetOrCreate("MOAILuaObject", null);
-            foreach (Type type in types) {
-                if (!(type.AncestorTypes.Contains(luaObjectType)) && type != luaObjectType) {
-                    type.BaseTypes.Add(luaObjectType);
+            MoaiClass luaObjectClass = types.GetOrCreateClass("MOAILuaObject", null);
+            foreach (MoaiClass moaiClass in types.OfType<MoaiClass>()) {
+                if (!(moaiClass.AncestorClasses.Contains(luaObjectClass)) && moaiClass != luaObjectClass) {
+                    moaiClass.BaseClasses.Add(luaObjectClass);
                 }
             }
 
             // Mark registered classes as scriptable
-            statusCallback("Checking which types are registered to be scriptable from Lua.");
+            statusCallback("Checking which classes are registered to be scriptable from Lua.");
             MarkScriptableClasses(moaiDirectory);
 
             // Perform additional checks that do not alter the code graph
@@ -85,8 +85,12 @@ namespace MoaiUtils.MoaiParsing {
             }
         }
 
-        public IEnumerable<Type> DocumentedTypes {
-            get { return types.Where(type => type.IsDocumented); }
+        public IEnumerable<MoaiClass> DocumentedClasses {
+            get {
+                return types
+                    .OfType<MoaiClass>()
+                    .Where(moaiClass => moaiClass.IsDocumented);
+            }
         }
 
         private void ParseMoaiCodeFiles(DirectoryInfo moaiDirectory) {
@@ -120,12 +124,12 @@ namespace MoaiUtils.MoaiParsing {
                     continue;
                 }
 
-                // Search file for type registrations
+                // Search file for class registrations
                 var matches = registrationRegex.Matches(File.ReadAllText(fileName));
                 foreach (Match match in matches) {
-                    string typeName = match.Groups["className"].Value;
-                    Type type = types.GetOrCreate(typeName, new FilePosition(new FileInfo(fileName)));
-                    type.IsScriptable = true;
+                    string className = match.Groups["className"].Value;
+                    MoaiClass moaiClass = types.GetOrCreateClass(className, new FilePosition(new FileInfo(fileName)));
+                    moaiClass.IsScriptable = true;
                 }
             }
         }

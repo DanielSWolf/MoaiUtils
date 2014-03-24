@@ -4,17 +4,17 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using MoaiUtils.MoaiParsing.CodeGraph;
+using MoaiUtils.MoaiParsing.CodeGraph.Types;
 using MoaiUtils.Tools;
 using Newtonsoft.Json.Linq;
-using Type = MoaiUtils.MoaiParsing.CodeGraph.Type;
 
 namespace MoaiUtils.DocExport.Exporters {
     public class SublimeTextExporter : IApiExporter {
-        public void Export(IEnumerable<Type> types, string header, DirectoryInfo outputDirectory) {
+        public void Export(IEnumerable<MoaiClass> classes, string header, DirectoryInfo outputDirectory) {
             // Create contents
             JObject contentsObject = new JObject {
                 { "scope", "source.lua" },
-                { "completions", CreateCompletionListTable(types.Where(type => type.IsScriptable)) }
+                { "completions", CreateCompletionListTable(classes.Where(moaiClass => moaiClass.IsScriptable)) }
             };
 
             // Write to file
@@ -29,30 +29,30 @@ namespace MoaiUtils.DocExport.Exporters {
             }
         }
 
-        private JArray CreateCompletionListTable(IEnumerable<Type> types) {
+        private JArray CreateCompletionListTable(IEnumerable<MoaiClass> classes) {
             JArray completionList = new JArray();
-            foreach (var type in types.OrderBy(type => type.Name)) {
+            foreach (var moaiClass in classes.OrderBy(c => c.Name)) {
                 // Add class name
-                completionList.Add(type.Name);
+                completionList.Add(moaiClass.Name);
 
                 // Add fields
-                var fields = type.AllMembers
+                var fields = moaiClass.AllMembers
                     .OfType<Field>()
                     .OrderBy(field => field.Name);
                 foreach (var field in fields) {
-                    completionList.Add(string.Format("{0}.{1}", type.Name, field.Name));
+                    completionList.Add(string.Format("{0}.{1}", moaiClass.Name, field.Name));
                 }
 
                 // Add methods
-                var methods = type.AllMembers
+                var methods = moaiClass.AllMembers
                     .OfType<Method>()
                     .OrderBy(method => method.Name);
                 foreach (var method in methods) {
                     foreach (var overload in method.Overloads) {
                         string trigger = string.Format("{0}.{1}{2}",
-                            type.Name, method.Name, FormatTriggerParams(overload.InParameters));
+                            moaiClass.Name, method.Name, FormatTriggerParams(overload.InParameters));
                         string contents = overload.IsStatic
-                            ? string.Format("{0}.{1}{2}", type.Name, method.Name, FormatReplacementParams(overload.InParameters))
+                            ? string.Format("{0}.{1}{2}", moaiClass.Name, method.Name, FormatReplacementParams(overload.InParameters))
                             : string.Format("{0}{1}", method.Name, FormatReplacementParams(overload.InParameters.Skip(1).ToList()));
                         completionList.Add(new JObject {
                             { "trigger", trigger },

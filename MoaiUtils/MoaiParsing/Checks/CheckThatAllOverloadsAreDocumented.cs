@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using MoaiUtils.MoaiParsing.CodeGraph;
-using Type = MoaiUtils.MoaiParsing.CodeGraph.Type;
+using MoaiUtils.MoaiParsing.CodeGraph.Types;
 
 namespace MoaiUtils.MoaiParsing.Checks {
     public class CheckThatAllOverloadsAreDocumented : CheckBase {
@@ -25,7 +25,7 @@ namespace MoaiUtils.MoaiParsing.Checks {
                 foreach (Match match in matches) {
                     // Find the Lua name for the param name
                     string paramTypeName = match.Groups["type"].Value;
-                    Type paramType = Types.Find(paramTypeName, MatchMode.FindSynonyms, t => t.IsDocumented | t.IsPrimitive);
+                    IType paramType = Types.Find(paramTypeName, MatchMode.FindSynonyms, t => t.IsConfirmed);
                     if (paramType != null) paramTypeName = paramType.Name;
 
                     int index = Int32.Parse(match.Groups["index"].Value, CultureInfo.InvariantCulture);

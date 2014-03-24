@@ -31,10 +31,10 @@ namespace MoaiUtils.MoaiParsing.Checks {
                     }
                     var firstInParam = overload.InParameters.FirstOrDefault();
                     if (firstInParam != null && firstInParam.Name == "self") {
-                        if (firstInParam.Type != method.OwningType) {
+                        if (firstInParam.Type != method.OwningClass) {
                             Warnings.Add(method.MethodPosition, WarningType.UnexpectedValue,
                                 "'self' param is of type {0}. Expected {1}.",
-                                firstInParam.Type != null ? firstInParam.Type.Name : "unknown", method.OwningType.Name);
+                                firstInParam.Type != null ? firstInParam.Type.Name : "unknown", method.OwningClass.Name);
                         }
                     }
                 }
