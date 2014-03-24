@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using MoaiUtils.MoaiParsing.CodeGraph;
+using Type = MoaiUtils.MoaiParsing.CodeGraph.Type;
 
 namespace MoaiUtils.MoaiParsing.Checks {
     public class CheckThatAllOverloadsAreDocumented : CheckBase {
@@ -12,7 +13,7 @@ namespace MoaiUtils.MoaiParsing.Checks {
             RegexOptions.ExplicitCapture | RegexOptions.Compiled);
 
         public override void Run() {
-            foreach (MoaiMethod method in Methods) {
+            foreach (Method method in Methods) {
                 // Make sure the method has at least one overload
                 if (!method.Overloads.Any()) {
                     Warnings.Add(method.MethodPosition, WarningType.MissingAnnotation,
@@ -24,7 +25,7 @@ namespace MoaiUtils.MoaiParsing.Checks {
                 foreach (Match match in matches) {
                     // Find the Lua name for the param name
                     string paramTypeName = match.Groups["type"].Value;
-                    MoaiType paramType = Types.Find(paramTypeName, MatchMode.FindSynonyms, t => t.IsDocumented | t.IsPrimitive);
+                    Type paramType = Types.Find(paramTypeName, MatchMode.FindSynonyms, t => t.IsDocumented | t.IsPrimitive);
                     if (paramType != null) paramTypeName = paramType.Name;
 
                     int index = Int32.Parse(match.Groups["index"].Value, CultureInfo.InvariantCulture);

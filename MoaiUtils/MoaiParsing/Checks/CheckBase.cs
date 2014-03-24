@@ -7,7 +7,7 @@ using MoaiUtils.Tools;
 namespace MoaiUtils.MoaiParsing.Checks {
     public abstract class CheckBase {
         public DirectoryInfo MoaiDirectory { get; set; }
-        public MoaiTypeCollection Types { get; set; }
+        public TypeCollection Types { get; set; }
         public WarningList Warnings { get; set; }
         
         public abstract void Run();
@@ -16,8 +16,8 @@ namespace MoaiUtils.MoaiParsing.Checks {
             get { return MoaiDirectory.GetDirectoryInfo("src"); }
         }
 
-        protected IEnumerable<MoaiMethod> Methods {
-            get { return Types.SelectMany(type => type.Members).OfType<MoaiMethod>(); }
+        protected IEnumerable<Method> Methods {
+            get { return Types.SelectMany(type => type.Members).OfType<Method>(); }
         }
     }
 }

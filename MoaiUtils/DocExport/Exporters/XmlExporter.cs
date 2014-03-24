@@ -7,10 +7,12 @@ using System.Xml.Linq;
 using MoaiUtils.MoaiParsing;
 using MoaiUtils.MoaiParsing.CodeGraph;
 using MoaiUtils.Tools;
+using Attribute = MoaiUtils.MoaiParsing.CodeGraph.Attribute;
+using Type = MoaiUtils.MoaiParsing.CodeGraph.Type;
 
 namespace MoaiUtils.DocExport.Exporters {
     public class XmlExporter : IApiExporter {
-        public void Export(IEnumerable<MoaiType> types, string header, DirectoryInfo outputDirectory) {
+        public void Export(IEnumerable<Type> types, string header, DirectoryInfo outputDirectory) {
             // Create XML DOM
             var document = new XDocument(
                 new XComment(header),
@@ -28,7 +30,7 @@ namespace MoaiUtils.DocExport.Exporters {
             }
         }
 
-        private XElement CreateTypeElement(MoaiType type) {
+        private XElement CreateTypeElement(Type type) {
             return new XElement("type",
                 new XAttribute("name", type.Name),
                 new XAttribute("scriptable", type.IsScriptable),
@@ -40,11 +42,11 @@ namespace MoaiUtils.DocExport.Exporters {
             );
         }
 
-        private XElement CreateMemberElement(MoaiField field) {
-            var fieldTypes = new Dictionary<Type, string> {
-                { typeof(MoaiConstant), "constant" },
-                { typeof(MoaiFlag), "flag" },
-                { typeof(MoaiAttribute), "attribute" }
+        private XElement CreateMemberElement(Field field) {
+            var fieldTypes = new Dictionary<System.Type, string> {
+                { typeof(Constant), "constant" },
+                { typeof(Flag), "flag" },
+                { typeof(Attribute), "attribute" }
             };
 
             return new XElement("field",
@@ -54,7 +56,7 @@ namespace MoaiUtils.DocExport.Exporters {
             );
         }
 
-        private XElement CreateMemberElement(MoaiMethod method) {
+        private XElement CreateMemberElement(Method method) {
             return new XElement("method",
                 new XAttribute("name", method.Name),
                 new XElement("description", method.Description),
@@ -66,7 +68,7 @@ namespace MoaiUtils.DocExport.Exporters {
             );
         }
 
-        private XElement CreateOverloadElement(MoaiMethodOverload overload) {
+        private XElement CreateOverloadElement(MethodOverload overload) {
             return new XElement("overload",
                 new XAttribute("static", overload.IsStatic),
                 new XElement("inParams", overload.InParameters.Select(CreateInParamElement)),
@@ -74,7 +76,7 @@ namespace MoaiUtils.DocExport.Exporters {
             );
         }
 
-        private XElement CreateInParamElement(MoaiInParameter param) {
+        private XElement CreateInParamElement(InParameter param) {
             return new XElement("inParam",
                 new XAttribute("name", param.Name ?? string.Empty),
                 new XAttribute("type", param.Type.Name),
@@ -83,7 +85,7 @@ namespace MoaiUtils.DocExport.Exporters {
             );
         }
 
-        private XElement CreateOutParamElement(MoaiOutParameter param) {
+        private XElement CreateOutParamElement(OutParameter param) {
             return new XElement("outParam",
                 new XAttribute("name", param.Name ?? string.Empty),
                 new XAttribute("type", param.Type.Name),

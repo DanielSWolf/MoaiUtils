@@ -5,14 +5,14 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using MoaiUtils.Common;
 using MoaiUtils.MoaiParsing.Checks;
-using MoaiUtils.MoaiParsing.CodeGraph;
 using MoaiUtils.MoaiParsing.Parsing;
 using MoaiUtils.Tools;
+using Type = MoaiUtils.MoaiParsing.CodeGraph.Type;
 
 namespace MoaiUtils.MoaiParsing {
     public class MoaiParser {
         private readonly Action<string> statusCallback;
-        private MoaiTypeCollection types;
+        private TypeCollection types;
 
         public MoaiParser(Action<string> statusCallback) {
             this.statusCallback = statusCallback;
@@ -35,7 +35,7 @@ namespace MoaiUtils.MoaiParsing {
             statusCallback(string.Format("Found {0}.", MoaiVersionInfo));
 
             // Initialize type list with primitive types
-            types = new MoaiTypeCollection(initializeWithPrimitives: true);
+            types = new TypeCollection(initializeWithPrimitives: true);
 
             // Parse Moai types and store them by type name
             statusCallback("Parsing Moai types.");
@@ -43,15 +43,15 @@ namespace MoaiUtils.MoaiParsing {
 
             // MOAILuaObject is not documented, probably because it would mess up
             // the Doxygen-generated documentation. Use dummy code instead.
-            statusCallback("Adding hard-coded documentation for MoaiLuaObject base class.");
-            FilePosition dummyFilePosition = new FilePosition(new FileInfo("MoaiLuaObject dummy code"));
-            MoaiFileParser.ParseMoaiCodeFile(MoaiLuaObject.DummyCode, dummyFilePosition, types, Warnings);
+            statusCallback("Adding hard-coded documentation for MOAILuaObject base class.");
+            FilePosition dummyFilePosition = new FilePosition(new FileInfo("MOAILuaObject dummy code"));
+            FileParser.ParseMoaiCodeFile(MOAILuaObject.DummyCode, dummyFilePosition, types, Warnings);
 
             // Make sure every class directly or indirectly inherits from MOAILuaObject
-            MoaiType moaiLuaObjectType = types.GetOrCreate("MOAILuaObject", null);
-            foreach (MoaiType type in types) {
-                if (!(type.AncestorTypes.Contains(moaiLuaObjectType)) && type != moaiLuaObjectType) {
-                    type.BaseTypes.Add(moaiLuaObjectType);
+            Type luaObjectType = types.GetOrCreate("MOAILuaObject", null);
+            foreach (Type type in types) {
+                if (!(type.AncestorTypes.Contains(luaObjectType)) && type != luaObjectType) {
+                    type.BaseTypes.Add(luaObjectType);
                 }
             }
 
@@ -85,7 +85,7 @@ namespace MoaiUtils.MoaiParsing {
             }
         }
 
-        public IEnumerable<MoaiType> DocumentedTypes {
+        public IEnumerable<Type> DocumentedTypes {
             get { return types.Where(type => type.IsDocumented); }
         }
 
@@ -95,7 +95,7 @@ namespace MoaiUtils.MoaiParsing {
             IEnumerable<FileInfo> codeFiles = srcDirectory.GetFilesRecursively(".cpp", ".h");
 
             foreach (var codeFile in codeFiles) {
-                MoaiFileParser.ParseMoaiCodeFile(codeFile, new FilePosition(codeFile), types, Warnings);
+                FileParser.ParseMoaiCodeFile(codeFile, new FilePosition(codeFile), types, Warnings);
             }
         }
 
@@ -124,7 +124,7 @@ namespace MoaiUtils.MoaiParsing {
                 var matches = registrationRegex.Matches(File.ReadAllText(fileName));
                 foreach (Match match in matches) {
                     string typeName = match.Groups["className"].Value;
-                    MoaiType type = types.GetOrCreate(typeName, new FilePosition(new FileInfo(fileName)));
+                    Type type = types.GetOrCreate(typeName, new FilePosition(new FileInfo(fileName)));
                     type.IsScriptable = true;
                 }
             }

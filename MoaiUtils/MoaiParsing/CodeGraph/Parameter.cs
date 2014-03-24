@@ -1,8 +1,8 @@
 ﻿namespace MoaiUtils.MoaiParsing.CodeGraph {
-    public abstract class MoaiParameter : INamedEntity, IDocumentedEntity {
+    public abstract class Parameter : INamedEntity, IDocumentedEntity {
         public string Name { get; set; }
         public string Description { get; set; }
-        public MoaiType Type { get; set; }
+        public Type Type { get; set; }
 
         public override string ToString() {
             return string.Format("{0} {1}", Type, Name);

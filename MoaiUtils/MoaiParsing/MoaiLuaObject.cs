@@ -1,5 +1,5 @@
 ﻿namespace MoaiUtils.MoaiParsing {
-    public static class MoaiLuaObject {
+    public static class MOAILuaObject {
         public const string DummyCode = @"
 /** @name   MOAILuaObject
     @text   Base class for all of Moai's Lua classes.

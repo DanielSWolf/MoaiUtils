@@ -5,6 +5,7 @@ using System.Linq;
 using MoaiUtils.MoaiParsing.CodeGraph;
 using MoaiUtils.Tools;
 using MoreLinq;
+using Type = MoaiUtils.MoaiParsing.CodeGraph.Type;
 
 namespace MoaiUtils.MoaiParsing {
     [Flags]
@@ -14,10 +15,10 @@ namespace MoaiUtils.MoaiParsing {
         FindSynonyms = 2
     }
 
-    public class MoaiTypeCollection : IEnumerable<MoaiType> {
-        private readonly Dictionary<string, MoaiType> typesByName = new Dictionary<string, MoaiType>();
+    public class TypeCollection : IEnumerable<Type> {
+        private readonly Dictionary<string, Type> typesByName = new Dictionary<string, Type>();
 
-        public MoaiTypeCollection(bool initializeWithPrimitives) {
+        public TypeCollection(bool initializeWithPrimitives) {
             if (initializeWithPrimitives) {
                 var primitiveTypeNames = new[] {
                     "nil", "boolean", "number", "string", "userdata", "function", "thread", "table"
@@ -28,37 +29,37 @@ namespace MoaiUtils.MoaiParsing {
             }
         }
 
-        public MoaiType GetOrCreate(string typeName, FilePosition documentationPosition) {
-            MoaiType result = typesByName.ContainsKey(typeName)
+        public Type GetOrCreate(string typeName, FilePosition documentationPosition) {
+            Type result = typesByName.ContainsKey(typeName)
                 ? typesByName[typeName]
-                : typesByName[typeName] = new MoaiType { Name = typeName };
+                : typesByName[typeName] = new Type { Name = typeName };
             if (documentationPosition != null) {
                 result.DocumentationReferences.Add(documentationPosition);
             }
             return result;
         }
 
-        public MoaiType Find(string typeName, MatchMode matchMode = MatchMode.Strict, Predicate<MoaiType> allow = null) {
+        public Type Find(string typeName, MatchMode matchMode = MatchMode.Strict, Predicate<Type> allow = null) {
             if (allow == null) allow = type => true;
 
             if (typesByName.ContainsKey(typeName)) {
-                MoaiType result = typesByName[typeName];
+                Type result = typesByName[typeName];
                 if (allow(result)) return result;
             }
             if (matchMode.HasFlag(MatchMode.FindSynonyms)) {
-                MoaiType result = GetBySynonym(typeName);
+                Type result = GetBySynonym(typeName);
                 if (result != null && allow(result)) return result;
             }
             if (matchMode.HasFlag(MatchMode.FindSimilar)) {
-                MoaiType result = GetFuzzy(typeName, allow);
+                Type result = GetFuzzy(typeName, allow);
                 if (result != null) return result;
             }
             return null;
         }
 
-        private MoaiType GetFuzzy(string typeName, Predicate<MoaiType> allow) {
+        private Type GetFuzzy(string typeName, Predicate<Type> allow) {
             // Find type with closest name
-            MoaiType closestType = typesByName
+            Type closestType = typesByName
                 .Where(pair => allow(pair.Value))
                 .Select(pair => pair.Value)
                 .MinBy(type => Levenshtein.Distance(type.Name, typeName));
@@ -68,7 +69,7 @@ namespace MoaiUtils.MoaiParsing {
             return (similarity >= 0.6) ? closestType : null;
         }
 
-        private MoaiType GetBySynonym(string typeName) {
+        private Type GetBySynonym(string typeName) {
             if (booleanSynonyms.Contains(typeName)) {
                 return typesByName["boolean"];
             }
@@ -81,7 +82,7 @@ namespace MoaiUtils.MoaiParsing {
             return null;
         }
         
-        IEnumerator<MoaiType> IEnumerable<MoaiType>.GetEnumerator() {
+        IEnumerator<Type> IEnumerable<Type>.GetEnumerator() {
             return typesByName.Values.GetEnumerator();
         }
 

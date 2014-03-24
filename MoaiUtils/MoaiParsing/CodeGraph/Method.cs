@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 
 namespace MoaiUtils.MoaiParsing.CodeGraph {
-    public class MoaiMethod : MoaiTypeMember {
-        public MoaiMethod() {
-            Overloads = new List<MoaiMethodOverload>();
+    public class Method : TypeMember {
+        public Method() {
+            Overloads = new List<MethodOverload>();
         }
 
         public MethodPosition MethodPosition { get; set; }
-        public List<MoaiMethodOverload> Overloads { get; private set; }
+        public List<MethodOverload> Overloads { get; private set; }
         public ISignature InParameterSignature { get; set; }
         public ISignature OutParameterSignature { get; set; }
         public string Body { get; set; }

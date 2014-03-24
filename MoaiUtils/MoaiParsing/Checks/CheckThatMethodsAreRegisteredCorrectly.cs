@@ -27,12 +27,12 @@ namespace MoaiUtils.MoaiParsing.Checks {
                 .ToDictionary(typeGroup => typeGroup.Key, typeGroup => typeGroup.ToList());
 
             // Check that all methods are registered as expected
-            foreach (MoaiMethod method in Methods) {
+            foreach (Method method in Methods) {
                 CheckMethodRegistration(method, registrationsByType);
             }
         }
 
-        private void CheckMethodRegistration(MoaiMethod method, Dictionary<string, List<MethodRegistration>> registrationsByType) {
+        private void CheckMethodRegistration(Method method, Dictionary<string, List<MethodRegistration>> registrationsByType) {
             var methodRegistrations = FindMethodRegistrations(method, registrationsByType).ToArray();
             string fullMethodName = string.Format("{0}::{1}()", method.OwningType.Name, method.MethodPosition.NativeMethodName);
 
@@ -109,7 +109,7 @@ namespace MoaiUtils.MoaiParsing.Checks {
             }
         }
 
-        private IEnumerable<MethodRegistration> FindMethodRegistrations(MoaiMethod method, Dictionary<string, List<MethodRegistration>> registrationsByType) {
+        private IEnumerable<MethodRegistration> FindMethodRegistrations(Method method, Dictionary<string, List<MethodRegistration>> registrationsByType) {
             List<MethodRegistration> methodRegistrations;
             if (!registrationsByType.TryGetValue(method.OwningType.Name, out methodRegistrations)) {
                 return Enumerable.Empty<MethodRegistration>();

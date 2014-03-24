@@ -4,6 +4,6 @@ using MoaiUtils.MoaiParsing.CodeGraph;
 
 namespace MoaiUtils.DocExport.Exporters {
     public interface IApiExporter {
-        void Export(IEnumerable<MoaiType> types, string header, DirectoryInfo outputDirectory);
+        void Export(IEnumerable<Type> types, string header, DirectoryInfo outputDirectory);
     }
 }

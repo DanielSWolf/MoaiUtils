@@ -1,5 +1,5 @@
 ﻿namespace MoaiUtils.MoaiParsing.CodeGraph {
-    public class MoaiInParameter : MoaiParameter {
+    public class InParameter : Parameter {
         public bool IsOptional { get; set; }
     }
 }

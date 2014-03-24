@@ -5,14 +5,14 @@ using MoaiUtils.MoaiParsing.CodeGraph;
 namespace MoaiUtils.MoaiParsing.Checks {
     public class CheckThatReferencedTypesAreKnown : CheckBase {
         public override void Run() {
-            IEnumerable<MoaiType> typesReferencedInDocumentation = Types
+            IEnumerable<Type> typesReferencedInDocumentation = Types
                 .Where(type => type.DocumentationReferences.Any());
-            foreach (MoaiType type in typesReferencedInDocumentation.ToArray()) {
+            foreach (Type type in typesReferencedInDocumentation.ToArray()) {
                 WarnIfSpeculative(type);
             }
         }
 
-        private void WarnIfSpeculative(MoaiType type) {
+        private void WarnIfSpeculative(Type type) {
             if (type.Name == "...") return;
 
             if (type.Name.EndsWith("...")) {
@@ -21,7 +21,7 @@ namespace MoaiUtils.MoaiParsing.Checks {
 
             if (!type.IsDocumented && !type.IsPrimitive) {
                 // Make an educated guess as to what type was meant.
-                MoaiType typeProposal = Types.Find(type.Name,
+                Type typeProposal = Types.Find(type.Name,
                     MatchMode.FindSynonyms, t => t.IsDocumented || t.IsPrimitive);
 
                 foreach (FilePosition referencingFilePosition in type.DocumentationReferences) {

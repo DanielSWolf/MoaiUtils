@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using MoaiUtils.MoaiParsing.CodeGraph;
+using Type = MoaiUtils.MoaiParsing.CodeGraph.Type;
 
 namespace MoaiUtils.MoaiParsing.Parsing {
-    public static class MoaiMethodParser {
-        public static void ParseMethodDocumentation(MoaiType type, Annotation[] annotations, string methodBody, MethodPosition methodPosition, MoaiTypeCollection types, WarningList warnings) {
-            MoaiMethod method = CreateMethod(type, annotations, methodPosition, types, warnings);
+    public static class MethodParser {
+        public static void ParseMethodDocumentation(Type type, Annotation[] annotations, string methodBody, MethodPosition methodPosition, TypeCollection types, WarningList warnings) {
+            Method method = CreateMethod(type, annotations, methodPosition, types, warnings);
             if (method == null) return;
 
             // Fill method body
@@ -16,13 +17,13 @@ namespace MoaiUtils.MoaiParsing.Parsing {
             CreateCompactSignature(method, warnings);
 
             // Determine if overloads are static
-            foreach (MoaiMethodOverload overload in method.Overloads) {
+            foreach (MethodOverload overload in method.Overloads) {
                 var firstInParam = overload.InParameters.FirstOrDefault();
                 overload.IsStatic = firstInParam == null || firstInParam.Name != "self";
             }
         }
 
-        private static void CreateCompactSignature(MoaiMethod method, WarningList warnings) {
+        private static void CreateCompactSignature(Method method, WarningList warnings) {
             try {
                 method.InParameterSignature = GetCompactSignature(method.Overloads.Select(overload => overload.InParameters.ToArray()));
                 method.OutParameterSignature = GetCompactSignature(method.Overloads.Select(overload => overload.OutParameters.ToArray()));
@@ -32,12 +33,12 @@ namespace MoaiUtils.MoaiParsing.Parsing {
             }
         }
 
-        private static ISignature GetCompactSignature(IEnumerable<MoaiParameter[]> overloads) {
+        private static ISignature GetCompactSignature(IEnumerable<CodeGraph.Parameter[]> overloads) {
             List<Parameter[]> parameterOverloads = new List<Parameter[]>();
-            foreach (MoaiParameter[] overload in overloads) {
+            foreach (CodeGraph.Parameter[] overload in overloads) {
                 // Input parameters may be optional. In these cases, create multiple overloads.
                 for (int index = overload.Length - 1;
-                    index >= 0 && overload[index] is MoaiInParameter && ((MoaiInParameter) overload[index]).IsOptional;
+                    index >= 0 && overload[index] is InParameter && ((InParameter) overload[index]).IsOptional;
                     index--) {
                     parameterOverloads.Add(ConvertOverload(overload.Take(index)).ToArray());
                 }
@@ -49,11 +50,11 @@ namespace MoaiUtils.MoaiParsing.Parsing {
                 : new Sequence();
         }
 
-        private static IEnumerable<Parameter> ConvertOverload(IEnumerable<MoaiParameter> overload) {
+        private static IEnumerable<Parameter> ConvertOverload(IEnumerable<CodeGraph.Parameter> overload) {
             return overload.Select(parameter => new Parameter { Name = parameter.Name, Type = parameter.Type.Name, ShowName = true });
         }
 
-        private static MoaiMethod CreateMethod(MoaiType type, Annotation[] annotations, MethodPosition methodPosition, MoaiTypeCollection types, WarningList warnings) {
+        private static Method CreateMethod(Type type, Annotation[] annotations, MethodPosition methodPosition, TypeCollection types, WarningList warnings) {
             // Get @name annotation
             var nameAnnotation = GetNameAnnotation(type, annotations, methodPosition, warnings);
             if (nameAnnotation == null) return null;
@@ -62,13 +63,13 @@ namespace MoaiUtils.MoaiParsing.Parsing {
             CheckTextAnnotation(annotations, methodPosition, warnings);
 
             // Parse annotations
-            var method = new MoaiMethod {
+            var method = new Method {
                 MethodPosition = methodPosition,
                 Name = nameAnnotation.Value,
                 OwningType = type,
             };
             type.Members.Add(method);
-            MoaiMethodOverload currentOverload = null;
+            MethodOverload currentOverload = null;
             foreach (var annotation in annotations) {
                 if (annotation is NameAnnotation) {
                     // Nothing to do - name has already been set.
@@ -77,7 +78,7 @@ namespace MoaiUtils.MoaiParsing.Parsing {
                     method.Description = ((TextAnnotation) annotation).Value;
                 } else if (annotation is ParameterAnnotation) {
                     if (currentOverload == null) {
-                        currentOverload = new MoaiMethodOverload {OwningMethod = method};
+                        currentOverload = new MethodOverload {OwningMethod = method};
                         method.Overloads.Add(currentOverload);
                     }
                     var parameterAnnotation = (ParameterAnnotation) annotation;
@@ -88,7 +89,7 @@ namespace MoaiUtils.MoaiParsing.Parsing {
                             warnings.Add(methodPosition, WarningType.UnexpectedValue,
                                 "Found multiple params with name '{0}' for single overload.", paramName);
                         }
-                        var inParameter = new MoaiInParameter {
+                        var inParameter = new InParameter {
                             Name = paramName,
                             Description = parameterAnnotation.Description,
                             Type = types.GetOrCreate(parameterAnnotation.Type, methodPosition),
@@ -97,7 +98,7 @@ namespace MoaiUtils.MoaiParsing.Parsing {
                         currentOverload.InParameters.Add(inParameter);
                     } else {
                         // Add output parameter
-                        var outParameter = new MoaiOutParameter {
+                        var outParameter = new OutParameter {
                             Name = paramName,
                             Type = types.GetOrCreate(parameterAnnotation.Type, methodPosition),
                             Description = parameterAnnotation.Description
@@ -124,7 +125,7 @@ namespace MoaiUtils.MoaiParsing.Parsing {
             }
         }
 
-        private static NameAnnotation GetNameAnnotation(MoaiType type, Annotation[] annotations, MethodPosition methodPosition, WarningList warnings) {
+        private static NameAnnotation GetNameAnnotation(Type type, Annotation[] annotations, MethodPosition methodPosition, WarningList warnings) {
             // Check that there is a single @name annotation and that it isn't a duplicate. Otherwise exit.
             int nameAnnotationCount = annotations.OfType<NameAnnotation>().Count();
             if (nameAnnotationCount == 0) {

@@ -4,7 +4,7 @@ namespace MoaiUtils.MoaiParsing.Checks {
     public class CheckThatMethodNamesFollowConvention : CheckBase {
         
         public override void Run() {
-            foreach (MoaiMethod method in Methods) {
+            foreach (Method method in Methods) {
                 // Check that @name annotation sticks to convention
                 if (!method.MethodPosition.NativeMethodName.StartsWith("_")) {
                     Warnings.Add(method.MethodPosition, WarningType.UnexpectedValue,

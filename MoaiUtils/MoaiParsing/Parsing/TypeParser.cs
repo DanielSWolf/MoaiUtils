@@ -2,9 +2,9 @@
 using MoaiUtils.MoaiParsing.CodeGraph;
 
 namespace MoaiUtils.MoaiParsing.Parsing {
-    public static class MoaiTypeParser {
+    public static class TypeParser {
         
-        public static void ParseTypeDocumentation(MoaiType type, Annotation[] annotations, MoaiType[] baseTypes, TypePosition typePosition, WarningList warnings) {
+        public static void ParseTypeDocumentation(Type type, Annotation[] annotations, Type[] baseTypes, TypePosition typePosition, WarningList warnings) {
             // Check that there is a single @name annotation
             int nameAnnotationCount = annotations.OfType<NameAnnotation>().Count();
             if (nameAnnotationCount == 0) {
@@ -39,9 +39,9 @@ namespace MoaiUtils.MoaiParsing.Parsing {
                 } else if (annotation is FieldAnnotation) {
                     // Add field (constant, flag, or attribute)
                     var fieldAnnotation = (FieldAnnotation) annotation;
-                    MoaiField field = (annotation is ConstantAnnotation) ? new MoaiConstant()
-                        : (annotation is FlagAnnotation) ? (MoaiField) new MoaiFlag()
-                        : new MoaiAttribute();
+                    Field field = (annotation is ConstantAnnotation) ? new Constant()
+                        : (annotation is FlagAnnotation) ? (Field) new Flag()
+                        : new Attribute();
                     field.OwningType = type;
                     field.Name = fieldAnnotation.Name;
                     field.Description = fieldAnnotation.Description;

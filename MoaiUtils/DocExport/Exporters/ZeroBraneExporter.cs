@@ -7,10 +7,11 @@ using MoaiUtils.LuaIO;
 using MoaiUtils.MoaiParsing;
 using MoaiUtils.MoaiParsing.CodeGraph;
 using MoaiUtils.Tools;
+using Parameter = MoaiUtils.MoaiParsing.CodeGraph.Parameter;
 
 namespace MoaiUtils.DocExport.Exporters {
     public class ZeroBraneExporter : IApiExporter {
-        public void Export(IEnumerable<MoaiType> types, string header, DirectoryInfo outputDirectory) {
+        public void Export(IEnumerable<Type> types, string header, DirectoryInfo outputDirectory) {
             // Create contents
             LuaTable typeListTable = CreateTypeListTable(types.Where(type => type.IsScriptable));
 
@@ -19,16 +20,16 @@ namespace MoaiUtils.DocExport.Exporters {
             LuaTableWriter.Write(typeListTable, targetFileInfo, new LuaComment(header, blankLineAfter: true));
         }
 
-        private LuaTable CreateTypeListTable(IEnumerable<MoaiType> types) {
+        private LuaTable CreateTypeListTable(IEnumerable<Type> types) {
             var typeListTable = new LuaTable();
-            foreach (MoaiType type in types.OrderBy(t => t.Name)) {
+            foreach (Type type in types.OrderBy(t => t.Name)) {
                 typeListTable.Add(new LuaComment(type.Signature, blankLineBefore: typeListTable.Any()));
                 typeListTable.Add(type.Name, CreateTypeTable(type));
             }
             return typeListTable;
         }
 
-        private LuaTable CreateTypeTable(MoaiType type) {
+        private LuaTable CreateTypeTable(Type type) {
             return new LuaTable {
                 { "type", "class" },
                 { "description", ConvertString(type.Description) },
@@ -36,12 +37,12 @@ namespace MoaiUtils.DocExport.Exporters {
             };
         }
 
-        private LuaTable CreateMemberListTable(MoaiType type) {
+        private LuaTable CreateMemberListTable(Type type) {
             var memberListTable = new LuaTable();
 
             memberListTable.Add(new LuaComment("Direct members"));
-            IEnumerable<MoaiTypeMember> directMembers = type.Members
-                .OrderBy(member => member.GetType().Name) // MoaiAttribute, then MoaiConstant, MoaiFlag, MoaiMethod
+            IEnumerable<TypeMember> directMembers = type.Members
+                .OrderBy(member => member.GetType().Name) // Attribute, then Constant, Flag, Method
                 .ThenBy(member => member.Name);
             foreach (var member in directMembers) {
                 memberListTable.Add(member.Name, CreateMemberTable((dynamic) member));
@@ -60,14 +61,14 @@ namespace MoaiUtils.DocExport.Exporters {
             return memberListTable;
         }
 
-        private LuaTable CreateMemberTable(MoaiField field) {
+        private LuaTable CreateMemberTable(Field field) {
             return new LuaTable {
                 { "type", "value" },
                 { "description", ConvertString(field.Description) }
             };
         }
 
-        private LuaTable CreateMemberTable(MoaiMethod method) {
+        private LuaTable CreateMemberTable(Method method) {
             StringBuilder description = new StringBuilder();
             description.AppendLine(method.Description);
             if (method.Overloads.Count == 1) {
@@ -92,8 +93,8 @@ namespace MoaiUtils.DocExport.Exporters {
             return memberTable;
         }
 
-        private static string GetValueType(MoaiMethod method) {
-            MoaiOutParameter[] outParameters = method.Overloads
+        private static string GetValueType(Method method) {
+            OutParameter[] outParameters = method.Overloads
                 .Where(overload => overload.OutParameters.Any())
                 .Select(overload => overload.OutParameters.First())
                 .ToArray();
@@ -111,7 +112,7 @@ namespace MoaiUtils.DocExport.Exporters {
             return valueType;
         }
 
-        private static string GetOverloadInfo(MoaiMethodOverload overload) {
+        private static string GetOverloadInfo(MethodOverload overload) {
             StringBuilder result = new StringBuilder();
             foreach (var inParameter in overload.InParameters) {
                 if (inParameter.IsOptional) {
@@ -132,7 +133,7 @@ namespace MoaiUtils.DocExport.Exporters {
             return result.ToString();
         }
 
-        private static void AppendParameterInfo(StringBuilder result, MoaiParameter parameter) {
+        private static void AppendParameterInfo(StringBuilder result, Parameter parameter) {
             result.Append(parameter.Type.Name);
             if (parameter.Name != null) {
                 result.AppendFormat(" {0}", parameter.Name);

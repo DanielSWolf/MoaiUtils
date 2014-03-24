@@ -6,10 +6,11 @@ using System.Text;
 using MoaiUtils.MoaiParsing.CodeGraph;
 using MoaiUtils.Tools;
 using Newtonsoft.Json.Linq;
+using Type = MoaiUtils.MoaiParsing.CodeGraph.Type;
 
 namespace MoaiUtils.DocExport.Exporters {
     public class SublimeTextExporter : IApiExporter {
-        public void Export(IEnumerable<MoaiType> types, string header, DirectoryInfo outputDirectory) {
+        public void Export(IEnumerable<Type> types, string header, DirectoryInfo outputDirectory) {
             // Create contents
             JObject contentsObject = new JObject {
                 { "scope", "source.lua" },
@@ -28,7 +29,7 @@ namespace MoaiUtils.DocExport.Exporters {
             }
         }
 
-        private JArray CreateCompletionListTable(IEnumerable<MoaiType> types) {
+        private JArray CreateCompletionListTable(IEnumerable<Type> types) {
             JArray completionList = new JArray();
             foreach (var type in types.OrderBy(type => type.Name)) {
                 // Add class name
@@ -36,7 +37,7 @@ namespace MoaiUtils.DocExport.Exporters {
 
                 // Add fields
                 var fields = type.AllMembers
-                    .OfType<MoaiField>()
+                    .OfType<Field>()
                     .OrderBy(field => field.Name);
                 foreach (var field in fields) {
                     completionList.Add(string.Format("{0}.{1}", type.Name, field.Name));
@@ -44,7 +45,7 @@ namespace MoaiUtils.DocExport.Exporters {
 
                 // Add methods
                 var methods = type.AllMembers
-                    .OfType<MoaiMethod>()
+                    .OfType<Method>()
                     .OrderBy(method => method.Name);
                 foreach (var method in methods) {
                     foreach (var overload in method.Overloads) {
@@ -64,7 +65,7 @@ namespace MoaiUtils.DocExport.Exporters {
             return completionList;
         }
 
-        private string FormatTriggerParams(List<MoaiInParameter> parameters) {
+        private string FormatTriggerParams(List<InParameter> parameters) {
             if (!parameters.Any()) return "( )";
 
             StringBuilder result = new StringBuilder("( ");
@@ -84,7 +85,7 @@ namespace MoaiUtils.DocExport.Exporters {
             return result.ToString();
         }
 
-        private string FormatReplacementParams(List<MoaiInParameter> parameters) {
+        private string FormatReplacementParams(List<InParameter> parameters) {
             if (!parameters.Any()) return "( )";
 
             var paramStrings = parameters
