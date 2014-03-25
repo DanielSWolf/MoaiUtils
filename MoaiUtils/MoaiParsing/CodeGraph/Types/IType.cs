@@ -4,7 +4,7 @@
         string Name { get; }
         string Description { get; }
         string Signature { get; }
-        bool IsConfirmed { get; }
+        bool Exists { get; }
     }
 
 }

@@ -36,10 +36,7 @@ namespace MoaiUtils.MoaiParsing.Parsing {
                 )?
                 |
                 # Method definition
-                int\s+(?<className>[A-Za-z0-9_]+)\s*::\s*(?<methodName>[A-Za-z0-9_]+)\s*\([^)]*\)\s*
-                (
-                    \{(?<methodBody>[\s\S]*?)(^\}|\}\s*//-----------------------------)
-                )?
+                int\s+(?<className>[A-Za-z0-9_]+)\s*::\s*(?<methodName>[A-Za-z0-9_]+)\s*\([^)]*\)\s*\{
             )", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.ExplicitCapture | RegexOptions.Compiled);
 
         private static void ParseDocumentationBlocks(string code, FilePosition filePosition, TypeCollection types, WarningList warnings) {
@@ -73,7 +70,9 @@ namespace MoaiUtils.MoaiParsing.Parsing {
                     // The documentation was attached to a method definition
 
                     // Get method body
-                    string methodBody = match.Groups["methodBody"].Value;
+                    int openingBraceIndex = match.Index + match.Length - 1;
+                    int blockLength = BlockParser.GetBlockLength(code, openingBraceIndex);
+                    string methodBody = code.Substring(openingBraceIndex + 1, blockLength - 2);
 
                     MethodParser.ParseMethodDocumentation(moaiClass, annotations, methodBody, (MethodPosition) documentationPosition, types, warnings);
                 } else {

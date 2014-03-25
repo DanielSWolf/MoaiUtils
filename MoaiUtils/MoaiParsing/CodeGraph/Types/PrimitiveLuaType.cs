@@ -16,7 +16,7 @@ namespace MoaiUtils.MoaiParsing.CodeGraph.Types {
             get { return Name; }
         }
 
-        public bool IsConfirmed {
+        public bool Exists {
             get { return true; }
         }
 

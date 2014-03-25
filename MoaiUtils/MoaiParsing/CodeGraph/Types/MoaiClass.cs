@@ -3,11 +3,12 @@ using System.Linq;
 using MoaiUtils.Tools;
 
 namespace MoaiUtils.MoaiParsing.CodeGraph.Types {
-    public class MoaiClass : IType {
+    public class MoaiClass : IType, IDocumentationReferenceAware {
+        private readonly SortedSet<FilePosition> documentationReferences = new SortedSet<FilePosition>();
+
         public MoaiClass() {
             Members = new List<ClassMember>();
             BaseClasses = new List<MoaiClass>();
-            DocumentationReferences = new SortedSet<FilePosition>();
         }
 
         public string Name { get; set; }
@@ -17,7 +18,6 @@ namespace MoaiUtils.MoaiParsing.CodeGraph.Types {
 
         public List<ClassMember> Members { get; private set; }
         public List<MoaiClass> BaseClasses { get; private set; }
-        public SortedSet<FilePosition> DocumentationReferences { get; private set; }
 
         public string Signature {
             get {
@@ -27,8 +27,8 @@ namespace MoaiUtils.MoaiParsing.CodeGraph.Types {
             }
         }
 
-        public bool IsConfirmed {
-            get { return IsDocumented; }
+        public bool Exists {
+            get { return ClassPosition != null; }
         }
 
         public IEnumerable<ClassMember> InheritedMembers {
@@ -72,6 +72,14 @@ namespace MoaiUtils.MoaiParsing.CodeGraph.Types {
             public int GetHashCode(ClassMember obj) {
                 return obj.Name.GetHashCode();
             }
+        }
+
+        public IEnumerable<FilePosition> DocumentationReferences {
+            get { return documentationReferences; }
+        }
+
+        public void AddDocumentationReference(FilePosition position) {
+            documentationReferences.Add(position);
         }
     }
 }

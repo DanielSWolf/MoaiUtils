@@ -44,8 +44,8 @@ namespace MoaiUtils.MoaiParsing {
             IType result = typesByName.ContainsKey(typeName)
                 ? typesByName[typeName]
                 : typesByName[typeName] = new MoaiClass { Name = typeName };
-            if (documentationPosition != null && result is MoaiClass) {
-                ((MoaiClass) result).DocumentationReferences.Add(documentationPosition);
+            if (documentationPosition != null && result is IDocumentationReferenceAware) {
+                ((IDocumentationReferenceAware) result).AddDocumentationReference(documentationPosition);
             }
             return result;
         }

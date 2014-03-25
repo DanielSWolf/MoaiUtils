@@ -52,13 +52,14 @@
     <Compile Include="Checks\CheckThatMethodNamesFollowConvention.cs" />
     <Compile Include="Checks\CheckThatMethodOverloadsAreValid.cs" />
     <Compile Include="Checks\CheckThatMethodsAreRegisteredCorrectly.cs" />
-    <Compile Include="Checks\CheckThatReferencedClassesAreKnown.cs" />
+    <Compile Include="Checks\CheckThatReferencedClassesExist.cs" />
     <Compile Include="Checks\CheckBase.cs" />
     <Compile Include="CodeGraph\Field.cs" />
     <Compile Include="CodeGraph\InParameter.cs" />
     <Compile Include="CodeGraph\Method.cs" />
     <Compile Include="CodeGraph\MethodOverload.cs" />
     <Compile Include="CodeGraph\Types\Ellipsis.cs" />
+    <Compile Include="CodeGraph\Types\IDocumentationReferenceAware.cs" />
     <Compile Include="CodeGraph\Types\MoaiClass.cs" />
     <Compile Include="CodeGraph\OutParameter.cs" />
     <Compile Include="CodeGraph\Parameter.cs" />
@@ -68,6 +69,7 @@
     <Compile Include="CodeGraph\Types\Variant.cs" />
     <Compile Include="CompactSignature.cs" />
     <Compile Include="FilePosition.cs" />
+    <Compile Include="Parsing\BlockParser.cs" />
     <Compile Include="Parsing\FileParser.cs" />
     <Compile Include="Parsing\MethodParser.cs" />
     <Compile Include="MoaiParser.cs" />

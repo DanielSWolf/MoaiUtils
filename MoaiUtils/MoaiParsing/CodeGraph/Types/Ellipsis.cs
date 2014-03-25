@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MoaiUtils.MoaiParsing.CodeGraph.Types {
-    public class Ellipsis : IType {
+    public class Ellipsis : IType, IDocumentationReferenceAware {
         public Ellipsis(IType type) {
             if (type == null) throw new ArgumentNullException("type");
             Type = type;
@@ -21,8 +23,8 @@ namespace MoaiUtils.MoaiParsing.CodeGraph.Types {
             get { return Name; }
         }
 
-        public bool IsConfirmed {
-            get { return Type.IsConfirmed; }
+        public bool Exists {
+            get { return Type.Exists; }
         }
 
         public override string ToString() {
@@ -47,5 +49,19 @@ namespace MoaiUtils.MoaiParsing.CodeGraph.Types {
         }
 
         #endregion
+
+        public IEnumerable<FilePosition> DocumentationReferences {
+            get {
+                return (Type is IDocumentationReferenceAware)
+                    ? ((IDocumentationReferenceAware) Type).DocumentationReferences
+                    : Enumerable.Empty<FilePosition>();
+            }
+        }
+
+        public void AddDocumentationReference(FilePosition position) {
+            if (Type is IDocumentationReferenceAware) {
+                ((IDocumentationReferenceAware) Type).AddDocumentationReference(position);
+            }
+        }
     }
 }

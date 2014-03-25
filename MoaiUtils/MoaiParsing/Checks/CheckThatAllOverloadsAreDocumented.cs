@@ -25,7 +25,7 @@ namespace MoaiUtils.MoaiParsing.Checks {
                 foreach (Match match in matches) {
                     // Find the Lua name for the param name
                     string paramTypeName = match.Groups["type"].Value;
-                    IType paramType = Types.Find(paramTypeName, MatchMode.FindSynonyms, t => t.IsConfirmed);
+                    IType paramType = Types.Find(paramTypeName, MatchMode.FindSynonyms, t => t.Exists);
                     if (paramType != null) paramTypeName = paramType.Name;
 
                     int index = Int32.Parse(match.Groups["index"].Value, CultureInfo.InvariantCulture);
