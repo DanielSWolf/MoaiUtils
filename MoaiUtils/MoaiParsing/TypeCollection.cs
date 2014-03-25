@@ -39,6 +39,8 @@ namespace MoaiUtils.MoaiParsing {
                 return new Ellipsis(GetOrCreate(typeName.Substring(0, typeName.Length - 3), documentationPosition));
             }
 
+            // Let's assume that any unknown type is a class.
+            // Usually that's correct, and if the name is a typo and really refers to some other type, it doesn't matter.
             IType result = typesByName.ContainsKey(typeName)
                 ? typesByName[typeName]
                 : typesByName[typeName] = new MoaiClass { Name = typeName };
