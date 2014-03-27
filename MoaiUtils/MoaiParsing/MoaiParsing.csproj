@@ -48,7 +48,6 @@
     </Compile>
     <Compile Include="Annotation.cs" />
     <Compile Include="Checks\CheckThatAllOverloadsAreDocumented.cs" />
-    <Compile Include="Checks\CheckThatLuaMethodsAreDocumented.cs" />
     <Compile Include="Checks\CheckThatMethodNamesFollowConvention.cs" />
     <Compile Include="Checks\CheckThatMethodOverloadsAreValid.cs" />
     <Compile Include="Checks\CheckThatMethodsAreRegisteredCorrectly.cs" />

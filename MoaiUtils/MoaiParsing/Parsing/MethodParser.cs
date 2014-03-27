@@ -8,12 +8,12 @@ using MoaiUtils.MoaiParsing.CodeGraph.Types;
 namespace MoaiUtils.MoaiParsing.Parsing {
     public static class MethodParser {
         private static readonly Regex methodDefinitionRegex = new Regex(@"
-            # Documentation
+            # Documentation (optional)
             (?>
                 /\*\*\s*
                     (?<annotation>@([^@*]|\S@|\*(?!/))*)+
                 \*/\s*
-            )
+            )?
             
             # Method definition
             int\s+(?<className>[A-Za-z0-9_]+)\s*::\s*(?<methodName>[A-Za-z0-9_]+)\s*\([^)]*\)\s*\{
@@ -51,7 +51,12 @@ namespace MoaiUtils.MoaiParsing.Parsing {
                 // Parse annotation block
                 MoaiClass moaiClass = types.GetOrCreate(className, methodPosition) as MoaiClass;
                 if (moaiClass != null) {
-                    ParseMethodDocumentation(moaiClass, annotations, methodBody, methodPosition, types, warnings);
+                    if (annotations.Any()) {
+                        ParseMethodDocumentation(moaiClass, annotations, methodBody, methodPosition, types, warnings);
+                    } else if (nativeMethodName.StartsWith("_")) {
+                        warnings.Add(methodPosition, WarningType.MissingAnnotation,
+                            "Missing method documentation.");
+                    }
                 }
             }
         }
