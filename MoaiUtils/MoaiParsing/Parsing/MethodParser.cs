@@ -1,12 +1,62 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using MoaiUtils.MoaiParsing.CodeGraph;
 using MoaiUtils.MoaiParsing.CodeGraph.Types;
 
 namespace MoaiUtils.MoaiParsing.Parsing {
     public static class MethodParser {
-        public static void ParseMethodDocumentation(MoaiClass moaiClass, Annotation[] annotations, string methodBody, MethodPosition methodPosition, TypeCollection types, WarningList warnings) {
+        private static readonly Regex methodDefinitionRegex = new Regex(@"
+            # Documentation
+            (?>
+                /\*\*\s*
+                    (?<annotation>@([^@*]|\S@|\*(?!/))*)+
+                \*/\s*
+            )
+            
+            # Method definition
+            int\s+(?<className>[A-Za-z0-9_]+)\s*::\s*(?<methodName>[A-Za-z0-9_]+)\s*\([^)]*\)\s*\{
+            ",
+            RegexOptions.IgnorePatternWhitespace | RegexOptions.ExplicitCapture | RegexOptions.Compiled);
+
+        public static void ParseMethodDefinitions(string code, FilePosition filePosition, TypeCollection types, WarningList warnings) {
+            // Find all method definitions
+            var matches = methodDefinitionRegex.Matches(code);
+
+            // Parse method definitions
+            foreach (Match match in matches) {
+                string className = match.Groups["className"].Value;
+                string nativeMethodName = match.Groups["methodName"].Value;
+                var methodPosition = new MethodPosition(filePosition, className, nativeMethodName);
+
+                // Parse annotations, filtering out unknown ones
+                Annotation[] annotations = match.Groups["annotation"].Captures
+                    .Cast<Capture>()
+                    .Select(capture => Annotation.Create(capture.Value, methodPosition, warnings))
+                    .ToArray();
+                foreach (var unknownAnnotation in annotations.OfType<UnknownAnnotation>()) {
+                    warnings.Add(methodPosition, WarningType.UnexpectedAnnotation,
+                        "Unknown annotation command '{0}'.", unknownAnnotation.Command);
+                }
+                annotations = annotations
+                    .Where(annotation => !(annotation is UnknownAnnotation))
+                    .ToArray();
+
+                // Get method body
+                int openingBraceIndex = match.Index + match.Length - 1;
+                int blockLength = BlockParser.GetBlockLength(code, openingBraceIndex);
+                string methodBody = code.Substring(openingBraceIndex + 1, blockLength - 2);
+
+                // Parse annotation block
+                MoaiClass moaiClass = types.GetOrCreate(className, methodPosition) as MoaiClass;
+                if (moaiClass != null) {
+                    ParseMethodDocumentation(moaiClass, annotations, methodBody, methodPosition, types, warnings);
+                }
+            }
+        }
+
+        private static void ParseMethodDocumentation(MoaiClass moaiClass, Annotation[] annotations, string methodBody, MethodPosition methodPosition, TypeCollection types, WarningList warnings) {
             Method method = CreateMethod(moaiClass, annotations, methodPosition, types, warnings);
             if (method == null) return;
 
@@ -135,7 +185,7 @@ namespace MoaiUtils.MoaiParsing.Parsing {
             if (nameAnnotationCount > 1) {
                 warnings.Add(methodPosition, WarningType.UnexpectedAnnotation, "Multiple @name annotations.");
             }
-            var nameAnnotation = annotations.OfType<NameAnnotation>().Single();
+            var nameAnnotation = annotations.OfType<NameAnnotation>().First();
             if (moaiClass.Members.Any(member => member.Name == nameAnnotation.Value)) {
                 warnings.Add(methodPosition, WarningType.UnexpectedValue,
                     "There is already a member with name '{0}'.", nameAnnotation.Value);

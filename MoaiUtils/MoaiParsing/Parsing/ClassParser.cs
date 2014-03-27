@@ -1,11 +1,75 @@
 ﻿using System.Linq;
+using System.Text.RegularExpressions;
 using MoaiUtils.MoaiParsing.CodeGraph;
 using MoaiUtils.MoaiParsing.CodeGraph.Types;
 
 namespace MoaiUtils.MoaiParsing.Parsing {
     public static class ClassParser {
-        
-        public static void ParseClassDocumentation(MoaiClass moaiClass, Annotation[] annotations, MoaiClass[] baseClasses, ClassPosition classPosition, WarningList warnings) {
+
+        private static readonly Regex classDefinitionRegex = new Regex(@"
+            # Documentation (optional)
+            (?>
+                /\*\*\s*
+                    (?<annotation>@([^@*]|\S@|\*(?!/))*)+
+                \*/\s*
+            )?
+
+            # Class definition
+            (class|struct)\s+
+            (?<className>[A-Za-z0-9_]+)\s*
+            (
+                :\s*
+                (
+                    ((public|protected|private|virtual)\s*)+
+                    (?<baseClassName>[A-Za-z0-9_:<,\s>]+?)\s*
+                    ,?\s*
+                )+
+            )?
+            \{
+            ", RegexOptions.IgnorePatternWhitespace | RegexOptions.ExplicitCapture | RegexOptions.Compiled);
+
+        public static void ParseClassDefinitions(string code, FilePosition filePosition, TypeCollection types, WarningList warnings) {
+            // Find all class definitions
+            var matches = classDefinitionRegex.Matches(code);
+
+            // Parse class definitions
+            foreach (Match match in matches) {
+                string className = match.Groups["className"].Value;
+                var classPosition = new ClassPosition(filePosition, className);
+
+                // Parse annotations, filtering out unknown ones
+                Annotation[] annotations = match.Groups["annotation"].Captures
+                    .Cast<Capture>()
+                    .Select(capture => Annotation.Create(capture.Value, classPosition, warnings))
+                    .ToArray();
+                foreach (var unknownAnnotation in annotations.OfType<UnknownAnnotation>()) {
+                    warnings.Add(classPosition, WarningType.UnexpectedAnnotation,
+                        "Unknown annotation command '{0}'.", unknownAnnotation.Command);
+                }
+                annotations = annotations
+                    .Where(annotation => !(annotation is UnknownAnnotation))
+                    .ToArray();
+
+                // Get base class names, ignoring all template classes and primitive types
+                MoaiClass[] baseClasses = match.Groups["baseClassName"].Captures
+                    .Cast<Capture>()
+                    .Where(capture => !capture.Value.Contains("<"))
+                    .Select(capture => types.GetOrCreate(capture.Value, null))
+                    .OfType<MoaiClass>()
+                    .ToArray();
+
+                // Parse annotation block
+                MoaiClass moaiClass = types.GetOrCreate(className, classPosition) as MoaiClass;
+                if (moaiClass != null) {
+                    moaiClass.ClassPosition = classPosition;
+                    if (annotations.Any()) {
+                        ParseClassDocumentation(moaiClass, annotations, baseClasses, classPosition, warnings);
+                    }
+                }
+            }
+        }
+
+        private static void ParseClassDocumentation(MoaiClass moaiClass, Annotation[] annotations, MoaiClass[] baseClasses, ClassPosition classPosition, WarningList warnings) {
             // Check that there is a single @name annotation
             int nameAnnotationCount = annotations.OfType<NameAnnotation>().Count();
             if (nameAnnotationCount == 0) {

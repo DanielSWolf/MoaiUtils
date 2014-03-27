@@ -48,7 +48,7 @@ namespace MoaiUtils.MoaiParsing {
             FileParser.ParseMoaiCodeFile(MOAILuaObject.DummyCode, dummyFilePosition, types, Warnings);
 
             // Make sure every class directly or indirectly inherits from MOAILuaObject
-            MoaiClass luaObjectClass = types.GetOrCreateClass("MOAILuaObject", null);
+            MoaiClass luaObjectClass = (MoaiClass) types.GetOrCreate("MOAILuaObject", null);
             foreach (MoaiClass moaiClass in types.OfType<MoaiClass>()) {
                 if (!(moaiClass.AncestorClasses.Contains(luaObjectClass)) && moaiClass != luaObjectClass) {
                     moaiClass.BaseClasses.Add(luaObjectClass);
@@ -89,7 +89,7 @@ namespace MoaiUtils.MoaiParsing {
             get {
                 return types
                     .OfType<MoaiClass>()
-                    .Where(moaiClass => moaiClass.IsDocumented);
+                    .Where(moaiClass => moaiClass.HasDocumentation);
             }
         }
 
@@ -128,8 +128,10 @@ namespace MoaiUtils.MoaiParsing {
                 var matches = registrationRegex.Matches(File.ReadAllText(fileName));
                 foreach (Match match in matches) {
                     string className = match.Groups["className"].Value;
-                    MoaiClass moaiClass = types.GetOrCreateClass(className, new FilePosition(new FileInfo(fileName)));
-                    moaiClass.IsScriptable = true;
+                    MoaiClass moaiClass = types.GetOrCreate(className, new FilePosition(new FileInfo(fileName))) as MoaiClass;
+                    if (moaiClass != null) {
+                        moaiClass.IsScriptable = true;
+                    }
                 }
             }
         }

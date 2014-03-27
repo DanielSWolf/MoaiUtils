@@ -56,7 +56,7 @@ namespace MoaiUtils.MoaiParsing.CodeGraph.Types {
             return Signature;
         }
 
-        public bool IsDocumented {
+        public bool HasDocumentation {
             get { return Description != null || Members.Any(); }
         }
 

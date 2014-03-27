@@ -54,6 +54,7 @@
     <Compile Include="Checks\CheckThatMethodsAreRegisteredCorrectly.cs" />
     <Compile Include="Checks\CheckThatReferencedClassesExist.cs" />
     <Compile Include="Checks\CheckBase.cs" />
+    <Compile Include="Checks\CheckThatClassesWithDocumentedMembersHaveDescription.cs" />
     <Compile Include="CodeGraph\Field.cs" />
     <Compile Include="CodeGraph\InParameter.cs" />
     <Compile Include="CodeGraph\Method.cs" />

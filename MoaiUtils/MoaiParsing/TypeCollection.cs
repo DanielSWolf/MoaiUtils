@@ -50,10 +50,6 @@ namespace MoaiUtils.MoaiParsing {
             return result;
         }
 
-        public MoaiClass GetOrCreateClass(string className, FilePosition documentationPosition) {
-            return GetOrCreate(className, documentationPosition) as MoaiClass;
-        }
-
         public IType Find(string typeName, MatchMode matchMode = MatchMode.Strict, Predicate<IType> allow = null) {
             if (allow == null) allow = type => true;
 
