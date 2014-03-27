@@ -10,7 +10,7 @@ using Newtonsoft.Json.Linq;
 
 namespace MoaiUtils.DocExport.Exporters {
     public class SublimeTextExporter : IApiExporter {
-        public void Export(IEnumerable<MoaiClass> classes, string header, DirectoryInfo outputDirectory) {
+        public void Export(MoaiClass[] classes, string header, DirectoryInfo outputDirectory) {
             // Create contents
             JObject contentsObject = new JObject {
                 { "scope", "source.lua" },

@@ -11,7 +11,7 @@ using Attribute = MoaiUtils.MoaiParsing.CodeGraph.Attribute;
 
 namespace MoaiUtils.DocExport.Exporters {
     public class XmlExporter : IApiExporter {
-        public void Export(IEnumerable<MoaiClass> classes, string header, DirectoryInfo outputDirectory) {
+        public void Export(MoaiClass[] classes, string header, DirectoryInfo outputDirectory) {
             // Create XML DOM
             var document = new XDocument(
                 new XComment(header),

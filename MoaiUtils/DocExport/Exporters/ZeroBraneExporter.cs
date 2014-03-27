@@ -12,7 +12,7 @@ using Parameter = MoaiUtils.MoaiParsing.CodeGraph.Parameter;
 
 namespace MoaiUtils.DocExport.Exporters {
     public class ZeroBraneExporter : IApiExporter {
-        public void Export(IEnumerable<MoaiClass> classes, string header, DirectoryInfo outputDirectory) {
+        public void Export(MoaiClass[] classes, string header, DirectoryInfo outputDirectory) {
             // Create contents
             LuaTable typeListTable = CreateTypeListTable(classes.Where(moaiClass => moaiClass.IsScriptable));
 
