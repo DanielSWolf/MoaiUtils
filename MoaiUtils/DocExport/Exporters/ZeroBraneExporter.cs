@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using MoaiUtils.LuaIO;
 using MoaiUtils.MoaiParsing;
 using MoaiUtils.MoaiParsing.CodeGraph;
@@ -142,13 +141,9 @@ namespace MoaiUtils.DocExport.Exporters {
             }
         }
 
-        private static readonly Regex newlineRegex = new Regex(@"\r\n?|\n", RegexOptions.Compiled);
-
-        // For whatever reason, ZeroBrane expects line breaks to be marked with "<br>".
-        // It doesn't understand any other HTML, though.
         private static string ConvertString(string s) {
             if (s == null) return null;
-            return newlineRegex.Replace(s, "<br>");
+            return s.Replace("\r", string.Empty);
         }
     }
 }
