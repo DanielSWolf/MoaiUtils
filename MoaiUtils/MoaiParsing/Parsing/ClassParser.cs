@@ -10,7 +10,7 @@ namespace MoaiUtils.MoaiParsing.Parsing {
             # Documentation (optional)
             (?>
                 /\*\*\s*
-                    (?<annotation>@([^@*]|\S@|\*(?!/))*)+
+                    (?<annotation>@(\S@|\*(?!/)|[^@*])*)+
                 \*/\s*
             )?
 
