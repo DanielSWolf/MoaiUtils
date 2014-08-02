@@ -15,7 +15,7 @@ namespace MoaiUtils.DocExport.Exporters {
             // Create XML DOM
             var document = new XDocument(
                 new XComment(header),
-                new XElement("types", classes.Select(CreateClassElement))
+                new XElement("types", classes.OrderBy(type => type.Name).Select(CreateClassElement))
             );
 
             // Save it
@@ -37,7 +37,7 @@ namespace MoaiUtils.DocExport.Exporters {
                     moaiClass.BaseClasses.Select(baseClass => new XElement("baseType", baseClass.Name))
                 ),
                 new XElement("description", moaiClass.Description),
-                new XElement("members", moaiClass.Members.Select(member => (XElement) CreateMemberElement((dynamic) member)))
+                new XElement("members", moaiClass.Members.OrderBy(member => member.Name).Select(member => (XElement) CreateMemberElement((dynamic) member)))
             );
         }
 
