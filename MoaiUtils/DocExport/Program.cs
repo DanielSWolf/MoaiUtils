@@ -43,6 +43,9 @@ namespace MoaiUtils.DocExport {
                 case ExportFormat.XML:
                     exporter = new XmlExporter();
                     break;
+                case ExportFormat.DokuWiki:
+                    exporter = new DokuWikiExporter();
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }

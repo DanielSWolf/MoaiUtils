@@ -37,5 +37,19 @@ namespace MoaiUtils.Tools {
             return s + "...";
         }
 
+        public static string SurroundLines(this string s, string prefix = "", string suffix = "") {
+            StringBuilder result = new StringBuilder(s.Length);
+            foreach (string line in SplitIntoLines(s)) {
+                if (result.Length > 0) result.AppendLine();
+                result.Append(prefix);
+                result.Append(line);
+                result.Append(suffix);
+            }
+            return result.ToString();
+        }
+
+        public static string Indent(this string s, string indent) {
+            return s.SurroundLines(prefix: indent);
+        }
     }
 }

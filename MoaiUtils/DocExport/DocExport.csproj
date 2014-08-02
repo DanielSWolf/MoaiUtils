@@ -57,6 +57,7 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Configuration.cs" />
+    <Compile Include="Exporters\DokuWikiExporter.cs" />
     <Compile Include="Exporters\SublimeTextExporter.cs" />
     <Compile Include="Exporters\XmlExporter.cs" />
     <Compile Include="ExportFormat.cs" />
