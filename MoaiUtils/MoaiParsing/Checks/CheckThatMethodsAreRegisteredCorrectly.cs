@@ -104,7 +104,7 @@ namespace MoaiUtils.MoaiParsing.Checks {
             foreach (MethodRegistration registration in methodRegistrations) {
                 if (registration.LuaMethodName != method.Name) {
                     Warnings.Add(registration.MethodPosition, WarningType.UnexpectedValue,
-                        "Method has @name annotation '{0}' but is registered as '{1}'.", method.Name, registration.LuaMethodName);
+                        "Method has @lua annotation '{0}' but is registered as '{1}'.", method.Name, registration.LuaMethodName);
                 }
             }
         }

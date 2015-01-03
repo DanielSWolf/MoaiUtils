@@ -29,8 +29,8 @@ namespace MoaiUtils.MoaiParsing {
             Match match = wordWithWhitespaceRegex.Match(text.Trim());
             string command = match.Groups["word"].Value;
             switch (command) {
-                case "@name":
-                    return new NameAnnotation(text, filePosition, warnings);
+                case "@lua":
+                    return new LuaNameAnnotation(text, filePosition, warnings);
                 case "@text":
                     return new TextAnnotation(text, filePosition, warnings);
                 case "@const":
@@ -96,8 +96,8 @@ namespace MoaiUtils.MoaiParsing {
         }
     }
 
-    public class NameAnnotation : Annotation {
-        public NameAnnotation(string text, FilePosition filePosition, WarningList warnings)
+    public class LuaNameAnnotation : Annotation {
+        public LuaNameAnnotation(string text, FilePosition filePosition, WarningList warnings)
             : base(text, filePosition) {
             if (Value == null) {
                 warnings.Add(filePosition, WarningType.IncompleteAnnotation,

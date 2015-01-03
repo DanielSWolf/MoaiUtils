@@ -110,9 +110,9 @@ namespace MoaiUtils.MoaiParsing.Parsing {
         }
 
         private static Method CreateMethod(MoaiClass moaiClass, Annotation[] annotations, MethodPosition methodPosition, TypeCollection types, WarningList warnings) {
-            // Get @name annotation
-            var nameAnnotation = GetNameAnnotation(moaiClass, annotations, methodPosition, warnings);
-            if (nameAnnotation == null) return null;
+            // Get @lua annotation
+            var luaNameAnnotation = GetNameAnnotation(moaiClass, annotations, methodPosition, warnings);
+            if (luaNameAnnotation == null) return null;
 
             // Check that there is a single @text annotation
             CheckTextAnnotation(annotations, methodPosition, warnings);
@@ -120,13 +120,13 @@ namespace MoaiUtils.MoaiParsing.Parsing {
             // Parse annotations
             var method = new Method {
                 MethodPosition = methodPosition,
-                Name = nameAnnotation.Value,
+                Name = luaNameAnnotation.Value,
                 OwningClass = moaiClass,
             };
             moaiClass.Members.Add(method);
             MethodOverload currentOverload = null;
             foreach (var annotation in annotations) {
-                if (annotation is NameAnnotation) {
+                if (annotation is LuaNameAnnotation) {
                     // Nothing to do - name has already been set.
                 } else if (annotation is TextAnnotation) {
                     // Set method description
@@ -180,20 +180,20 @@ namespace MoaiUtils.MoaiParsing.Parsing {
             }
         }
 
-        private static NameAnnotation GetNameAnnotation(MoaiClass moaiClass, Annotation[] annotations, MethodPosition methodPosition, WarningList warnings) {
-            // Check that there is a single @name annotation and that it isn't a duplicate. Otherwise exit.
-            int nameAnnotationCount = annotations.OfType<NameAnnotation>().Count();
-            if (nameAnnotationCount == 0) {
-                warnings.Add(methodPosition, WarningType.MissingAnnotation, "Missing @name annotation.");
+        private static LuaNameAnnotation GetNameAnnotation(MoaiClass moaiClass, Annotation[] annotations, MethodPosition methodPosition, WarningList warnings) {
+            // Check that there is a single @lua annotation and that it isn't a duplicate. Otherwise exit.
+            int luaNameAnnotationCount = annotations.OfType<LuaNameAnnotation>().Count();
+            if (luaNameAnnotationCount == 0) {
+                warnings.Add(methodPosition, WarningType.MissingAnnotation, "Missing @lua annotation.");
                 return null;
             }
-            if (nameAnnotationCount > 1) {
-                warnings.Add(methodPosition, WarningType.UnexpectedAnnotation, "Multiple @name annotations.");
+            if (luaNameAnnotationCount > 1) {
+                warnings.Add(methodPosition, WarningType.UnexpectedAnnotation, "Multiple @lua annotations.");
             }
-            var nameAnnotation = annotations.OfType<NameAnnotation>().First();
+            var nameAnnotation = annotations.OfType<LuaNameAnnotation>().First();
             if (moaiClass.Members.Any(member => member.Name == nameAnnotation.Value)) {
                 warnings.Add(methodPosition, WarningType.UnexpectedValue,
-                    "There is already a member with name '{0}'.", nameAnnotation.Value);
+                    "There is already a member with Lua name '{0}'.", nameAnnotation.Value);
                 return null;
             }
             return nameAnnotation;

@@ -70,12 +70,12 @@ namespace MoaiUtils.MoaiParsing.Parsing {
         }
 
         private static void ParseClassDocumentation(MoaiClass moaiClass, Annotation[] annotations, MoaiClass[] baseClasses, ClassPosition classPosition, WarningList warnings) {
-            // Check that there is a single @name annotation
-            int nameAnnotationCount = annotations.OfType<NameAnnotation>().Count();
+            // Check that there is a single @lua annotation
+            int nameAnnotationCount = annotations.OfType<LuaNameAnnotation>().Count();
             if (nameAnnotationCount == 0) {
-                warnings.Add(classPosition, WarningType.MissingAnnotation, "Missing @name annotation.");
+                warnings.Add(classPosition, WarningType.MissingAnnotation, "Missing @lua annotation.");
             } else if (nameAnnotationCount > 1) {
-                warnings.Add(classPosition, WarningType.UnexpectedAnnotation, "Multiple @name annotations.");
+                warnings.Add(classPosition, WarningType.UnexpectedAnnotation, "Multiple @lua annotations.");
             }
 
             // Check that there is a single @text annotation
@@ -91,12 +91,12 @@ namespace MoaiUtils.MoaiParsing.Parsing {
 
             // Parse annotations
             foreach (var annotation in annotations) {
-                if (annotation is NameAnnotation) {
+                if (annotation is LuaNameAnnotation) {
                     // Nothing to do. Name is already set. Just make sure the annotation is correct.
-                    var nameAnnotation = (NameAnnotation) annotation;
+                    var nameAnnotation = (LuaNameAnnotation) annotation;
                     if (nameAnnotation.Value != moaiClass.Name) {
                         warnings.Add(classPosition, WarningType.UnexpectedValue,
-                            "@name annotation has inconsistent value '{0}'. Expected '{1}'.", nameAnnotation.Value, moaiClass.Name);
+                            "@lua annotation has inconsistent value '{0}'. Expected '{1}'.", nameAnnotation.Value, moaiClass.Name);
                     }
                 } else if (annotation is TextAnnotation) {
                     // Set class description
