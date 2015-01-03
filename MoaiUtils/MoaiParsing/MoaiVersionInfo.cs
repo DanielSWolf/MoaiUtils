@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
+using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using MoaiUtils.Common;
 using MoaiUtils.Tools;
@@ -8,20 +10,21 @@ using MoaiUtils.Tools;
 namespace MoaiUtils.MoaiParsing {
     public class MoaiVersionInfo {
         public MoaiVersionInfo(DirectoryInfo moaiDirectory) {
-            var versionFileInfo = moaiDirectory.GetFileInfo(@"src\config-default\moai_version.h");
+            DirectoryInfo configDir = moaiDirectory.GetDirectoryInfo(@"src\config-default");
             try {
-                // Read version file
-                string versionText = File.ReadAllText(versionFileInfo.FullName);
+                // Read all version files
+                string versionText = configDir.GetFiles("*.h")
+                    .Select(file => file.ReadAllText())
+                    .Join("\n");
 
-                // Extract version, revision, and author
-                Match versionMatch = Regex.Match(versionText, @"MOAI_SDK_VERSION_MAJOR_MINOR\s+([0-9]+)\.([0-9]+)");
-                Major = int.Parse(versionMatch.Groups[1].Value);
-                Minor = int.Parse(versionMatch.Groups[2].Value);
-                Revision = int.Parse(Regex.Match(versionText, @"MOAI_SDK_VERSION_REVISION\s+(-?[0-9]+)").Groups[1].Value, CultureInfo.InvariantCulture);
+                // Extract values
+                Major = ParseInt("MOAI_SDK_VERSION_MAJOR", versionText);
+                Minor = ParseInt("MOAI_SDK_VERSION_MINOR", versionText);
+                Revision = ParseInt("MOAI_SDK_VERSION_REVISION", versionText);
                 Author = Regex.Match(versionText, @"MOAI_SDK_VERSION_AUTHOR\s+""(.*?)""").Groups[1].Value;
             } catch (Exception e) {
                 throw new PlainTextException("Error determining Moai version from '{0}'. {1}",
-                    versionFileInfo.FullName, e.Message);
+                    configDir.FullName, e.Message);
             }
         }
 
@@ -31,15 +34,21 @@ namespace MoaiUtils.MoaiParsing {
         public string Author { get; private set; }
 
         public override string ToString() {
-            string result = string.Format("Moai SDK {0}.{1}", Major, Minor);
-            if (Revision >= 0) {
-                result += string.Format(" revision {0}", Revision);
+            StringBuilder result = new StringBuilder();
+            result.AppendFormat("Moai SDK {0}.{1}", Major, Minor);
+            if (Revision > 0) {
+                result.AppendFormat(".{0}", Revision);
             }
             if (Author != string.Empty) {
-                result += string.Format(Revision > 1 ? " ({0})" : " (interim version by {0})", Author);
+                result.AppendFormat(" (interim version by {0})", Author);
             }
 
-            return result;
+            return result.ToString();
+        }
+
+        private static int ParseInt(string name, string versionText) {
+            string valueString = Regex.Match(versionText, name + @"\s+(-?[0-9]+)").Groups[1].Value;
+            return int.Parse(valueString, CultureInfo.InvariantCulture);
         }
     }
 }
