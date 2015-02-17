@@ -3,6 +3,7 @@
         ZeroBrane,
         SublimeText,
         XML,
-        DokuWiki
+        DokuWiki,
+        Markdown
     }
 }
