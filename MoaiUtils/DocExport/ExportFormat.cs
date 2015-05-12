@@ -4,6 +4,7 @@
         SublimeText,
         XML,
         DokuWiki,
-        Markdown
+        Markdown,
+        Summary
     }
 }

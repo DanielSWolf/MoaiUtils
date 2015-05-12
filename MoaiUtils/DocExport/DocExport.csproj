@@ -60,6 +60,7 @@
     <Compile Include="Exporters\DokuWikiExporter.cs" />
     <Compile Include="Exporters\MarkdownExporter.cs" />
     <Compile Include="Exporters\SublimeTextExporter.cs" />
+    <Compile Include="Exporters\SummaryExporter.cs" />
     <Compile Include="Exporters\XmlExporter.cs" />
     <Compile Include="ExportFormat.cs" />
     <Compile Include="Exporters\ZeroBraneExporter.cs" />
