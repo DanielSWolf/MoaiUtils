@@ -1,6 +1,6 @@
-parser grammar MoaiCppParser;
+parser grammar Cpp;
 
-options { tokenVocab = MoaiCppLexer; }
+options { tokenVocab = CppLexer; }
 
 file : topLevelStatement* EOF ;
 

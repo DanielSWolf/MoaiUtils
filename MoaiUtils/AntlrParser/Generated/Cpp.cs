@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from MoaiCppParser.g4 by ANTLR 4.5
+// Generated from Cpp.g4 by ANTLR 4.5
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -30,7 +30,7 @@ using DFA = Antlr4.Runtime.Dfa.DFA;
 
 [System.CodeDom.Compiler.GeneratedCode("ANTLR", "4.5")]
 [System.CLSCompliant(false)]
-public partial class MoaiCppParser : Parser {
+public partial class Cpp : Parser {
 	public const int
 		Scope=1, LeftParen=2, RightParen=3, LeftBracket=4, RightBracket=5, LeftBrace=6, 
 		RightBrace=7, Less=8, LessEqual=9, Greater=10, GreaterEqual=11, LeftShift=12, 
@@ -96,19 +96,19 @@ public partial class MoaiCppParser : Parser {
 		}
 	}
 
-	public override string GrammarFileName { get { return "MoaiCppParser.g4"; } }
+	public override string GrammarFileName { get { return "Cpp.g4"; } }
 
 	public override string[] RuleNames { get { return ruleNames; } }
 
 	public override string SerializedAtn { get { return _serializedATN; } }
 
-	public MoaiCppParser(ITokenStream input)
+	public Cpp(ITokenStream input)
 		: base(input)
 	{
 		Interpreter = new ParserATNSimulator(this,_ATN);
 	}
 	public partial class FileContext : ParserRuleContext {
-		public ITerminalNode Eof() { return GetToken(MoaiCppParser.Eof, 0); }
+		public ITerminalNode Eof() { return GetToken(Cpp.Eof, 0); }
 		public TopLevelStatementContext[] topLevelStatement() {
 			return GetRuleContexts<TopLevelStatementContext>();
 		}
@@ -121,11 +121,11 @@ public partial class MoaiCppParser : Parser {
 		}
 		public override int RuleIndex { get { return RULE_file; } }
 		public override void EnterRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.EnterFile(this);
 		}
 		public override void ExitRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.ExitFile(this);
 		}
 	}
@@ -193,19 +193,19 @@ public partial class MoaiCppParser : Parser {
 		public TopLevelStatementContext topLevelStatement(int i) {
 			return GetRuleContext<TopLevelStatementContext>(i);
 		}
-		public ITerminalNode Namespace() { return GetToken(MoaiCppParser.Namespace, 0); }
-		public ITerminalNode Id() { return GetToken(MoaiCppParser.Id, 0); }
+		public ITerminalNode Namespace() { return GetToken(Cpp.Namespace, 0); }
+		public ITerminalNode Id() { return GetToken(Cpp.Id, 0); }
 		public TopLevelStatementContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
 		{
 		}
 		public override int RuleIndex { get { return RULE_topLevelStatement; } }
 		public override void EnterRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.EnterTopLevelStatement(this);
 		}
 		public override void ExitRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.ExitTopLevelStatement(this);
 		}
 	}
@@ -347,11 +347,11 @@ public partial class MoaiCppParser : Parser {
 		}
 		public override int RuleIndex { get { return RULE_declaration; } }
 		public override void EnterRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.EnterDeclaration(this);
 		}
 		public override void ExitRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.ExitDeclaration(this);
 		}
 	}
@@ -439,11 +439,11 @@ public partial class MoaiCppParser : Parser {
 		}
 		public override int RuleIndex { get { return RULE_typeDef; } }
 		public override void EnterRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.EnterTypeDef(this);
 		}
 		public override void ExitRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.ExitTypeDef(this);
 		}
 	}
@@ -494,11 +494,11 @@ public partial class MoaiCppParser : Parser {
 		}
 		public override int RuleIndex { get { return RULE_usingDirective; } }
 		public override void EnterRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.EnterUsingDirective(this);
 		}
 		public override void ExitRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.ExitUsingDirective(this);
 		}
 	}
@@ -559,11 +559,11 @@ public partial class MoaiCppParser : Parser {
 		}
 		public override int RuleIndex { get { return RULE_functionDefinition; } }
 		public override void EnterRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.EnterFunctionDefinition(this);
 		}
 		public override void ExitRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.ExitFunctionDefinition(this);
 		}
 	}
@@ -610,7 +610,7 @@ public partial class MoaiCppParser : Parser {
 		public TypeSpecifierContext typeSpecifier() {
 			return GetRuleContext<TypeSpecifierContext>(0);
 		}
-		public ITerminalNode Id() { return GetToken(MoaiCppParser.Id, 0); }
+		public ITerminalNode Id() { return GetToken(Cpp.Id, 0); }
 		public BaseClauseContext baseClause() {
 			return GetRuleContext<BaseClauseContext>(0);
 		}
@@ -620,11 +620,11 @@ public partial class MoaiCppParser : Parser {
 		}
 		public override int RuleIndex { get { return RULE_classDefinition; } }
 		public override void EnterRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.EnterClassDefinition(this);
 		}
 		public override void ExitRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.ExitClassDefinition(this);
 		}
 	}
@@ -714,11 +714,11 @@ public partial class MoaiCppParser : Parser {
 		}
 		public override int RuleIndex { get { return RULE_baseClause; } }
 		public override void EnterRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.EnterBaseClause(this);
 		}
 		public override void ExitRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.ExitBaseClause(this);
 		}
 	}
@@ -764,7 +764,7 @@ public partial class MoaiCppParser : Parser {
 		public TypeSpecifierContext typeSpecifier() {
 			return GetRuleContext<TypeSpecifierContext>(0);
 		}
-		public ITerminalNode Id() { return GetToken(MoaiCppParser.Id, 0); }
+		public ITerminalNode Id() { return GetToken(Cpp.Id, 0); }
 		public ParensBlockContext parensBlock() {
 			return GetRuleContext<ParensBlockContext>(0);
 		}
@@ -783,11 +783,11 @@ public partial class MoaiCppParser : Parser {
 		}
 		public override int RuleIndex { get { return RULE_constructorDefinition; } }
 		public override void EnterRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.EnterConstructorDefinition(this);
 		}
 		public override void ExitRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.ExitConstructorDefinition(this);
 		}
 	}
@@ -839,7 +839,7 @@ public partial class MoaiCppParser : Parser {
 		public TypeSpecifierContext typeSpecifier() {
 			return GetRuleContext<TypeSpecifierContext>(0);
 		}
-		public ITerminalNode Id() { return GetToken(MoaiCppParser.Id, 0); }
+		public ITerminalNode Id() { return GetToken(Cpp.Id, 0); }
 		public ParensBlockContext parensBlock() {
 			return GetRuleContext<ParensBlockContext>(0);
 		}
@@ -852,11 +852,11 @@ public partial class MoaiCppParser : Parser {
 		}
 		public override int RuleIndex { get { return RULE_destructorDefinition; } }
 		public override void EnterRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.EnterDestructorDefinition(this);
 		}
 		public override void ExitRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.ExitDestructorDefinition(this);
 		}
 	}
@@ -900,11 +900,11 @@ public partial class MoaiCppParser : Parser {
 		}
 		public override int RuleIndex { get { return RULE_memberInitializerList; } }
 		public override void EnterRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.EnterMemberInitializerList(this);
 		}
 		public override void ExitRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.ExitMemberInitializerList(this);
 		}
 	}
@@ -947,7 +947,7 @@ public partial class MoaiCppParser : Parser {
 	}
 
 	public partial class MemberInitializerContext : ParserRuleContext {
-		public ITerminalNode Id() { return GetToken(MoaiCppParser.Id, 0); }
+		public ITerminalNode Id() { return GetToken(Cpp.Id, 0); }
 		public TypeSpecifierContext typeSpecifier() {
 			return GetRuleContext<TypeSpecifierContext>(0);
 		}
@@ -963,11 +963,11 @@ public partial class MoaiCppParser : Parser {
 		}
 		public override int RuleIndex { get { return RULE_memberInitializer; } }
 		public override void EnterRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.EnterMemberInitializer(this);
 		}
 		public override void ExitRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.ExitMemberInitializer(this);
 		}
 	}
@@ -1051,11 +1051,11 @@ public partial class MoaiCppParser : Parser {
 		}
 		public ArrayContext(DeclaratorContext context) { CopyFrom(context); }
 		public override void EnterRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.EnterArray(this);
 		}
 		public override void ExitRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.ExitArray(this);
 		}
 	}
@@ -1065,11 +1065,11 @@ public partial class MoaiCppParser : Parser {
 		}
 		public GroupContext(DeclaratorContext context) { CopyFrom(context); }
 		public override void EnterRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.EnterGroup(this);
 		}
 		public override void ExitRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.ExitGroup(this);
 		}
 	}
@@ -1085,11 +1085,11 @@ public partial class MoaiCppParser : Parser {
 		}
 		public FunctionContext(DeclaratorContext context) { CopyFrom(context); }
 		public override void EnterRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.EnterFunction(this);
 		}
 		public override void ExitRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.ExitFunction(this);
 		}
 	}
@@ -1099,11 +1099,11 @@ public partial class MoaiCppParser : Parser {
 		}
 		public ReferenceContext(DeclaratorContext context) { CopyFrom(context); }
 		public override void EnterRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.EnterReference(this);
 		}
 		public override void ExitRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.ExitReference(this);
 		}
 	}
@@ -1113,11 +1113,11 @@ public partial class MoaiCppParser : Parser {
 		}
 		public PointerContext(DeclaratorContext context) { CopyFrom(context); }
 		public override void EnterRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.EnterPointer(this);
 		}
 		public override void ExitRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.ExitPointer(this);
 		}
 	}
@@ -1125,14 +1125,14 @@ public partial class MoaiCppParser : Parser {
 		public TypeSpecifierContext typeSpecifier() {
 			return GetRuleContext<TypeSpecifierContext>(0);
 		}
-		public ITerminalNode Id() { return GetToken(MoaiCppParser.Id, 0); }
+		public ITerminalNode Id() { return GetToken(Cpp.Id, 0); }
 		public NameContext(DeclaratorContext context) { CopyFrom(context); }
 		public override void EnterRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.EnterName(this);
 		}
 		public override void ExitRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.ExitName(this);
 		}
 	}
@@ -1281,11 +1281,11 @@ public partial class MoaiCppParser : Parser {
 		}
 		public override int RuleIndex { get { return RULE_type; } }
 		public override void EnterRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.EnterType(this);
 		}
 		public override void ExitRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.ExitType(this);
 		}
 	}
@@ -1313,25 +1313,25 @@ public partial class MoaiCppParser : Parser {
 	}
 
 	public partial class TypeSpecifierContext : ParserRuleContext {
-		public ITerminalNode Id() { return GetToken(MoaiCppParser.Id, 0); }
+		public ITerminalNode Id() { return GetToken(Cpp.Id, 0); }
 		public NestedNameSpecifierContext nestedNameSpecifier() {
 			return GetRuleContext<NestedNameSpecifierContext>(0);
 		}
 		public TemplateArgsBlockContext templateArgsBlock() {
 			return GetRuleContext<TemplateArgsBlockContext>(0);
 		}
-		public ITerminalNode IntType() { return GetToken(MoaiCppParser.IntType, 0); }
+		public ITerminalNode IntType() { return GetToken(Cpp.IntType, 0); }
 		public TypeSpecifierContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
 		{
 		}
 		public override int RuleIndex { get { return RULE_typeSpecifier; } }
 		public override void EnterRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.EnterTypeSpecifier(this);
 		}
 		public override void ExitRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.ExitTypeSpecifier(this);
 		}
 	}
@@ -1402,11 +1402,11 @@ public partial class MoaiCppParser : Parser {
 		}
 		public override int RuleIndex { get { return RULE_templateParamsBlock; } }
 		public override void EnterRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.EnterTemplateParamsBlock(this);
 		}
 		public override void ExitRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.ExitTemplateParamsBlock(this);
 		}
 	}
@@ -1463,7 +1463,7 @@ public partial class MoaiCppParser : Parser {
 		public TypeContext type(int i) {
 			return GetRuleContext<TypeContext>(i);
 		}
-		public ITerminalNode Id() { return GetToken(MoaiCppParser.Id, 0); }
+		public ITerminalNode Id() { return GetToken(Cpp.Id, 0); }
 		public ExpressionWithoutAngleBracketsContext expressionWithoutAngleBrackets() {
 			return GetRuleContext<ExpressionWithoutAngleBracketsContext>(0);
 		}
@@ -1473,11 +1473,11 @@ public partial class MoaiCppParser : Parser {
 		}
 		public override int RuleIndex { get { return RULE_templateParam; } }
 		public override void EnterRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.EnterTemplateParam(this);
 		}
 		public override void ExitRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.ExitTemplateParam(this);
 		}
 	}
@@ -1567,11 +1567,11 @@ public partial class MoaiCppParser : Parser {
 		}
 		public override int RuleIndex { get { return RULE_templateArgsBlock; } }
 		public override void EnterRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.EnterTemplateArgsBlock(this);
 		}
 		public override void ExitRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.ExitTemplateArgsBlock(this);
 		}
 	}
@@ -1634,11 +1634,11 @@ public partial class MoaiCppParser : Parser {
 		}
 		public override int RuleIndex { get { return RULE_templateArg; } }
 		public override void EnterRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.EnterTemplateArg(this);
 		}
 		public override void ExitRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.ExitTemplateArg(this);
 		}
 	}
@@ -1676,9 +1676,9 @@ public partial class MoaiCppParser : Parser {
 	}
 
 	public partial class NestedNameSpecifierContext : ParserRuleContext {
-		public ITerminalNode[] Id() { return GetTokens(MoaiCppParser.Id); }
+		public ITerminalNode[] Id() { return GetTokens(Cpp.Id); }
 		public ITerminalNode Id(int i) {
-			return GetToken(MoaiCppParser.Id, i);
+			return GetToken(Cpp.Id, i);
 		}
 		public TemplateArgsBlockContext[] templateArgsBlock() {
 			return GetRuleContexts<TemplateArgsBlockContext>();
@@ -1692,11 +1692,11 @@ public partial class MoaiCppParser : Parser {
 		}
 		public override int RuleIndex { get { return RULE_nestedNameSpecifier; } }
 		public override void EnterRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.EnterNestedNameSpecifier(this);
 		}
 		public override void ExitRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.ExitNestedNameSpecifier(this);
 		}
 	}
@@ -1774,11 +1774,11 @@ public partial class MoaiCppParser : Parser {
 		}
 		public override int RuleIndex { get { return RULE_bracesBlock; } }
 		public override void EnterRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.EnterBracesBlock(this);
 		}
 		public override void ExitRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.ExitBracesBlock(this);
 		}
 	}
@@ -1816,11 +1816,11 @@ public partial class MoaiCppParser : Parser {
 		}
 		public override int RuleIndex { get { return RULE_bracketsBlock; } }
 		public override void EnterRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.EnterBracketsBlock(this);
 		}
 		public override void ExitRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.ExitBracketsBlock(this);
 		}
 	}
@@ -1858,11 +1858,11 @@ public partial class MoaiCppParser : Parser {
 		}
 		public override int RuleIndex { get { return RULE_parensBlock; } }
 		public override void EnterRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.EnterParensBlock(this);
 		}
 		public override void ExitRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.ExitParensBlock(this);
 		}
 	}
@@ -1915,11 +1915,11 @@ public partial class MoaiCppParser : Parser {
 		}
 		public override int RuleIndex { get { return RULE_blockContent; } }
 		public override void EnterRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.EnterBlockContent(this);
 		}
 		public override void ExitRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.ExitBlockContent(this);
 		}
 	}
@@ -2077,11 +2077,11 @@ public partial class MoaiCppParser : Parser {
 		}
 		public override int RuleIndex { get { return RULE_expression; } }
 		public override void EnterRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.EnterExpression(this);
 		}
 		public override void ExitRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.ExitExpression(this);
 		}
 	}
@@ -2237,11 +2237,11 @@ public partial class MoaiCppParser : Parser {
 		}
 		public override int RuleIndex { get { return RULE_expressionWithoutAngleBrackets; } }
 		public override void EnterRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.EnterExpressionWithoutAngleBrackets(this);
 		}
 		public override void ExitRule(IParseTreeListener listener) {
-			IMoaiCppParserListener typedListener = listener as IMoaiCppParserListener;
+			ICppListener typedListener = listener as ICppListener;
 			if (typedListener != null) typedListener.ExitExpressionWithoutAngleBrackets(this);
 		}
 	}

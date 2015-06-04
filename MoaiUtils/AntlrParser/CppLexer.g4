@@ -1,4 +1,4 @@
-lexer grammar MoaiCppLexer ;
+lexer grammar CppLexer ;
 
 // Operators
 

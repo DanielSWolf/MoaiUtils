@@ -57,11 +57,11 @@ namespace CppParser {
             using (new ProgressBar(progress)) {
                 foreach (FileInfo file in files) {
                     ICharStream charStream = new CppFileStream(file);
-                    MoaiCppLexer lexer = new MoaiCppLexer(charStream);
+                    CppLexer lexer = new CppLexer(charStream);
                     lexer.RemoveErrorListeners();
                     lexer.AddErrorListener(new LexerDebugErrorListener(() => errorCount++));
                     CommonTokenStream tokenStream = new CommonTokenStream(lexer);
-                    MoaiCppParser parser = new MoaiCppParser(tokenStream);
+                    Cpp parser = new Cpp(tokenStream);
                     parser.RemoveErrorListeners();
                     parser.AddErrorListener(new DebugErrorListener(() => errorCount++));
 

@@ -49,10 +49,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CppFileStream.cs" />
-    <Compile Include="Generated\MoaiCppLexer.cs" />
-    <Compile Include="Generated\MoaiCppParser.cs" />
-    <Compile Include="Generated\MoaiCppParserBaseListener.cs" />
-    <Compile Include="Generated\MoaiCppParserListener.cs" />
+    <Compile Include="Generated\Cpp.cs" />
+    <Compile Include="Generated\CppBaseListener.cs" />
+    <Compile Include="Generated\CppLexer.cs" />
+    <Compile Include="Generated\CppListener.cs" />
     <Compile Include="IProgress.cs" />
     <Compile Include="MoaiCppLexer.cs" />
     <Compile Include="MoaiCppParser.cs" />
@@ -62,8 +62,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="MoaiCppLexer.g4" />
-    <None Include="MoaiCppParser.g4" />
+    <None Include="CppLexer.g4" />
+    <None Include="Cpp.g4" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

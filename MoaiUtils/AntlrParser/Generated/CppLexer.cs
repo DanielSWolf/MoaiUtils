@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from MoaiCppLexer.g4 by ANTLR 4.5
+// Generated from CppLexer.g4 by ANTLR 4.5
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -26,7 +26,7 @@ using DFA = Antlr4.Runtime.Dfa.DFA;
 
 [System.CodeDom.Compiler.GeneratedCode("ANTLR", "4.5")]
 [System.CLSCompliant(false)]
-public partial class MoaiCppLexer : Lexer {
+public partial class CppLexer : Lexer {
 	public const int
 		Scope=1, LeftParen=2, RightParen=3, LeftBracket=4, RightBracket=5, LeftBrace=6, 
 		RightBrace=7, Less=8, LessEqual=9, Greater=10, GreaterEqual=11, LeftShift=12, 
@@ -61,7 +61,7 @@ public partial class MoaiCppLexer : Lexer {
 	};
 
 
-	public MoaiCppLexer(ICharStream input)
+	public CppLexer(ICharStream input)
 		: base(input)
 	{
 		Interpreter = new LexerATNSimulator(this,_ATN);
@@ -101,7 +101,7 @@ public partial class MoaiCppLexer : Lexer {
 		}
 	}
 
-	public override string GrammarFileName { get { return "MoaiCppLexer.g4"; } }
+	public override string GrammarFileName { get { return "CppLexer.g4"; } }
 
 	public override string[] RuleNames { get { return ruleNames; } }
 
