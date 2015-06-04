@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoaiParsing", "MoaiParsing\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DocLint", "DocLint\DocLint.csproj", "{4369CB5A-CD93-4260-8669-8BE826D7A3B7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AntlrParser", "AntlrParser\AntlrParser.csproj", "{26C4E99B-9C97-4A6B-86EE-687E9DA8180D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{4369CB5A-CD93-4260-8669-8BE826D7A3B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4369CB5A-CD93-4260-8669-8BE826D7A3B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4369CB5A-CD93-4260-8669-8BE826D7A3B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26C4E99B-9C97-4A6B-86EE-687E9DA8180D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26C4E99B-9C97-4A6B-86EE-687E9DA8180D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26C4E99B-9C97-4A6B-86EE-687E9DA8180D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26C4E99B-9C97-4A6B-86EE-687E9DA8180D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

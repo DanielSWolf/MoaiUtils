@@ -1,9 +1,9 @@
 bin
 obj
-
 *.user
-
 *.suo
 packages
 /MoaiUtils/dist/MoaiUtils.zip
 /MoaiUtils/dist/MoaiUtils
+/MoaiUtils/AntlrParser/Generated/*.tokens
+/MoaiUtils/AntlrParser/Java
