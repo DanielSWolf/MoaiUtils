@@ -6,6 +6,7 @@ using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Dfa;
 using Antlr4.Runtime.Sharpen;
 using Antlr4.Runtime.Tree;
+using MoaiUtils.Tools;
 
 namespace CppParser {
     class Program {
@@ -47,14 +48,31 @@ namespace CppParser {
 
         static void Main(string[] args) {
             string[] cppExtensions = { ".h", ".cpp", ".m", ".mm" };
-            var files = new DirectoryInfo(@"X:\dev\projects\moai-dev\src").EnumerateFiles("*.*", SearchOption.AllDirectories)
+            var sourceDir = new DirectoryInfo(@"X:\dev\projects\moai-dev\src");
+            var files = sourceDir.EnumerateFiles("*.*", SearchOption.AllDirectories)
                 .Where(file => cppExtensions.Contains(file.Extension.ToLowerInvariant()))
                 .ToList();
 
             int errorCount = 0;
-            IntProgress progress = new IntProgress { MaxValue = files.Count };
+            IntProgress progress = new IntProgress { MaxValue = files.Count + 1 };
             Console.Write("Parsing files... ");
             using (new ProgressBar(progress)) {
+                {
+                    // TODO: Use better-suited stream
+                    ICharStream charStream = new CppFileStream(sourceDir.GetFileInfo(@"lua-headers\moai.lua"));
+                    LuaLexer lexer = new LuaLexer(charStream);
+                    lexer.RemoveErrorListeners();
+                    lexer.AddErrorListener(new LexerDebugErrorListener(() => errorCount++));
+                    CommonTokenStream tokenStream = new CommonTokenStream(lexer);
+                    LuaParser parser = new LuaParser(tokenStream);
+                    parser.RemoveErrorListeners();
+                    parser.AddErrorListener(new DebugErrorListener(() => errorCount++));
+
+                    IParseTree parseTree = parser.chunk();
+
+                    progress.Value++;
+                }
+
                 foreach (FileInfo file in files) {
                     ICharStream charStream = new CppFileStream(file);
                     CppLexer lexer = new CppLexer(charStream);

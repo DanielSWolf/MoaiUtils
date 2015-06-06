@@ -1,6 +1,6 @@
 # Generating the parser code
 
-I'm using [ANTLR 4](http://www.antlr.org/) to generate the actual parser code from the lexer/grammar files. While ANTLR is a great tool, it clearly comes from a Java background, so getting it to work in a .NET environment isn't completely straightforward.
+I'm using [ANTLR 4](http://www.antlr.org/) to generate the actual parser code from the grammar files. While ANTLR is a great tool, it clearly comes from a Java background, so getting it to work in a .NET environment isn't completely straightforward.
 
 ## Install Java
 
@@ -13,4 +13,4 @@ Install the SDK for Java 6 or 7
 
 ## Generate the parser
 
-You can now re-generate the C# parser files by running `GenerateParser.bat`.
+You can now re-generate the C# parser files by running `GenerateParsers.bat`.

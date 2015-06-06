@@ -53,6 +53,10 @@
     <Compile Include="Generated\CppParser.cs" />
     <Compile Include="Generated\CppParserBaseListener.cs" />
     <Compile Include="Generated\CppParserListener.cs" />
+    <Compile Include="Generated\LuaBaseListener.cs" />
+    <Compile Include="Generated\LuaLexer.cs" />
+    <Compile Include="Generated\LuaListener.cs" />
+    <Compile Include="Generated\LuaParser.cs" />
     <Compile Include="IProgress.cs" />
     <Compile Include="MoaiCppLexer.cs" />
     <Compile Include="MoaiCppParser.cs" />
@@ -64,6 +68,16 @@
     <None Include="App.config" />
     <None Include="CppLexer.g4" />
     <None Include="CppParser.g4" />
+    <Antlr4 Include="Lua.g4">
+      <Generator>MSBuild:Compile</Generator>
+      <CustomToolNamespace>CppParser</CustomToolNamespace>
+    </Antlr4>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Tools\Tools.csproj">
+      <Project>{63CB06A7-298F-411C-B010-C13BD1E612EC}</Project>
+      <Name>Tools</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
