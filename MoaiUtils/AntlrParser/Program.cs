@@ -61,7 +61,7 @@ namespace CppParser {
                     lexer.RemoveErrorListeners();
                     lexer.AddErrorListener(new LexerDebugErrorListener(() => errorCount++));
                     CommonTokenStream tokenStream = new CommonTokenStream(lexer);
-                    Cpp parser = new Cpp(tokenStream);
+                    CppParser parser = new CppParser(tokenStream);
                     parser.RemoveErrorListeners();
                     parser.AddErrorListener(new DebugErrorListener(() => errorCount++));
 

@@ -107,7 +107,8 @@ Modifier
 AccessSpecifier : ('private' | 'protected' | 'public') ':'? -> skip ;
 Preproc : '#' ~[\r\n]* -> skip ;
 LineComment : '//' ~[\r\n]* -> skip ;
-BlockComment : '/*' .*? '*/' -> skip ;
+BlockCommentStart : '/*' -> skip, pushMode(BLOCK_COMMENT) ;
+DocBlockStart : '/**' -> pushMode(DOC_BLOCK) ;
 Whitespace : [ \t\r\n]+ -> skip ;
 ObjectiveCDirective
 	: ('@'
@@ -124,3 +125,28 @@ CommonMacro // That's the price for not implementing a full preprocessor :-(
 Id
 	: [a-zA-Z_] [a-zA-Z0-9_]*
 	| 'operator' Whitespace ~[ \t\r\n(]+ (Whitespace? '[' Whitespace? ']')? ;
+
+
+mode DOC_BLOCK;
+
+DocBlockEnd : ~[ \t\r\n]* '*/' -> popMode ; // Allows for garbage before the '*/'
+
+LuaNameTag : '@lua' | '@name' ;
+TextTag : '@text' ;
+ConstTag : '@const' ;
+FlagTag : '@flag' ;
+AttributeTag : '@attr' ;
+InParamTag : '@in' ;
+OptionalInParamTag : '@opt' ;
+OutParamTag : '@out' ;
+OverloadTag : '@overload' ;
+UnknownTag : '@' [a-z] [a-zA-Z0-9_]* ;
+
+DocWord : ~[ \t\r\n]+ ;
+
+DocWhitespace : [ \t\r\n]+ -> skip ;
+
+
+mode BLOCK_COMMENT;
+
+BlockCommentEnd : .*? '*/' -> skip, popMode ;

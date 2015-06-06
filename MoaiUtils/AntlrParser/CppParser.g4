@@ -1,4 +1,4 @@
-parser grammar Cpp;
+parser grammar CppParser;
 
 options { tokenVocab = CppLexer; }
 
@@ -27,10 +27,12 @@ usingDirective
 	: 'using' 'namespace' .*? ';' ;
 
 functionDefinition :
+	functionDocBlock?
 	('template' templateParamsBlock)?
 	type bracesBlock ;
 
 classDefinition :
+	classDocBlock?
 	'typedef'? ('template' templateParamsBlock)?
 	('class' | 'struct' | 'union' | 'enum') (typeSpecifier baseClause?)? bracesBlock Id? ';' ;
 
@@ -99,3 +101,51 @@ expression
 expressionWithoutAngleBrackets
 	: (bracesBlock | bracketsBlock | parensBlock | ~('(' | ')' | '[' | ']' | '{' | '}' | ';' | ',' | '<' | '>'))+ ;
 
+classDocBlock :
+	DocBlockStart
+	luaNameTagLine
+	textTagLine?
+	(constTagLine | flagTagLine | attributeTagLine)*
+	DocBlockEnd
+	;
+
+functionDocBlock :
+	DocBlockStart
+	luaNameTagLine
+	textTagLine?
+	overloadList
+	DocBlockEnd
+	;
+
+luaNameTagLine
+	: LuaNameTag name=DocWord ;
+
+textTagLine
+	: TextTag text=DocWord+ ;
+
+constTagLine
+	: ConstTag name=DocWord (text=DocWord+)? ;
+
+flagTagLine
+	: FlagTag name=DocWord (text=DocWord+)? ;
+
+attributeTagLine
+	: AttributeTag name=DocWord (text=DocWord+)? ;
+
+overloadList
+	: overloadTagLine? overloadBlock (overloadTagLine overloadBlock)* ;
+
+overloadTagLine
+	: OverloadTag (text=DocWord+)? ;
+
+overloadBlock
+	: inParamTagLine* optionalInParamTagLine* outParamTagLine* ;
+
+inParamTagLine
+	: InParamTag paramType=DocWord (name=DocWord (text=DocWord+)?)? ;
+
+optionalInParamTagLine
+	: OptionalInParamTag paramType=DocWord (name=DocWord (text=DocWord+)?)? ;
+
+outParamTagLine
+	: OutParamTag paramType=DocWord (name=DocWord (text=DocWord+)?)? ;
