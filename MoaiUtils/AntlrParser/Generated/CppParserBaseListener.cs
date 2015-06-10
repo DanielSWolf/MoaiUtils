@@ -561,6 +561,18 @@ public partial class CppParserBaseListener : ICppParserListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitOutParamTagLine([NotNull] CppParser.OutParamTagLineContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="CppParser.description"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterDescription([NotNull] CppParser.DescriptionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="CppParser.description"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitDescription([NotNull] CppParser.DescriptionContext context) { }
 
 	/// <inheritdoc/>
 	/// <remarks>The default implementation does nothing.</remarks>

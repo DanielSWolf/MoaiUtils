@@ -481,5 +481,15 @@ public interface ICppParserListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitOutParamTagLine([NotNull] CppParser.OutParamTagLineContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="CppParser.description"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterDescription([NotNull] CppParser.DescriptionContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="CppParser.description"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitDescription([NotNull] CppParser.DescriptionContext context);
 }
 } // namespace CppParser

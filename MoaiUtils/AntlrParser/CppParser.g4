@@ -121,31 +121,34 @@ luaNameTagLine
 	: LuaNameTag name=DocWord ;
 
 textTagLine
-	: TextTag text=DocWord+ ;
+	: TextTag description ;
 
 constTagLine
-	: ConstTag name=DocWord (text=DocWord+)? ;
+	: ConstTag name=DocWord description? ;
 
 flagTagLine
-	: FlagTag name=DocWord (text=DocWord+)? ;
+	: FlagTag name=DocWord description? ;
 
 attributeTagLine
-	: AttributeTag name=DocWord (text=DocWord+)? ;
+	: AttributeTag name=DocWord description? ;
 
 overloadList
 	: overloadTagLine? overloadBlock (overloadTagLine overloadBlock)* ;
 
 overloadTagLine
-	: OverloadTag (text=DocWord+)? ;
+	: OverloadTag description? ;
 
 overloadBlock
 	: inParamTagLine* optionalInParamTagLine* outParamTagLine* ;
 
 inParamTagLine
-	: InParamTag paramType=DocWord (name=DocWord (text=DocWord+)?)? ;
+	: InParamTag paramType=DocWord (name=DocWord description?)? ;
 
 optionalInParamTagLine
-	: OptionalInParamTag paramType=DocWord (name=DocWord (text=DocWord+)?)? ;
+	: OptionalInParamTag paramType=DocWord (name=DocWord description?)? ;
 
 outParamTagLine
-	: OutParamTag paramType=DocWord (name=DocWord (text=DocWord+)?)? ;
+	: OutParamTag paramType=DocWord (name=DocWord description?)? ;
+
+description
+	: DocWord+ ;
