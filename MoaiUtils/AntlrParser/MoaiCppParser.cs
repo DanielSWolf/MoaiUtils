@@ -1,4 +1,5 @@
 ﻿namespace CppParser {
-    partial class MoaiCppParser {
-    }
+
+	partial class MoaiCppParser {}
+
 }

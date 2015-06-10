@@ -6,346 +6,351 @@ using MoaiUtils.Tools;
 using MoreLinq;
 
 namespace MoaiUtils.MoaiParsing {
-    /// <summary>
-    /// Utility class to create a shorthand signature that represents multiple overloads
-    /// (something like "number radius | (number innerRadius, number outerRadius)")
-    /// See http://stackoverflow.com/a/20712653/52041
-    /// </summary>
-    public static class CompactSignature {
-        public static ISignature FromOverloads(Parameter[][] overloads) {
-            // Make sure there are no duplicate parameters
-            foreach (Parameter[] parameters in overloads) {
-                var duplicateParameters = parameters
-                    .GroupBy(parameter => parameter)
-                    .Where(duplicateGroup => duplicateGroup.Count() > 1)
-                    .Select(duplicateGroup => duplicateGroup.First());
-                if (duplicateParameters.Any()) {
-                    throw new ApplicationException(string.Format(
-                        "One or more duplicate parameters: {0}",
-                        duplicateParameters.Select(param => param.ToString()).Join(", ")));
-                }
-            }
 
-            // Get all occurring parameters in order
-            Parameter[] allParameters = GetAllParameters(overloads);
+	/// <summary>
+	/// Utility class to create a shorthand signature that represents multiple overloads
+	/// (something like "number radius | (number innerRadius, number outerRadius)")
+	/// See http://stackoverflow.com/a/20712653/52041
+	/// </summary>
+	public static class CompactSignature {
+		public static ISignature FromOverloads(Parameter[][] overloads) {
+			// Make sure there are no duplicate parameters
+			foreach (Parameter[] parameters in overloads) {
+				var duplicateParameters = parameters
+					.GroupBy(parameter => parameter)
+					.Where(duplicateGroup => duplicateGroup.Count() > 1)
+					.Select(duplicateGroup => duplicateGroup.First());
+				if (duplicateParameters.Any()) {
+					throw new ApplicationException(string.Format(
+						"One or more duplicate parameters: {0}",
+						duplicateParameters.Select(param => param.ToString()).Join(", ")));
+				}
+			}
 
-            // Convert overloads to bool arrays
-            var boolOverloads = overloads
-                .Select(usedParameters => new Overload(allParameters.Select(usedParameters.Contains).ToArray()))
-                .ToArray();
+			// Get all occurring parameters in order
+			Parameter[] allParameters = GetAllParameters(overloads);
 
-            return FromOverloads(allParameters, boolOverloads);
-        }
+			// Convert overloads to bool arrays
+			var boolOverloads = overloads
+				.Select(usedParameters => new Overload(allParameters.Select(usedParameters.Contains).ToArray()))
+				.ToArray();
 
-        private static Parameter[] GetAllParameters(Parameter[][] overloads) {
-            Parameter[] allParameters = overloads
-                .SelectMany(overload => overload)
-                .Distinct()
-                .OrderBy((a, b) => {
-                    if (a == b) return 0;
-                    bool aBeforeB = overloads.Any(overload => overload.SkipWhile(p => p != a).Contains(b));
-                    bool bBeforeA = overloads.Any(overload => overload.SkipWhile(p => p != b).Contains(a));
-                    return (aBeforeB) ? -1 : bBeforeA ? 1 : 0;
-                })
-                .ToArray();
+			return FromOverloads(allParameters, boolOverloads);
+		}
 
-            // Make sure each overload observes this order
-            foreach (Parameter[] actualParameters in overloads) {
-                Parameter[] expectedParameters = allParameters.Intersect(actualParameters).ToArray();
-                if (!expectedParameters.SequenceEqual(actualParameters)) {
-                    throw new ApplicationException(string.Format(
-                        "Inconsistent parameter order. Expected: {0}; actual: {1}",
-                        expectedParameters.Select(param => param.ToString()).Join(", "),
-                        actualParameters.Select(param => param.ToString()).Join(", ")));
-                }
-            }
+		private static Parameter[] GetAllParameters(Parameter[][] overloads) {
+			Parameter[] allParameters = overloads
+				.SelectMany(overload => overload)
+				.Distinct()
+				.OrderBy((a, b) => {
+					if (a == b) return 0;
+					bool aBeforeB = overloads.Any(overload => overload.SkipWhile(p => p != a).Contains(b));
+					bool bBeforeA = overloads.Any(overload => overload.SkipWhile(p => p != b).Contains(a));
+					return (aBeforeB) ? -1 : bBeforeA ? 1 : 0;
+				})
+				.ToArray();
 
-            return allParameters;
-        }
+			// Make sure each overload observes this order
+			foreach (Parameter[] actualParameters in overloads) {
+				Parameter[] expectedParameters = allParameters.Intersect(actualParameters).ToArray();
+				if (!expectedParameters.SequenceEqual(actualParameters)) {
+					throw new ApplicationException(string.Format(
+						"Inconsistent parameter order. Expected: {0}; actual: {1}",
+						expectedParameters.Select(param => param.ToString()).Join(", "),
+						actualParameters.Select(param => param.ToString()).Join(", ")));
+				}
+			}
 
-        private static ISignature FromOverloads(Parameter[] allParameters, Overload[] overloads) {
-            // Make sure all overloads are distinct
-            overloads = overloads.Distinct().ToArray();
+			return allParameters;
+		}
 
-            // If there is only one overload: use a Sequence
-            if (overloads.Length == 1) {
-                return new Sequence(overloads.Single().ToParameterList(allParameters));
-            }
+		private static ISignature FromOverloads(Parameter[] allParameters, Overload[] overloads) {
+			// Make sure all overloads are distinct
+			overloads = overloads.Distinct().ToArray();
 
-            // If there is an empty overload: use an Option and recurse
-            Overload emptyOverload = overloads.FirstOrDefault(overload => overload.All(flag => !flag));
-            if (emptyOverload != null) {
-                return new Option {
-                    Value = FromOverloads(allParameters, overloads.Except(new[] { emptyOverload }).ToArray())
-                };
-            }
+			// If there is only one overload: use a Sequence
+			if (overloads.Length == 1) {
+				return new Sequence(overloads.Single().ToParameterList(allParameters));
+			}
 
-            // Find contiguous areas of parameters that are independent from the rest.
-            // Use a Sequence containing the constant parts and recurse for the independent areas.
-            Interval[] independentAreas = GetIndependentAreas(new HashSet<Overload>(overloads));
-            if (independentAreas.Any()) {
-                var sequence = new Sequence();
-                // Pad independent areas with zero-length dummy intervals
-                var pairs = independentAreas.Prepend(new Interval()).Concat(new Interval()).Pairwise();
-                foreach (Tuple<Interval, Interval> pair in pairs) {
-                    if (pair.Item1.Length > 0) {
-                        sequence.Add(FromArea(allParameters, overloads, pair.Item1));
-                    }
-                    for (int i = pair.Item1.End; i < pair.Item2.Start; i++) {
-                        sequence.Add(allParameters[i]);
-                    }
-                }
-                return sequence;
-            }
+			// If there is an empty overload: use an Option and recurse
+			Overload emptyOverload = overloads.FirstOrDefault(overload => overload.All(flag => !flag));
+			if (emptyOverload != null) {
+				return new Option {
+					Value = FromOverloads(allParameters, overloads.Except(new[] {emptyOverload}).ToArray())
+				};
+			}
 
-            // If there are no independent areas:
-            // Find all partitions of the overloads and use the one that yields the shortest representation.
-            // Ignore the trivial one-group partition as this will result in an endless recursion.
-            IEnumerable<Overload[][]> overloadPartitions = Partitioning.GetAllPartitions(overloads)
-                .Where(partition => partition.Length > 1);
-            IEnumerable<Choice> possibleRepresentations = overloadPartitions
-                .Select(overloadGroups => new Choice(overloadGroups.Select(overloadGroup => FromOverloads(allParameters, overloadGroup.ToArray()))));
-            return possibleRepresentations.MinBy(representation => representation.ParameterCount);
-        }
+			// Find contiguous areas of parameters that are independent from the rest.
+			// Use a Sequence containing the constant parts and recurse for the independent areas.
+			Interval[] independentAreas = GetIndependentAreas(new HashSet<Overload>(overloads));
+			if (independentAreas.Any()) {
+				var sequence = new Sequence();
+				// Pad independent areas with zero-length dummy intervals
+				var pairs = independentAreas.Prepend(new Interval()).Concat(new Interval()).Pairwise();
+				foreach (Tuple<Interval, Interval> pair in pairs) {
+					if (pair.Item1.Length > 0) {
+						sequence.Add(FromArea(allParameters, overloads, pair.Item1));
+					}
+					for (int i = pair.Item1.End; i < pair.Item2.Start; i++) {
+						sequence.Add(allParameters[i]);
+					}
+				}
+				return sequence;
+			}
 
-        private static ISignature FromArea(Parameter[] allParameters, Overload[] overloads, Interval area) {
-            Parameter[] trimmedParameters = allParameters
-                .Subsequence(area.Start, area.Length)
-                .ToArray();
-            Overload[] trimmedOverloads = overloads
-                .Select(overload => new Overload(overload.Subsequence(area.Start, area.Length)))
-                .ToArray();
-            return FromOverloads(trimmedParameters, trimmedOverloads);
-        }
+			// If there are no independent areas:
+			// Find all partitions of the overloads and use the one that yields the shortest representation.
+			// Ignore the trivial one-group partition as this will result in an endless recursion.
+			IEnumerable<Overload[][]> overloadPartitions = Partitioning.GetAllPartitions(overloads)
+				.Where(partition => partition.Length > 1);
+			IEnumerable<Choice> possibleRepresentations = overloadPartitions
+				.Select(overloadGroups => new Choice(overloadGroups.Select(overloadGroup => FromOverloads(allParameters, overloadGroup.ToArray()))));
+			return possibleRepresentations.MinBy(representation => representation.ParameterCount);
+		}
 
-        private static Interval[] GetIndependentAreas(HashSet<Overload> overloads) {
-            var independentAreas = new List<Interval>();
-            int index = 0;
-            var totalArea = new Interval { Start = 0, Length = overloads.First().Count };
-            while (index < totalArea.Length) {
-                bool isConstant = overloads.All(overload => overload[index] == overloads.First()[index]);
-                if (isConstant) {
-                    index++;
-                    continue;
-                }
+		private static ISignature FromArea(Parameter[] allParameters, Overload[] overloads, Interval area) {
+			Parameter[] trimmedParameters = allParameters
+				.Subsequence(area.Start, area.Length)
+				.ToArray();
+			Overload[] trimmedOverloads = overloads
+				.Select(overload => new Overload(overload.Subsequence(area.Start, area.Length)))
+				.ToArray();
+			return FromOverloads(trimmedParameters, trimmedOverloads);
+		}
 
-                var area = new Interval { Start = index, Length = 1 };
-                while (!IsIndependent(area, overloads)) {
-                    area.Length++;
-                }
-                if (!area.Equals(totalArea)) {
-                    independentAreas.Add(area);
-                }
-                index += area.Length;
-            }
+		private static Interval[] GetIndependentAreas(HashSet<Overload> overloads) {
+			var independentAreas = new List<Interval>();
+			int index = 0;
+			var totalArea = new Interval {Start = 0, Length = overloads.First().Count};
+			while (index < totalArea.Length) {
+				bool isConstant = overloads.All(overload => overload[index] == overloads.First()[index]);
+				if (isConstant) {
+					index++;
+					continue;
+				}
 
-            return independentAreas.ToArray();
-        }
+				var area = new Interval {Start = index, Length = 1};
+				while (!IsIndependent(area, overloads)) {
+					area.Length++;
+				}
+				if (!area.Equals(totalArea)) {
+					independentAreas.Add(area);
+				}
+				index += area.Length;
+			}
 
-        private static bool IsIndependent(Interval area, HashSet<Overload> overloads) {
-            foreach (Overload basisOverload in overloads) {
-                Overload generatedOverload = new Overload(basisOverload);
-                foreach (Overload areaOverload in overloads) {
-                    areaOverload.CopyTo(generatedOverload, area.Start, area.Start, area.Length);
-                    if (!overloads.Contains(generatedOverload)) {
-                        return false;
-                    }
-                }
-            }
-            return true;
-        }
+			return independentAreas.ToArray();
+		}
 
-        /// Slim wrapper around a bool array.
-        /// Each boolean indicates whether the corresponding parameter is present in the overload.
-        private class Overload : IEnumerable<bool> {
-            private readonly bool[] values;
+		private static bool IsIndependent(Interval area, HashSet<Overload> overloads) {
+			foreach (Overload basisOverload in overloads) {
+				Overload generatedOverload = new Overload(basisOverload);
+				foreach (Overload areaOverload in overloads) {
+					areaOverload.CopyTo(generatedOverload, area.Start, area.Start, area.Length);
+					if (!overloads.Contains(generatedOverload)) {
+						return false;
+					}
+				}
+			}
+			return true;
+		}
 
-            public Overload(IEnumerable<bool> list) {
-                values = list.ToArray();
-            }
+		/// Slim wrapper around a bool array.
+		/// Each boolean indicates whether the corresponding parameter is present in the overload.
+		private class Overload : IEnumerable<bool> {
+			private readonly bool[] values;
 
-            public IEnumerator<bool> GetEnumerator() {
-                return values.Cast<bool>().GetEnumerator();
-            }
+			public Overload(IEnumerable<bool> list) {
+				values = list.ToArray();
+			}
 
-            IEnumerator IEnumerable.GetEnumerator() {
-                return GetEnumerator();
-            }
+			public IEnumerator<bool> GetEnumerator() {
+				return values.Cast<bool>().GetEnumerator();
+			}
 
-            public int Count {
-                get { return values.Length; }
-            }
+			IEnumerator IEnumerable.GetEnumerator() {
+				return GetEnumerator();
+			}
 
-            public bool this[int index] {
-                get { return values[index]; }
-                set { values[index] = value; }
-            }
+			public int Count {
+				get { return values.Length; }
+			}
 
-            public void CopyTo(Overload other, int sourceIndex, int targetIndex, int count) {
-                for (int i = 0; i < count; i++) {
-                    other[targetIndex + i] = this[targetIndex + i];
-                }
-            }
+			public bool this[int index] {
+				get { return values[index]; }
+				set { values[index] = value; }
+			}
 
-            public IList<Parameter> ToParameterList(Parameter[] allParameters) {
-                if (allParameters.Length != Count) {
-                    throw new ArgumentException("Parameter count does not match.");
-                }
-                var result = new List<Parameter>();
-                for (int i = 0; i < Count; i++) {
-                    if (this[i]) {
-                        result.Add(allParameters[i]);
-                    }
-                }
-                return result;
-            }
+			public void CopyTo(Overload other, int sourceIndex, int targetIndex, int count) {
+				for (int i = 0; i < count; i++) {
+					other[targetIndex + i] = this[targetIndex + i];
+				}
+			}
 
-            #region Equality members
+			public IList<Parameter> ToParameterList(Parameter[] allParameters) {
+				if (allParameters.Length != Count) {
+					throw new ArgumentException("Parameter count does not match.");
+				}
+				var result = new List<Parameter>();
+				for (int i = 0; i < Count; i++) {
+					if (this[i]) {
+						result.Add(allParameters[i]);
+					}
+				}
+				return result;
+			}
 
-            protected bool Equals(Overload other) {
-                return this.SequenceEqual(other);
-            }
+			#region Equality members
 
-            public override bool Equals(object obj) {
-                if (ReferenceEquals(null, obj)) return false;
-                if (ReferenceEquals(this, obj)) return true;
-                if (obj.GetType() != GetType()) return false;
-                return Equals((Overload) obj);
-            }
+			protected bool Equals(Overload other) {
+				return this.SequenceEqual(other);
+			}
 
-            public override int GetHashCode() {
-                return this.Aggregate(0, (current, flag) => (current << 1) | (flag ? 1 : 0));
-            }
+			public override bool Equals(object obj) {
+				if (ReferenceEquals(null, obj)) return false;
+				if (ReferenceEquals(this, obj)) return true;
+				if (obj.GetType() != GetType()) return false;
+				return Equals((Overload) obj);
+			}
 
-            public static bool operator ==(Overload left, Overload right) {
-                return Equals(left, right);
-            }
+			public override int GetHashCode() {
+				return this.Aggregate(0, (current, flag) => (current << 1) | (flag ? 1 : 0));
+			}
 
-            public static bool operator !=(Overload left, Overload right) {
-                return !Equals(left, right);
-            }
+			public static bool operator ==(Overload left, Overload right) {
+				return Equals(left, right);
+			}
 
-            #endregion
-        }
+			public static bool operator !=(Overload left, Overload right) {
+				return !Equals(left, right);
+			}
 
-        private struct Interval {
-            public int Start { get; set; }
-            public int Length { get; set; }
-            public int End { get { return Start + Length; } }
-        }
-    }
+			#endregion
+		}
 
-    public interface ISignature {
-        string ToString(SignatureGrouping grouping);
-        int ParameterCount { get; }
-    }
+		private struct Interval {
+			public int Start { get; set; }
+			public int Length { get; set; }
 
-    public class Parameter : ISignature {
-        public string Type { get; set; }
-        public string Name { get; set; }
-        public bool ShowName { get; set; }
+			public int End {
+				get { return Start + Length; }
+			}
+		}
+	}
 
-        public string ToString(SignatureGrouping grouping) {
-            string result = ShowName && Name != null
-                ? string.Format("{0} {1}", Type, Name)
-                : Type;
-            return grouping == SignatureGrouping.Parentheses
-                ? result.Enclose("(", ")")
-                : result;
-        }
+	public interface ISignature {
+		string ToString(SignatureGrouping grouping);
+		int ParameterCount { get; }
+	}
 
-        public override string ToString() {
-            return String.Format("{0} {1}", Type, Name);
-        }
+	public class Parameter : ISignature {
+		public string Type { get; set; }
+		public string Name { get; set; }
+		public bool ShowName { get; set; }
 
-        public int ParameterCount {
-            get { return 1; }
-        }
+		public string ToString(SignatureGrouping grouping) {
+			string result = ShowName && Name != null
+				? string.Format("{0} {1}", Type, Name)
+				: Type;
+			return grouping == SignatureGrouping.Parentheses
+				? result.Enclose("(", ")")
+				: result;
+		}
 
-        #region Equality members
+		public override string ToString() {
+			return String.Format("{0} {1}", Type, Name);
+		}
 
-        protected bool Equals(Parameter other) {
-            return string.Equals(Type, other.Type) && string.Equals(Name, other.Name);
-        }
+		public int ParameterCount {
+			get { return 1; }
+		}
 
-        public override bool Equals(object obj) {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((Parameter) obj);
-        }
+		#region Equality members
 
-        public override int GetHashCode() {
-            unchecked {
-                return ((Type != null ? Type.GetHashCode() : 0) * 397) ^ (Name != null ? Name.GetHashCode() : 0);
-            }
-        }
+		protected bool Equals(Parameter other) {
+			return string.Equals(Type, other.Type) && string.Equals(Name, other.Name);
+		}
 
-        #endregion
-    }
+		public override bool Equals(object obj) {
+			if (ReferenceEquals(null, obj)) return false;
+			if (ReferenceEquals(this, obj)) return true;
+			if (obj.GetType() != this.GetType()) return false;
+			return Equals((Parameter) obj);
+		}
 
-    public class Sequence : List<ISignature>, ISignature {
-        public Sequence() { }
-        public Sequence(IEnumerable<ISignature> collection) : base(collection) { }
+		public override int GetHashCode() {
+			unchecked {
+				return ((Type != null ? Type.GetHashCode() : 0)*397) ^ (Name != null ? Name.GetHashCode() : 0);
+			}
+		}
 
-        public string ToString(SignatureGrouping grouping) {
-            if (Count == 1) {
-                return this.Single().ToString(grouping);
-            }
+		#endregion
+	}
 
-            string result = this
-                .Select(signature => signature.ToString(SignatureGrouping.Any))
-                .Join(", ");
-            return grouping == SignatureGrouping.None
-                ? result
-                : result.Enclose("(", ")");
-        }
+	public class Sequence : List<ISignature>, ISignature {
+		public Sequence() {}
+		public Sequence(IEnumerable<ISignature> collection) : base(collection) {}
 
-        public int ParameterCount {
-            get { return this.Sum(signature => signature.ParameterCount); }
-        }
-    }
+		public string ToString(SignatureGrouping grouping) {
+			if (Count == 1) {
+				return this.Single().ToString(grouping);
+			}
 
-    public class Choice : List<ISignature>, ISignature {
-        public Choice() { }
-        public Choice(IEnumerable<ISignature> collection) : base(collection) { }
+			string result = this
+				.Select(signature => signature.ToString(SignatureGrouping.Any))
+				.Join(", ");
+			return grouping == SignatureGrouping.None
+				? result
+				: result.Enclose("(", ")");
+		}
 
-        public string ToString(SignatureGrouping grouping) {
-            if (Count == 1) {
-                return this.Single().ToString(grouping);
-            }
+		public int ParameterCount {
+			get { return this.Sum(signature => signature.ParameterCount); }
+		}
+	}
 
-            string result = this
-                .Select(signature => signature.ToString(SignatureGrouping.Any))
-                .Join(" | ");
-            return grouping == SignatureGrouping.None
-                ? result
-                : result.Enclose("(", ")");
-        }
+	public class Choice : List<ISignature>, ISignature {
+		public Choice() {}
+		public Choice(IEnumerable<ISignature> collection) : base(collection) {}
 
-        public int ParameterCount {
-            get { return this.Sum(signature => signature.ParameterCount); }
-        }
-    }
+		public string ToString(SignatureGrouping grouping) {
+			if (Count == 1) {
+				return this.Single().ToString(grouping);
+			}
 
-    public class Option : ISignature {
-        public ISignature Value { get; set; }
+			string result = this
+				.Select(signature => signature.ToString(SignatureGrouping.Any))
+				.Join(" | ");
+			return grouping == SignatureGrouping.None
+				? result
+				: result.Enclose("(", ")");
+		}
 
-        public string ToString(SignatureGrouping grouping) {
-            string result = Value.ToString(SignatureGrouping.None);
-            return grouping == SignatureGrouping.Parentheses
-                ? result.Enclose("(", ")")
-                : result.Enclose("[", "]");
-        }
+		public int ParameterCount {
+			get { return this.Sum(signature => signature.ParameterCount); }
+		}
+	}
 
-        public int ParameterCount {
-            get { return Value.ParameterCount; }
-        }
-    }
+	public class Option : ISignature {
+		public ISignature Value { get; set; }
 
-    public enum SignatureGrouping {
-        None,
-        Any,
-        Parentheses
-    }
+		public string ToString(SignatureGrouping grouping) {
+			string result = Value.ToString(SignatureGrouping.None);
+			return grouping == SignatureGrouping.Parentheses
+				? result.Enclose("(", ")")
+				: result.Enclose("[", "]");
+		}
+
+		public int ParameterCount {
+			get { return Value.ParameterCount; }
+		}
+	}
+
+	public enum SignatureGrouping {
+		None,
+		Any,
+		Parentheses
+	}
+
 }

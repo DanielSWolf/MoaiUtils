@@ -1,6 +1,7 @@
 ﻿namespace MoaiUtils.MoaiParsing {
-    public static class MOAILuaObject {
-        public const string DummyCode = @"
+
+	public static class MOAILuaObject {
+		public const string DummyCode = @"
 /** @lua    MOAILuaObject
     @text   Base class for all of Moai's Lua classes.
 */
@@ -27,5 +28,6 @@ int MOAILuaObject::_getClassName(lua_State* L) {
 int MOAILuaObject::_setInterface(lua_State* L) {
     ...
 }";
-    }
+	}
+
 }

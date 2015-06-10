@@ -9,13 +9,13 @@ modification, are permitted provided that the following conditions
 are met:
 
 1. Redistributions of source code must retain the above copyright
-   notice, this list of conditions and the following disclaimer.
+	notice, this list of conditions and the following disclaimer.
 2. Redistributions in binary form must reproduce the above copyright
-   notice, this list of conditions and the following disclaimer in the
-   documentation and/or other materials provided with the distribution.
+	notice, this list of conditions and the following disclaimer in the
+	documentation and/or other materials provided with the distribution.
 3. Neither the NAME of Rainer Schuster nor the NAMEs of its contributors
-   may be used to endorse or promote products derived from this software
-   without specific prior written permission.
+	may be used to endorse or promote products derived from this software
+	without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -31,11 +31,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 This grammar file derived from:
 
-    Lua 5.2 Reference Manual
-    http://www.lua.org/manual/5.2/manual.html
+	Lua 5.2 Reference Manual
+	http://www.lua.org/manual/5.2/manual.html
 
-    Lua 5.1 grammar written by Nicolai Mainiero
-    http://www.antlr3.org/grammar/1178608849736/Lua.g
+	Lua 5.1 grammar written by Nicolai Mainiero
+	http://www.antlr3.org/grammar/1178608849736/Lua.g
 
 I tested my grammar with Test suite for Lua 5.2 (http://www.lua.org/tests/5.2/)
 */
@@ -43,60 +43,60 @@ I tested my grammar with Test suite for Lua 5.2 (http://www.lua.org/tests/5.2/)
 grammar Lua;
 
 chunk
-    : block EOF
-    ;
+	: block EOF
+	;
 
 block
-    : stat* retstat?
-    ;
+	: stat* retstat?
+	;
 
 stat
-    : ';'
-    | varlist '=' explist
-    | functioncall
-    | label
-    | 'break'
-    | 'goto' NAME
-    | 'do' block 'end'
-    | 'while' exp 'do' block 'end'
-    | 'repeat' block 'until' exp
-    | 'if' exp 'then' block ('elseif' exp 'then' block)* ('else' block)? 'end'
-    | 'for' NAME '=' exp ',' exp (',' exp)? 'do' block 'end'
-    | 'for' namelist 'in' explist 'do' block 'end'
-    | 'function' funcname funcbody
-    | 'local' 'function' NAME funcbody
-    | 'local' namelist ('=' explist)?
-    ;
+	: ';'
+	| varlist '=' explist
+	| functioncall
+	| label
+	| 'break'
+	| 'goto' NAME
+	| 'do' block 'end'
+	| 'while' exp 'do' block 'end'
+	| 'repeat' block 'until' exp
+	| 'if' exp 'then' block ('elseif' exp 'then' block)* ('else' block)? 'end'
+	| 'for' NAME '=' exp ',' exp (',' exp)? 'do' block 'end'
+	| 'for' namelist 'in' explist 'do' block 'end'
+	| 'function' funcname funcbody
+	| 'local' 'function' NAME funcbody
+	| 'local' namelist ('=' explist)?
+	;
 
 retstat
-    : 'return' explist? ';'?
-    ;
+	: 'return' explist? ';'?
+	;
 
 label
-    : '::' NAME '::'
-    ;
+	: '::' NAME '::'
+	;
 
 funcname
-    : NAME ('.' NAME)* (':' NAME)?
-    ;
+	: NAME ('.' NAME)* (':' NAME)?
+	;
 
 varlist
-    : var (',' var)*
-    ;
+	: var (',' var)*
+	;
 
 namelist
-    : NAME (',' NAME)*
-    ;
+	: NAME (',' NAME)*
+	;
 
 explist
-    : exp (',' exp)*
-    ;
+	: exp (',' exp)*
+	;
 
 exp
-    : 'nil' | 'false' | 'true' | number | string		
+	: 'nil' | 'false' | 'true' | number | string		
 	| '...'											
 	| functiondef								
-    | prefixexp										
+	| prefixexp										
 	| tableconstructor								
 	| <assoc=right> exp operatorPower exp			
 	| operatorUnary exp								
@@ -109,74 +109,74 @@ exp
 	;
 
 var
-    : (NAME | '(' exp ')' varSuffix) varSuffix*
-    ;
+	: (NAME | '(' exp ')' varSuffix) varSuffix*
+	;
 
 prefixexp
-    : varOrExp nameAndArgs*
-    ;
+	: varOrExp nameAndArgs*
+	;
 
 functioncall
-    : varOrExp nameAndArgs+
-    ;
+	: varOrExp nameAndArgs+
+	;
 
 varOrExp
-    : var | '(' exp ')'
-    ;
+	: var | '(' exp ')'
+	;
 
 nameAndArgs
-    : (':' NAME)? args
-    ;
+	: (':' NAME)? args
+	;
 
 varSuffix
-    : nameAndArgs* ('[' exp ']' | '.' NAME)
-    ;
+	: nameAndArgs* ('[' exp ']' | '.' NAME)
+	;
 
 /*
 var
-    : NAME | prefixexp '[' exp ']' | prefixexp '.' NAME
-    ;
+	: NAME | prefixexp '[' exp ']' | prefixexp '.' NAME
+	;
 
 prefixexp
-    : var | functioncall | '(' exp ')'
-    ;
+	: var | functioncall | '(' exp ')'
+	;
 
 functioncall
-    : prefixexp args | prefixexp ':' NAME args 
-    ;
+	: prefixexp args | prefixexp ':' NAME args 
+	;
 */
 
 args
-    : '(' explist? ')' | tableconstructor | string
-    ;
+	: '(' explist? ')' | tableconstructor | string
+	;
 
 functiondef
-    : 'function' funcbody
-    ;
+	: 'function' funcbody
+	;
 
 funcbody
-    : '(' parlist? ')' block 'end'
-    ;
+	: '(' parlist? ')' block 'end'
+	;
 
 parlist
-    : namelist (',' '...')? | '...'
-    ;
+	: namelist (',' '...')? | '...'
+	;
 
 tableconstructor
-    : '{' fieldlist? '}'
-    ;
+	: '{' fieldlist? '}'
+	;
 
 fieldlist
-    : field (fieldsep field)* fieldsep?
-    ;
+	: field (fieldsep field)* fieldsep?
+	;
 
 field
-    : '[' exp ']' '=' exp | NAME '=' exp | exp
-    ;
+	: '[' exp ']' '=' exp | NAME '=' exp | exp
+	;
 
 fieldsep
-    : ',' | ';'
-    ;
+	: ',' | ';'
+	;
 
 operatorOr 
 	: 'or';
@@ -197,121 +197,121 @@ operatorMulDivMod
 	: '*' | '/' | '%';
 
 operatorUnary
-    : 'not' | '#' | '-';
+	: 'not' | '#' | '-';
 
 operatorPower
-    : '^';
+	: '^';
 
 number
-    : INT | HEX | FLOAT | HEX_FLOAT
-    ;
+	: INT | HEX | FLOAT | HEX_FLOAT
+	;
 
 string
-    : NORMALSTRING | CHARSTRING | LONGSTRING
-    ;
+	: NORMALSTRING | CHARSTRING | LONGSTRING
+	;
 
 // LEXER
 
 NAME
-    : [a-zA-Z_][a-zA-Z_0-9]*
-    ;
+	: [a-zA-Z_][a-zA-Z_0-9]*
+	;
 
 NORMALSTRING
-    : '"' ( EscapeSequence | ~('\\'|'"') )* '"' 
-    ;
+	: '"' ( EscapeSequence | ~('\\'|'"') )* '"' 
+	;
 
 CHARSTRING
-    : '\'' ( EscapeSequence | ~('\''|'\\') )* '\''
-    ;
+	: '\'' ( EscapeSequence | ~('\''|'\\') )* '\''
+	;
 
 LONGSTRING
-    : '[' NESTED_STR ']'
-    ;
+	: '[' NESTED_STR ']'
+	;
 
 fragment
 NESTED_STR
-    : '=' NESTED_STR '='
-    | '[' .*? ']'
-    ;
+	: '=' NESTED_STR '='
+	| '[' .*? ']'
+	;
 
 INT
-    : Digit+
-    ;
+	: Digit+
+	;
 
 HEX
-    : '0' [xX] HexDigit+
-    ;
+	: '0' [xX] HexDigit+
+	;
 
 FLOAT
-    : Digit+ '.' Digit* ExponentPart?
-    | '.' Digit+ ExponentPart?
-    | Digit+ ExponentPart
-    ;
+	: Digit+ '.' Digit* ExponentPart?
+	| '.' Digit+ ExponentPart?
+	| Digit+ ExponentPart
+	;
 
 HEX_FLOAT
-    : '0' [xX] HexDigit+ '.' HexDigit* HexExponentPart?
-    | '0' [xX] '.' HexDigit+ HexExponentPart?
-    | '0' [xX] HexDigit+ HexExponentPart
-    ;
+	: '0' [xX] HexDigit+ '.' HexDigit* HexExponentPart?
+	| '0' [xX] '.' HexDigit+ HexExponentPart?
+	| '0' [xX] HexDigit+ HexExponentPart
+	;
 
 fragment
 ExponentPart
-    : [eE] [+-]? Digit+
-    ;
+	: [eE] [+-]? Digit+
+	;
 
 fragment
 HexExponentPart
-    : [pP] [+-]? Digit+
-    ;
+	: [pP] [+-]? Digit+
+	;
 
 fragment
 EscapeSequence
-    : '\\' [abfnrtvz"'\\]
-    | '\\' '\r'? '\n'
-    | DecimalEscape
-    | HexEscape
-    ;
-    
+	: '\\' [abfnrtvz"'\\]
+	| '\\' '\r'? '\n'
+	| DecimalEscape
+	| HexEscape
+	;
+
 fragment
 DecimalEscape
-    : '\\' Digit
-    | '\\' Digit Digit
-    | '\\' [0-2] Digit Digit
-    ;
-    
+	: '\\' Digit
+	| '\\' Digit Digit
+	| '\\' [0-2] Digit Digit
+	;
+
 fragment
 HexEscape
-    : '\\' 'x' HexDigit HexDigit
-    ;
+	: '\\' 'x' HexDigit HexDigit
+	;
 
 fragment
 Digit
-    : [0-9]
-    ;
+	: [0-9]
+	;
 
 fragment
 HexDigit
-    : [0-9a-fA-F]
-    ;
+	: [0-9a-fA-F]
+	;
 
 COMMENT
-    : '--[' NESTED_STR ']' -> channel(HIDDEN)
-    ;
-    
+	: '--[' NESTED_STR ']' -> channel(HIDDEN)
+	;
+
 LINE_COMMENT
-    : '--'
-    (                                               // --
-    | '[' '='*                                      // --[==
-    | '[' '='* ~('='|'['|'\r'|'\n') ~('\r'|'\n')*   // --[==AA
-    | ~('['|'\r'|'\n') ~('\r'|'\n')*                // --AAA
-    ) ('\r\n'|'\r'|'\n'|EOF)
-    -> channel(HIDDEN)
-    ;
-    
-WS  
-    : [ \t\u000C\r\n]+ -> skip
-    ;
+	: '--'
+	(												// --
+	| '[' '='*										// --[==
+	| '[' '='* ~('='|'['|'\r'|'\n') ~('\r'|'\n')*	// --[==AA
+	| ~('['|'\r'|'\n') ~('\r'|'\n')*				// --AAA
+	) ('\r\n'|'\r'|'\n'|EOF)
+	-> channel(HIDDEN)
+	;
+
+WS
+	: [ \t\u000C\r\n]+ -> skip
+	;
 
 SHEBANG
-    : '#' '!' ~('\n'|'\r')* -> channel(HIDDEN)
-    ;
+	: '#' '!' ~('\n'|'\r')* -> channel(HIDDEN)
+	;

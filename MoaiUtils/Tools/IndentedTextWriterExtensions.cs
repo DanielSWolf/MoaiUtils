@@ -2,22 +2,24 @@
 using System.CodeDom.Compiler;
 
 namespace MoaiUtils.Tools {
-    public static class IndentedTextWriterExtensions {
-        public static IDisposable IndentBlock(this IndentedTextWriter indentedTextWriter) {
-            return new Indenter(indentedTextWriter);
-        }
 
-        private class Indenter : IDisposable {
-            private readonly IndentedTextWriter indentedTextWriter;
+	public static class IndentedTextWriterExtensions {
+		public static IDisposable IndentBlock(this IndentedTextWriter indentedTextWriter) {
+			return new Indenter(indentedTextWriter);
+		}
 
-            public Indenter(IndentedTextWriter indentedTextWriter) {
-                this.indentedTextWriter = indentedTextWriter;
-                indentedTextWriter.Indent++;
-            }
+		private class Indenter : IDisposable {
+			private readonly IndentedTextWriter indentedTextWriter;
 
-            public void Dispose() {
-                indentedTextWriter.Indent--;
-            }
-        }
-    }
+			public Indenter(IndentedTextWriter indentedTextWriter) {
+				this.indentedTextWriter = indentedTextWriter;
+				indentedTextWriter.Indent++;
+			}
+
+			public void Dispose() {
+				indentedTextWriter.Indent--;
+			}
+		}
+	}
+
 }

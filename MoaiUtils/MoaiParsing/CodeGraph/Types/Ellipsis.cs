@@ -3,65 +3,67 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace MoaiUtils.MoaiParsing.CodeGraph.Types {
-    public class Ellipsis : IType, IDocumentationReferenceAware {
-        public Ellipsis(IType type) {
-            if (type == null) throw new ArgumentNullException("type");
-            Type = type;
-        }
 
-        public IType Type { get; private set; }
+	public class Ellipsis : IType, IDocumentationReferenceAware {
+		public Ellipsis(IType type) {
+			if (type == null) throw new ArgumentNullException("type");
+			Type = type;
+		}
 
-        public string Name {
-            get { return Type is Variant ? "..." : string.Format("{0}...", Type); }
-        }
+		public IType Type { get; private set; }
 
-        public string Description {
-            get { return string.Format("Any number of {0} elements", Type); }
-        }
+		public string Name {
+			get { return Type is Variant ? "..." : string.Format("{0}...", Type); }
+		}
 
-        public string Signature {
-            get { return Name; }
-        }
+		public string Description {
+			get { return string.Format("Any number of {0} elements", Type); }
+		}
 
-        public bool Exists {
-            get { return Type.Exists; }
-        }
+		public string Signature {
+			get { return Name; }
+		}
 
-        public override string ToString() {
-            return Signature;
-        }
+		public bool Exists {
+			get { return Type.Exists; }
+		}
 
-        #region Equality members
+		public override string ToString() {
+			return Signature;
+		}
 
-        protected bool Equals(Ellipsis other) {
-            return Type.Equals(other.Type);
-        }
+		#region Equality members
 
-        public override bool Equals(object obj) {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((Ellipsis) obj);
-        }
+		protected bool Equals(Ellipsis other) {
+			return Type.Equals(other.Type);
+		}
 
-        public override int GetHashCode() {
-            return Type.GetHashCode();
-        }
+		public override bool Equals(object obj) {
+			if (ReferenceEquals(null, obj)) return false;
+			if (ReferenceEquals(this, obj)) return true;
+			if (obj.GetType() != this.GetType()) return false;
+			return Equals((Ellipsis) obj);
+		}
 
-        #endregion
+		public override int GetHashCode() {
+			return Type.GetHashCode();
+		}
 
-        public IEnumerable<FilePosition> DocumentationReferences {
-            get {
-                return (Type is IDocumentationReferenceAware)
-                    ? ((IDocumentationReferenceAware) Type).DocumentationReferences
-                    : Enumerable.Empty<FilePosition>();
-            }
-        }
+		#endregion
 
-        public void AddDocumentationReference(FilePosition position) {
-            if (Type is IDocumentationReferenceAware) {
-                ((IDocumentationReferenceAware) Type).AddDocumentationReference(position);
-            }
-        }
-    }
+		public IEnumerable<FilePosition> DocumentationReferences {
+			get {
+				return (Type is IDocumentationReferenceAware)
+					? ((IDocumentationReferenceAware) Type).DocumentationReferences
+					: Enumerable.Empty<FilePosition>();
+			}
+		}
+
+		public void AddDocumentationReference(FilePosition position) {
+			if (Type is IDocumentationReferenceAware) {
+				((IDocumentationReferenceAware) Type).AddDocumentationReference(position);
+			}
+		}
+	}
+
 }

@@ -1,48 +1,50 @@
 ﻿using System.Collections.Generic;
 
 namespace MoaiUtils.MoaiParsing {
-    public class WarningList : List<Warning> {
-        public void Add(FilePosition position, WarningType type, string message) {
-            Add(new Warning(position, type, message));
-        }
 
-        public void Add(FilePosition position, WarningType type, string messageFormat, params object[] args) {
-            Add(position, type, string.Format(messageFormat, args));
-        }
-    }
+	public class WarningList : List<Warning> {
+		public void Add(FilePosition position, WarningType type, string message) {
+			Add(new Warning(position, type, message));
+		}
 
-    public class Warning {
-        public Warning(FilePosition position, WarningType type, string message) {
-            Position = position;
-            Type = type;
-            Message = message;
-        }
+		public void Add(FilePosition position, WarningType type, string messageFormat, params object[] args) {
+			Add(position, type, string.Format(messageFormat, args));
+		}
+	}
 
-        public FilePosition Position { get; private set; }
-        public WarningType Type { get; private set; }
-        public string Message { get; private set; }
-    }
+	public class Warning {
+		public Warning(FilePosition position, WarningType type, string message) {
+			Position = position;
+			Type = type;
+			Message = message;
+		}
 
-    public enum WarningType {
-        // A required annotation is missing
-        MissingAnnotation,
+		public FilePosition Position { get; private set; }
+		public WarningType Type { get; private set; }
+		public string Message { get; private set; }
+	}
 
-        // This annotation is not allowed in this place or is altogether unknown
-        UnexpectedAnnotation,
+	public enum WarningType {
+		// A required annotation is missing
+		MissingAnnotation,
 
-        // An annotation is missing a required value
-        IncompleteAnnotation,
+		// This annotation is not allowed in this place or is altogether unknown
+		UnexpectedAnnotation,
 
-        // An annotation value appears to be wrong
-        UnexpectedValue,
+		// An annotation is missing a required value
+		IncompleteAnnotation,
 
-        // Documentation looks suspicious without necessarily being wrong
-        HeuristicWarning,
+		// An annotation value appears to be wrong
+		UnexpectedValue,
 
-        // There is an error with the way a Lua methd is registered
-        IncorrectMethodRegistration,
+		// Documentation looks suspicious without necessarily being wrong
+		HeuristicWarning,
 
-        // MoaiUtils couldn't handle a particular case
-        ToolLimitation
-    }
+		// There is an error with the way a Lua methd is registered
+		IncorrectMethodRegistration,
+
+		// MoaiUtils couldn't handle a particular case
+		ToolLimitation
+	}
+
 }

@@ -1,28 +1,30 @@
 ﻿namespace MoaiUtils.MoaiParsing.CodeGraph.Types {
-    public class Variant : IType {
-        public static readonly Variant Instance = new Variant();
 
-        private Variant() {}
+	public class Variant : IType {
+		public static readonly Variant Instance = new Variant();
 
-        public string Name {
-            get { return "variant"; }
-        }
+		private Variant() {}
 
-        public string Description {
-            get { return "This can be any type."; }
-        }
+		public string Name {
+			get { return "variant"; }
+		}
 
-        public string Signature {
-            get { return Name; }
-        }
+		public string Description {
+			get { return "This can be any type."; }
+		}
 
-        public bool Exists {
-            get { return true; }
-        }
+		public string Signature {
+			get { return Name; }
+		}
 
-        public override string ToString() {
-            return Signature;
-        }
+		public bool Exists {
+			get { return true; }
+		}
 
-    }
+		public override string ToString() {
+			return Signature;
+		}
+
+	}
+
 }

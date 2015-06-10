@@ -6,195 +6,197 @@ using System.Collections.Specialized;
 using System.Linq;
 
 namespace MoaiUtils.LuaIO {
-    /// <summary>
-    /// This class imitates the behavior of a table in Lua.
-    /// In addition, it guarantees that items are kept in the same order in which they were added.
-    /// While not technically necessary, this allows generated Lua files to be structured meaningfully.
-    /// </summary>
-    public class LuaTable : IDictionary<object, object> {
-        private readonly OrderedDictionary elements = new OrderedDictionary();
-        private int nextAutoIndex = 1;
 
-        public int Count {
-            get { return elements.Count; }
-        }
+	/// <summary>
+	/// This class imitates the behavior of a table in Lua.
+	/// In addition, it guarantees that items are kept in the same order in which they were added.
+	/// While not technically necessary, this allows generated Lua files to be structured meaningfully.
+	/// </summary>
+	public class LuaTable : IDictionary<object, object> {
+		private readonly OrderedDictionary elements = new OrderedDictionary();
+		private int nextAutoIndex = 1;
 
-        public void Clear() {
-            elements.Clear();
-        }
+		public int Count {
+			get { return elements.Count; }
+		}
 
-        public bool ContainsKey(object key) {
-            return elements.Contains(key);
-        }
+		public void Clear() {
+			elements.Clear();
+		}
 
-        public object this[object key] {
-            get {
-                if (!ContainsKey(key)) {
-                    throw new InvalidOperationException(string.Format("There is no element with key [{0}].", key));
-                }
-                return elements[key];
-            }
-            set {
-                KeyValuePair<object, object>? pair = CleanKeyValuePair(key, value);
-                if (pair != null) {
-                    elements[pair.Value.Key] = pair.Value.Value;
-                }
-            }
-        }
+		public bool ContainsKey(object key) {
+			return elements.Contains(key);
+		}
 
-        public void Add(object key, object value) {
-            if (ContainsKey(key)) {
-                throw new InvalidOperationException(string.Format("There already is an element with key [{0}].", key));
-            }
-            this[key] = value;
-        }
+		public object this[object key] {
+			get {
+				if (!ContainsKey(key)) {
+					throw new InvalidOperationException(string.Format("There is no element with key [{0}].", key));
+				}
+				return elements[key];
+			}
+			set {
+				KeyValuePair<object, object>? pair = CleanKeyValuePair(key, value);
+				if (pair != null) {
+					elements[pair.Value.Key] = pair.Value.Value;
+				}
+			}
+		}
 
-        public void Add(object value) {
-            if (value is LuaComment) {
-                Add(new LuaCommentKey(), value);
-            } else {
-                Add((double) nextAutoIndex++, value);
-            }
-        }
+		public void Add(object key, object value) {
+			if (ContainsKey(key)) {
+				throw new InvalidOperationException(string.Format("There already is an element with key [{0}].", key));
+			}
+			this[key] = value;
+		}
 
-        public bool Remove(object key) {
-            if (ContainsKey(key)) {
-                elements.Remove(key);
-                return true;
-            }
-            return false;
-        }
+		public void Add(object value) {
+			if (value is LuaComment) {
+				Add(new LuaCommentKey(), value);
+			} else {
+				Add((double) nextAutoIndex++, value);
+			}
+		}
 
-        public ICollection<object> Keys {
-            get { return new ReadOnlyCollection<object>(elements.Keys.Cast<object>().ToList()); }
-        }
+		public bool Remove(object key) {
+			if (ContainsKey(key)) {
+				elements.Remove(key);
+				return true;
+			}
+			return false;
+		}
 
-        public ICollection<object> Values {
-            get { return new ReadOnlyCollection<object>(elements.Values.Cast<object>().ToList()); }
-        }
+		public ICollection<object> Keys {
+			get { return new ReadOnlyCollection<object>(elements.Keys.Cast<object>().ToList()); }
+		}
 
-        public IEnumerable<object> SequencePart {
-            get {
-                for (int index = 1;; index++) {
-                    if (ContainsKey(index)) {
-                        yield return elements[index];
-                    } else {
-                        yield break;
-                    }
-                }
-            }
-        }
+		public ICollection<object> Values {
+			get { return new ReadOnlyCollection<object>(elements.Values.Cast<object>().ToList()); }
+		}
 
-        private KeyValuePair<object, object>? CleanKeyValuePair(object key, object value) {
-            // Key must be set.
-            if (!(key is bool || key is double || key is int || key is string || key is LuaTable || key is LuaFunction || key is LuaCommentKey)) {
-                throw new ArgumentException(string.Format(
-                    "Unsupported key [{0}]. Keys must be of type bool, double/int, string, LuaTable, LuaFunction, or LuaCommentKey.",
-                    key ?? "null"));
-            }
+		public IEnumerable<object> SequencePart {
+			get {
+				for (int index = 1;; index++) {
+					if (ContainsKey(index)) {
+						yield return elements[index];
+					} else {
+						yield break;
+					}
+				}
+			}
+		}
 
-            // Value should be set - null value means ignore this.
-            if (value == null) {
-                return null;
-            }
-            if (!(value is bool || value is double || value is int || value is string || value is LuaTable || value is LuaFunction || value is LuaComment)) {
-                throw new ArgumentException(string.Format(
-                    "Unsupported value [{0}]. Values must be of type bool, double/int, string, LuaTable, LuaFunction, or LuaComment.",
-                    value));
-            }
+		private KeyValuePair<object, object>? CleanKeyValuePair(object key, object value) {
+			// Key must be set.
+			if (!(key is bool || key is double || key is int || key is string || key is LuaTable || key is LuaFunction || key is LuaCommentKey)) {
+				throw new ArgumentException(string.Format(
+					"Unsupported key [{0}]. Keys must be of type bool, double/int, string, LuaTable, LuaFunction, or LuaCommentKey.",
+					key ?? "null"));
+			}
 
-            // At this point, key and value are both set. Check that they are compatible.
-            if ((key is LuaCommentKey) != (value is LuaComment)) {
-                throw new ArgumentException("LuaCommentKey and LuaComment must be used together.");
-            }
+			// Value should be set - null value means ignore this.
+			if (value == null) {
+				return null;
+			}
+			if (!(value is bool || value is double || value is int || value is string || value is LuaTable || value is LuaFunction || value is LuaComment)) {
+				throw new ArgumentException(string.Format(
+					"Unsupported value [{0}]. Values must be of type bool, double/int, string, LuaTable, LuaFunction, or LuaComment.",
+					value));
+			}
 
-            // Apply trivial conversions
-            if (key is int) key = (double) (int) key;
-            if (value is int) value = (double) (int) value;
+			// At this point, key and value are both set. Check that they are compatible.
+			if ((key is LuaCommentKey) != (value is LuaComment)) {
+				throw new ArgumentException("LuaCommentKey and LuaComment must be used together.");
+			}
 
-            return new KeyValuePair<object, object>(key, value);
-        }
+			// Apply trivial conversions
+			if (key is int) key = (double) (int) key;
+			if (value is int) value = (double) (int) value;
 
-        #region IDictionary overhead
+			return new KeyValuePair<object, object>(key, value);
+		}
 
-        public IEnumerator<KeyValuePair<object, object>> GetEnumerator() {
-            return elements
-                .Cast<DictionaryEntry>()
-                .Select(entry => new KeyValuePair<object, object>(entry.Key, entry.Value))
-                .GetEnumerator();
-        }
+		#region IDictionary overhead
 
-        IEnumerator IEnumerable.GetEnumerator() {
-            return GetEnumerator();
-        }
+		public IEnumerator<KeyValuePair<object, object>> GetEnumerator() {
+			return elements
+				.Cast<DictionaryEntry>()
+				.Select(entry => new KeyValuePair<object, object>(entry.Key, entry.Value))
+				.GetEnumerator();
+		}
 
-        public void Add(KeyValuePair<object, object> item) {
-            Add(item.Key, item.Value);
-        }
+		IEnumerator IEnumerable.GetEnumerator() {
+			return GetEnumerator();
+		}
 
-        bool ICollection<KeyValuePair<object, object>>.Contains(KeyValuePair<object, object> item) {
-            throw new NotSupportedException();
-        }
+		public void Add(KeyValuePair<object, object> item) {
+			Add(item.Key, item.Value);
+		}
 
-        void ICollection<KeyValuePair<object, object>>.CopyTo(KeyValuePair<object, object>[] array, int arrayIndex) {
-            int targetIndex = arrayIndex;
-            foreach (DictionaryEntry entry in elements) {
-                array[targetIndex] = new KeyValuePair<object, object>(entry.Key, entry.Value);
-                targetIndex++;
-            }
-        }
+		bool ICollection<KeyValuePair<object, object>>.Contains(KeyValuePair<object, object> item) {
+			throw new NotSupportedException();
+		}
 
-        bool ICollection<KeyValuePair<object, object>>.Remove(KeyValuePair<object, object> item) {
-            throw new NotSupportedException();
-        }
+		void ICollection<KeyValuePair<object, object>>.CopyTo(KeyValuePair<object, object>[] array, int arrayIndex) {
+			int targetIndex = arrayIndex;
+			foreach (DictionaryEntry entry in elements) {
+				array[targetIndex] = new KeyValuePair<object, object>(entry.Key, entry.Value);
+				targetIndex++;
+			}
+		}
 
-        bool IDictionary<object, object>.TryGetValue(object key, out object value) {
-            if (ContainsKey(key)) {
-                value = elements[key];
-                return true;
-            }
-            value = null;
-            return false;
-        }
+		bool ICollection<KeyValuePair<object, object>>.Remove(KeyValuePair<object, object> item) {
+			throw new NotSupportedException();
+		}
 
-        bool ICollection<KeyValuePair<object, object>>.IsReadOnly {
-            get { return false; }
-        }
+		bool IDictionary<object, object>.TryGetValue(object key, out object value) {
+			if (ContainsKey(key)) {
+				value = elements[key];
+				return true;
+			}
+			value = null;
+			return false;
+		}
 
-        #endregion
-    }
+		bool ICollection<KeyValuePair<object, object>>.IsReadOnly {
+			get { return false; }
+		}
 
-    public static class LuaTableExtensions {
-        public static LuaTable ToLuaList(this IEnumerable elements) {
-            var result = new LuaTable();
-            foreach (object element in elements) {
-                result.Add(element);
-            }
-            return result;
-        }
+		#endregion
+	}
 
-        public static LuaTable ToLuaDictionary<TElement>(this IEnumerable<TElement> elements, Func<TElement, object> keySelector) {
-            var result = new LuaTable();
-            foreach (TElement element in elements) {
-                result.Add(keySelector(element), element);
-            }
-            return result;
-        }
+	public static class LuaTableExtensions {
+		public static LuaTable ToLuaList(this IEnumerable elements) {
+			var result = new LuaTable();
+			foreach (object element in elements) {
+				result.Add(element);
+			}
+			return result;
+		}
 
-        public static LuaTable ToLuaDictionary<TElement>(this IEnumerable<TElement> elements, Func<TElement, object> keySelector, Func<TElement, object> valueSelector) {
-            var result = new LuaTable();
-            foreach (TElement element in elements) {
-                result.Add(keySelector(element), valueSelector(element));
-            }
-            return result;
-        }
+		public static LuaTable ToLuaDictionary<TElement>(this IEnumerable<TElement> elements, Func<TElement, object> keySelector) {
+			var result = new LuaTable();
+			foreach (TElement element in elements) {
+				result.Add(keySelector(element), element);
+			}
+			return result;
+		}
 
-        public static LuaTable ToLuaDictionary<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> pairs) {
-            var result = new LuaTable();
-            foreach (var pair in pairs) {
-                result.Add(pair.Key, pair.Value);
-            }
-            return result;
-        }
-    }
+		public static LuaTable ToLuaDictionary<TElement>(this IEnumerable<TElement> elements, Func<TElement, object> keySelector, Func<TElement, object> valueSelector) {
+			var result = new LuaTable();
+			foreach (TElement element in elements) {
+				result.Add(keySelector(element), valueSelector(element));
+			}
+			return result;
+		}
+
+		public static LuaTable ToLuaDictionary<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> pairs) {
+			var result = new LuaTable();
+			foreach (var pair in pairs) {
+				result.Add(pair.Key, pair.Value);
+			}
+			return result;
+		}
+	}
+
 }
