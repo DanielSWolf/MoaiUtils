@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Antlr4.Runtime;
@@ -6,6 +7,7 @@ using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Dfa;
 using Antlr4.Runtime.Sharpen;
 using Antlr4.Runtime.Tree;
+using CppParser.CppSymbols;
 using MoaiUtils.Tools;
 
 namespace CppParser {
@@ -73,17 +75,10 @@ namespace CppParser {
                     progress.Value++;
                 }
 
+                List<CppParser.FileContext> fileContexts = new List<CppParser.FileContext>();
                 foreach (FileInfo file in files) {
-                    ICharStream charStream = new CppFileStream(file);
-                    CppLexer lexer = new CppLexer(charStream);
-                    lexer.RemoveErrorListeners();
-                    lexer.AddErrorListener(new LexerDebugErrorListener(() => errorCount++));
-                    CommonTokenStream tokenStream = new CommonTokenStream(lexer);
-                    CppParser parser = new CppParser(tokenStream);
-                    parser.RemoveErrorListeners();
-                    parser.AddErrorListener(new DebugErrorListener(() => errorCount++));
-
-                    IParseTree parseTree = parser.file();
+                    CppParser.FileContext fileContext = ParseCppFile(file, () => errorCount++);
+                    fileContexts.Add(fileContext);
 
                     progress.Value++;
                 }
@@ -91,6 +86,19 @@ namespace CppParser {
 
             Console.WriteLine("Done with {0} errors.", errorCount);
             Console.ReadLine();
+        }
+
+        private static CppParser.FileContext ParseCppFile(FileInfo file, Action addError) {
+            ICharStream charStream = new CppFileStream(file);
+            CppLexer lexer = new CppLexer(charStream);
+            lexer.RemoveErrorListeners();
+            lexer.AddErrorListener(new LexerDebugErrorListener(addError));
+            CommonTokenStream tokenStream = new CommonTokenStream(lexer);
+            CppParser parser = new CppParser(tokenStream);
+            parser.RemoveErrorListeners();
+            parser.AddErrorListener(new DebugErrorListener(addError));
+
+            return parser.file();
         }
     }
 }
