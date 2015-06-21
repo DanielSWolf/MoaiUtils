@@ -6,7 +6,7 @@ file : topLevelStatement* EOF ;
 
 topLevelStatement
 	: declaration
-	| typeDef
+	| typedef
 	| usingDirective
 	| functionDefinition
 	| classDefinition
@@ -20,7 +20,7 @@ declaration :
 	('template' templateParamsBlock)?
 	(typeSpecifier | 'class' | 'struct' | 'union' | 'enum') declarator ('=' expression)? ';' ;
 
-typeDef
+typedef
 	: 'typedef' ('class' | 'struct' | 'union' | 'enum')? type ';' ;
 
 usingDirective
@@ -53,12 +53,12 @@ memberInitializer
 	: (Id | typeSpecifier) '(' (expression (',' expression)*)? ')' ;
 
 declarator
-	: (typeSpecifier '::')? Id?						# Name
-	| declarator bracketsBlock						# Array
-	| declarator templateArgsBlock? parensBlock		# Function
-	| '*' declarator								# Pointer
-	| '&' declarator								# Reference
-	| '(' declarator ')'							# Group
+	: '(' declarator ')'							# DeclaratorGroup
+	| declarator bracketsBlock						# ArrayDeclarator
+	| declarator templateArgsBlock? parensBlock		# FunctionDeclarator
+	| '*' declarator								# PointerDeclarator
+	| '&' declarator								# ReferenceDeclarator
+	| (typeSpecifier '::')? Id?						# NameDeclarator
 	;
 
 type

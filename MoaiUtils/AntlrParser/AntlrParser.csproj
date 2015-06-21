@@ -39,6 +39,10 @@
     <Reference Include="Antlr4.Runtime">
       <HintPath>.\Antlr4.Runtime.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Experimental.Collections, Version=1.0.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Experimental.Collections.1.0.3-alpha\lib\portable-net45+win8+wp8\Microsoft.Experimental.Collections.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -48,7 +52,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CodePosition.cs" />
     <Compile Include="CppFileStream.cs" />
+    <Compile Include="CppParserRulePartials.cs" />
+    <Compile Include="CppSymbols\CppClass.cs" />
+    <Compile Include="CppSymbols\CppClassDraft.cs" />
+    <Compile Include="CppSymbols\CppTypedefDraft.cs" />
+    <Compile Include="CppSymbols\ICppType.cs" />
+    <Compile Include="CppSymbols\ICppTypeDraft.cs" />
+    <Compile Include="CppSymbols\PrimitiveCppType.cs" />
     <Compile Include="Generated\CppLexer.cs" />
     <Compile Include="Generated\CppParser.cs" />
     <Compile Include="Generated\CppParserBaseListener.cs" />
@@ -57,9 +69,11 @@
     <Compile Include="Generated\LuaLexer.cs" />
     <Compile Include="Generated\LuaListener.cs" />
     <Compile Include="Generated\LuaParser.cs" />
+    <Compile Include="ICodeElement.cs" />
     <Compile Include="IProgress.cs" />
     <Compile Include="MoaiCppLexer.cs" />
     <Compile Include="MoaiCppParser.cs" />
+    <Compile Include="ParseTreeExtensions.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="ProgressBar.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -72,6 +86,7 @@
       <Generator>MSBuild:Compile</Generator>
       <CustomToolNamespace>CppParser</CustomToolNamespace>
     </Antlr4>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Tools\Tools.csproj">
@@ -79,6 +94,7 @@
       <Name>Tools</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -70,17 +70,17 @@ public partial class CppParserBaseListener : ICppParserListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitDeclaration([NotNull] CppParser.DeclarationContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="CppParser.typeDef"/>.
+	/// Enter a parse tree produced by <see cref="CppParser.typedef"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterTypeDef([NotNull] CppParser.TypeDefContext context) { }
+	public virtual void EnterTypedef([NotNull] CppParser.TypedefContext context) { }
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="CppParser.typeDef"/>.
+	/// Exit a parse tree produced by <see cref="CppParser.typedef"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitTypeDef([NotNull] CppParser.TypeDefContext context) { }
+	public virtual void ExitTypedef([NotNull] CppParser.TypedefContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="CppParser.usingDirective"/>.
 	/// <para>The default implementation does nothing.</para>
@@ -178,77 +178,77 @@ public partial class CppParserBaseListener : ICppParserListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitMemberInitializer([NotNull] CppParser.MemberInitializerContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="CppParser.Array"/>.
+	/// Enter a parse tree produced by <see cref="CppParser.PointerDeclarator"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterArray([NotNull] CppParser.ArrayContext context) { }
+	public virtual void EnterPointerDeclarator([NotNull] CppParser.PointerDeclaratorContext context) { }
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="CppParser.Array"/>.
+	/// Exit a parse tree produced by <see cref="CppParser.PointerDeclarator"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitArray([NotNull] CppParser.ArrayContext context) { }
+	public virtual void ExitPointerDeclarator([NotNull] CppParser.PointerDeclaratorContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="CppParser.Group"/>.
+	/// Enter a parse tree produced by <see cref="CppParser.ReferenceDeclarator"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterGroup([NotNull] CppParser.GroupContext context) { }
+	public virtual void EnterReferenceDeclarator([NotNull] CppParser.ReferenceDeclaratorContext context) { }
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="CppParser.Group"/>.
+	/// Exit a parse tree produced by <see cref="CppParser.ReferenceDeclarator"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitGroup([NotNull] CppParser.GroupContext context) { }
+	public virtual void ExitReferenceDeclarator([NotNull] CppParser.ReferenceDeclaratorContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="CppParser.Function"/>.
+	/// Enter a parse tree produced by <see cref="CppParser.NameDeclarator"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterFunction([NotNull] CppParser.FunctionContext context) { }
+	public virtual void EnterNameDeclarator([NotNull] CppParser.NameDeclaratorContext context) { }
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="CppParser.Function"/>.
+	/// Exit a parse tree produced by <see cref="CppParser.NameDeclarator"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitFunction([NotNull] CppParser.FunctionContext context) { }
+	public virtual void ExitNameDeclarator([NotNull] CppParser.NameDeclaratorContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="CppParser.Reference"/>.
+	/// Enter a parse tree produced by <see cref="CppParser.ArrayDeclarator"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterReference([NotNull] CppParser.ReferenceContext context) { }
+	public virtual void EnterArrayDeclarator([NotNull] CppParser.ArrayDeclaratorContext context) { }
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="CppParser.Reference"/>.
+	/// Exit a parse tree produced by <see cref="CppParser.ArrayDeclarator"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitReference([NotNull] CppParser.ReferenceContext context) { }
+	public virtual void ExitArrayDeclarator([NotNull] CppParser.ArrayDeclaratorContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="CppParser.Pointer"/>.
+	/// Enter a parse tree produced by <see cref="CppParser.DeclaratorGroup"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterPointer([NotNull] CppParser.PointerContext context) { }
+	public virtual void EnterDeclaratorGroup([NotNull] CppParser.DeclaratorGroupContext context) { }
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="CppParser.Pointer"/>.
+	/// Exit a parse tree produced by <see cref="CppParser.DeclaratorGroup"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitPointer([NotNull] CppParser.PointerContext context) { }
+	public virtual void ExitDeclaratorGroup([NotNull] CppParser.DeclaratorGroupContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="CppParser.Name"/>.
+	/// Enter a parse tree produced by <see cref="CppParser.FunctionDeclarator"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterName([NotNull] CppParser.NameContext context) { }
+	public virtual void EnterFunctionDeclarator([NotNull] CppParser.FunctionDeclaratorContext context) { }
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="CppParser.Name"/>.
+	/// Exit a parse tree produced by <see cref="CppParser.FunctionDeclarator"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitName([NotNull] CppParser.NameContext context) { }
+	public virtual void ExitFunctionDeclarator([NotNull] CppParser.FunctionDeclaratorContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="CppParser.type"/>.
 	/// <para>The default implementation does nothing.</para>

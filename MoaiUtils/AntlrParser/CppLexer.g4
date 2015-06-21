@@ -117,6 +117,7 @@ ObjectiveCDirective
 LinkageSpecification : 'extern' Whitespace? StringLiteral -> skip ;
 CommonMacro // That's the price for not implementing a full preprocessor :-(
 	: ( 'CALLBACK' | 'WINAPI' | 'JNICALL' | 'JNIEXPORT' | 'AKU_API' | 'F_CALLBACK'
+	| 'GL_APIENTRYP'
 	| 'SUPPRESS_EMPTY_FILE_WARNING'
 	) -> skip ;
 

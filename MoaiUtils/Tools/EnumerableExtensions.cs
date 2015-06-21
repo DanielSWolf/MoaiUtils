@@ -28,6 +28,7 @@ namespace MoaiUtils.Tools {
 				return compare(x, y);
 			}
 		}
+
 	}
 
 }

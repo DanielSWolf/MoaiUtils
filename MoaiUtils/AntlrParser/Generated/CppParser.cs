@@ -48,7 +48,7 @@ public partial class CppParser : Parser {
 		FlagTag=78, AttributeTag=79, InParamTag=80, OptionalInParamTag=81, OutParamTag=82, 
 		OverloadTag=83, UnknownTag=84, DocWord=85, DocWhitespace=86, BlockCommentEnd=87;
 	public const int
-		RULE_file = 0, RULE_topLevelStatement = 1, RULE_declaration = 2, RULE_typeDef = 3, 
+		RULE_file = 0, RULE_topLevelStatement = 1, RULE_declaration = 2, RULE_typedef = 3, 
 		RULE_usingDirective = 4, RULE_functionDefinition = 5, RULE_classDefinition = 6, 
 		RULE_baseClause = 7, RULE_constructorDefinition = 8, RULE_destructorDefinition = 9, 
 		RULE_memberInitializerList = 10, RULE_memberInitializer = 11, RULE_declarator = 12, 
@@ -62,7 +62,7 @@ public partial class CppParser : Parser {
 		RULE_overloadBlock = 35, RULE_inParamTagLine = 36, RULE_optionalInParamTagLine = 37, 
 		RULE_outParamTagLine = 38, RULE_description = 39;
 	public static readonly string[] ruleNames = {
-		"file", "topLevelStatement", "declaration", "typeDef", "usingDirective", 
+		"file", "topLevelStatement", "declaration", "typedef", "usingDirective", 
 		"functionDefinition", "classDefinition", "baseClause", "constructorDefinition", 
 		"destructorDefinition", "memberInitializerList", "memberInitializer", 
 		"declarator", "type", "typeSpecifier", "templateParamsBlock", "templateParam", 
@@ -187,8 +187,8 @@ public partial class CppParser : Parser {
 		public DeclarationContext declaration() {
 			return GetRuleContext<DeclarationContext>(0);
 		}
-		public TypeDefContext typeDef() {
-			return GetRuleContext<TypeDefContext>(0);
+		public TypedefContext typedef() {
+			return GetRuleContext<TypedefContext>(0);
 		}
 		public UsingDirectiveContext usingDirective() {
 			return GetRuleContext<UsingDirectiveContext>(0);
@@ -245,7 +245,7 @@ public partial class CppParser : Parser {
 			case 2:
 				EnterOuterAlt(_localctx, 2);
 				{
-				State = 89; typeDef();
+				State = 89; typedef();
 				}
 				break;
 			case 3:
@@ -447,29 +447,29 @@ public partial class CppParser : Parser {
 		return _localctx;
 	}
 
-	public partial class TypeDefContext : ParserRuleContext {
+	public partial class TypedefContext : ParserRuleContext {
 		public TypeContext type() {
 			return GetRuleContext<TypeContext>(0);
 		}
-		public TypeDefContext(ParserRuleContext parent, int invokingState)
+		public TypedefContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
 		{
 		}
-		public override int RuleIndex { get { return RULE_typeDef; } }
+		public override int RuleIndex { get { return RULE_typedef; } }
 		public override void EnterRule(IParseTreeListener listener) {
 			ICppParserListener typedListener = listener as ICppParserListener;
-			if (typedListener != null) typedListener.EnterTypeDef(this);
+			if (typedListener != null) typedListener.EnterTypedef(this);
 		}
 		public override void ExitRule(IParseTreeListener listener) {
 			ICppParserListener typedListener = listener as ICppParserListener;
-			if (typedListener != null) typedListener.ExitTypeDef(this);
+			if (typedListener != null) typedListener.ExitTypedef(this);
 		}
 	}
 
 	[RuleVersion(0)]
-	public TypeDefContext typeDef() {
-		TypeDefContext _localctx = new TypeDefContext(Context, State);
-		EnterRule(_localctx, 6, RULE_typeDef);
+	public TypedefContext typedef() {
+		TypedefContext _localctx = new TypedefContext(Context, State);
+		EnterRule(_localctx, 6, RULE_typedef);
 		int _la;
 		try {
 			EnterOuterAlt(_localctx, 1);
@@ -1082,38 +1082,81 @@ public partial class CppParser : Parser {
 			base.CopyFrom(context);
 		}
 	}
-	public partial class ArrayContext : DeclaratorContext {
+	public partial class PointerDeclaratorContext : DeclaratorContext {
+		public DeclaratorContext declarator() {
+			return GetRuleContext<DeclaratorContext>(0);
+		}
+		public PointerDeclaratorContext(DeclaratorContext context) { CopyFrom(context); }
+		public override void EnterRule(IParseTreeListener listener) {
+			ICppParserListener typedListener = listener as ICppParserListener;
+			if (typedListener != null) typedListener.EnterPointerDeclarator(this);
+		}
+		public override void ExitRule(IParseTreeListener listener) {
+			ICppParserListener typedListener = listener as ICppParserListener;
+			if (typedListener != null) typedListener.ExitPointerDeclarator(this);
+		}
+	}
+	public partial class ReferenceDeclaratorContext : DeclaratorContext {
+		public DeclaratorContext declarator() {
+			return GetRuleContext<DeclaratorContext>(0);
+		}
+		public ReferenceDeclaratorContext(DeclaratorContext context) { CopyFrom(context); }
+		public override void EnterRule(IParseTreeListener listener) {
+			ICppParserListener typedListener = listener as ICppParserListener;
+			if (typedListener != null) typedListener.EnterReferenceDeclarator(this);
+		}
+		public override void ExitRule(IParseTreeListener listener) {
+			ICppParserListener typedListener = listener as ICppParserListener;
+			if (typedListener != null) typedListener.ExitReferenceDeclarator(this);
+		}
+	}
+	public partial class NameDeclaratorContext : DeclaratorContext {
+		public TypeSpecifierContext typeSpecifier() {
+			return GetRuleContext<TypeSpecifierContext>(0);
+		}
+		public ITerminalNode Id() { return GetToken(CppParser.Id, 0); }
+		public NameDeclaratorContext(DeclaratorContext context) { CopyFrom(context); }
+		public override void EnterRule(IParseTreeListener listener) {
+			ICppParserListener typedListener = listener as ICppParserListener;
+			if (typedListener != null) typedListener.EnterNameDeclarator(this);
+		}
+		public override void ExitRule(IParseTreeListener listener) {
+			ICppParserListener typedListener = listener as ICppParserListener;
+			if (typedListener != null) typedListener.ExitNameDeclarator(this);
+		}
+	}
+	public partial class ArrayDeclaratorContext : DeclaratorContext {
 		public DeclaratorContext declarator() {
 			return GetRuleContext<DeclaratorContext>(0);
 		}
 		public BracketsBlockContext bracketsBlock() {
 			return GetRuleContext<BracketsBlockContext>(0);
 		}
-		public ArrayContext(DeclaratorContext context) { CopyFrom(context); }
+		public ArrayDeclaratorContext(DeclaratorContext context) { CopyFrom(context); }
 		public override void EnterRule(IParseTreeListener listener) {
 			ICppParserListener typedListener = listener as ICppParserListener;
-			if (typedListener != null) typedListener.EnterArray(this);
+			if (typedListener != null) typedListener.EnterArrayDeclarator(this);
 		}
 		public override void ExitRule(IParseTreeListener listener) {
 			ICppParserListener typedListener = listener as ICppParserListener;
-			if (typedListener != null) typedListener.ExitArray(this);
+			if (typedListener != null) typedListener.ExitArrayDeclarator(this);
 		}
 	}
-	public partial class GroupContext : DeclaratorContext {
+	public partial class DeclaratorGroupContext : DeclaratorContext {
 		public DeclaratorContext declarator() {
 			return GetRuleContext<DeclaratorContext>(0);
 		}
-		public GroupContext(DeclaratorContext context) { CopyFrom(context); }
+		public DeclaratorGroupContext(DeclaratorContext context) { CopyFrom(context); }
 		public override void EnterRule(IParseTreeListener listener) {
 			ICppParserListener typedListener = listener as ICppParserListener;
-			if (typedListener != null) typedListener.EnterGroup(this);
+			if (typedListener != null) typedListener.EnterDeclaratorGroup(this);
 		}
 		public override void ExitRule(IParseTreeListener listener) {
 			ICppParserListener typedListener = listener as ICppParserListener;
-			if (typedListener != null) typedListener.ExitGroup(this);
+			if (typedListener != null) typedListener.ExitDeclaratorGroup(this);
 		}
 	}
-	public partial class FunctionContext : DeclaratorContext {
+	public partial class FunctionDeclaratorContext : DeclaratorContext {
 		public DeclaratorContext declarator() {
 			return GetRuleContext<DeclaratorContext>(0);
 		}
@@ -1123,57 +1166,14 @@ public partial class CppParser : Parser {
 		public TemplateArgsBlockContext templateArgsBlock() {
 			return GetRuleContext<TemplateArgsBlockContext>(0);
 		}
-		public FunctionContext(DeclaratorContext context) { CopyFrom(context); }
+		public FunctionDeclaratorContext(DeclaratorContext context) { CopyFrom(context); }
 		public override void EnterRule(IParseTreeListener listener) {
 			ICppParserListener typedListener = listener as ICppParserListener;
-			if (typedListener != null) typedListener.EnterFunction(this);
+			if (typedListener != null) typedListener.EnterFunctionDeclarator(this);
 		}
 		public override void ExitRule(IParseTreeListener listener) {
 			ICppParserListener typedListener = listener as ICppParserListener;
-			if (typedListener != null) typedListener.ExitFunction(this);
-		}
-	}
-	public partial class ReferenceContext : DeclaratorContext {
-		public DeclaratorContext declarator() {
-			return GetRuleContext<DeclaratorContext>(0);
-		}
-		public ReferenceContext(DeclaratorContext context) { CopyFrom(context); }
-		public override void EnterRule(IParseTreeListener listener) {
-			ICppParserListener typedListener = listener as ICppParserListener;
-			if (typedListener != null) typedListener.EnterReference(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ICppParserListener typedListener = listener as ICppParserListener;
-			if (typedListener != null) typedListener.ExitReference(this);
-		}
-	}
-	public partial class PointerContext : DeclaratorContext {
-		public DeclaratorContext declarator() {
-			return GetRuleContext<DeclaratorContext>(0);
-		}
-		public PointerContext(DeclaratorContext context) { CopyFrom(context); }
-		public override void EnterRule(IParseTreeListener listener) {
-			ICppParserListener typedListener = listener as ICppParserListener;
-			if (typedListener != null) typedListener.EnterPointer(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ICppParserListener typedListener = listener as ICppParserListener;
-			if (typedListener != null) typedListener.ExitPointer(this);
-		}
-	}
-	public partial class NameContext : DeclaratorContext {
-		public TypeSpecifierContext typeSpecifier() {
-			return GetRuleContext<TypeSpecifierContext>(0);
-		}
-		public ITerminalNode Id() { return GetToken(CppParser.Id, 0); }
-		public NameContext(DeclaratorContext context) { CopyFrom(context); }
-		public override void EnterRule(IParseTreeListener listener) {
-			ICppParserListener typedListener = listener as ICppParserListener;
-			if (typedListener != null) typedListener.EnterName(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ICppParserListener typedListener = listener as ICppParserListener;
-			if (typedListener != null) typedListener.ExitName(this);
+			if (typedListener != null) typedListener.ExitFunctionDeclarator(this);
 		}
 	}
 
@@ -1198,7 +1198,7 @@ public partial class CppParser : Parser {
 			switch ( Interpreter.AdaptivePredict(TokenStream,27,Context) ) {
 			case 1:
 				{
-				_localctx = new PointerContext(_localctx);
+				_localctx = new PointerDeclaratorContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
 
@@ -1208,7 +1208,7 @@ public partial class CppParser : Parser {
 				break;
 			case 2:
 				{
-				_localctx = new ReferenceContext(_localctx);
+				_localctx = new ReferenceDeclaratorContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
 				State = 244; Match(And);
@@ -1217,36 +1217,36 @@ public partial class CppParser : Parser {
 				break;
 			case 3:
 				{
-				_localctx = new NameContext(_localctx);
+				_localctx = new DeclaratorGroupContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
-				State = 249;
-				switch ( Interpreter.AdaptivePredict(TokenStream,25,Context) ) {
-				case 1:
-					{
-					State = 246; typeSpecifier();
-					State = 247; Match(Scope);
-					}
-					break;
-				}
-				State = 252;
-				switch ( Interpreter.AdaptivePredict(TokenStream,26,Context) ) {
-				case 1:
-					{
-					State = 251; Match(Id);
-					}
-					break;
-				}
+				State = 246; Match(LeftParen);
+				State = 247; declarator(0);
+				State = 248; Match(RightParen);
 				}
 				break;
 			case 4:
 				{
-				_localctx = new GroupContext(_localctx);
+				_localctx = new NameDeclaratorContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
-				State = 254; Match(LeftParen);
-				State = 255; declarator(0);
-				State = 256; Match(RightParen);
+				State = 253;
+				switch ( Interpreter.AdaptivePredict(TokenStream,25,Context) ) {
+				case 1:
+					{
+					State = 250; typeSpecifier();
+					State = 251; Match(Scope);
+					}
+					break;
+				}
+				State = 256;
+				switch ( Interpreter.AdaptivePredict(TokenStream,26,Context) ) {
+				case 1:
+					{
+					State = 255; Match(Id);
+					}
+					break;
+				}
 				}
 				break;
 			}
@@ -1264,7 +1264,7 @@ public partial class CppParser : Parser {
 					switch ( Interpreter.AdaptivePredict(TokenStream,29,Context) ) {
 					case 1:
 						{
-						_localctx = new ArrayContext(new DeclaratorContext(_parentctx, _parentState));
+						_localctx = new ArrayDeclaratorContext(new DeclaratorContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_declarator);
 						State = 260;
 						if (!(Precpred(Context, 5))) throw new FailedPredicateException(this, "Precpred(Context, 5)");
@@ -1273,7 +1273,7 @@ public partial class CppParser : Parser {
 						break;
 					case 2:
 						{
-						_localctx = new FunctionContext(new DeclaratorContext(_parentctx, _parentState));
+						_localctx = new FunctionDeclaratorContext(new DeclaratorContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_declarator);
 						State = 262;
 						if (!(Precpred(Context, 4))) throw new FailedPredicateException(this, "Precpred(Context, 4)");
@@ -3362,7 +3362,7 @@ public partial class CppParser : Parser {
 		"\v\x3\v\x3\v\x3\v\x3\v\x3\f\x3\f\x3\f\x3\f\a\f\xDE\n\f\f\f\xE\f\xE1\v"+
 		"\f\x3\r\x3\r\x5\r\xE5\n\r\x3\r\x3\r\x3\r\x3\r\a\r\xEB\n\r\f\r\xE\r\xEE"+
 		"\v\r\x5\r\xF0\n\r\x3\r\x3\r\x3\xE\x3\xE\x3\xE\x3\xE\x3\xE\x3\xE\x3\xE"+
-		"\x3\xE\x5\xE\xFC\n\xE\x3\xE\x5\xE\xFF\n\xE\x3\xE\x3\xE\x3\xE\x3\xE\x5"+
+		"\x3\xE\x3\xE\x3\xE\x3\xE\x3\xE\x5\xE\x100\n\xE\x3\xE\x5\xE\x103\n\xE\x5"+
 		"\xE\x105\n\xE\x3\xE\x3\xE\x3\xE\x3\xE\x5\xE\x10B\n\xE\x3\xE\a\xE\x10E"+
 		"\n\xE\f\xE\xE\xE\x111\v\xE\x3\xF\x3\xF\x3\xF\x3\x10\x5\x10\x117\n\x10"+
 		"\x3\x10\x3\x10\x5\x10\x11B\n\x10\x3\x10\x5\x10\x11E\n\x10\x3\x11\x3\x11"+
@@ -3451,40 +3451,40 @@ public partial class CppParser : Parser {
 		"\x2\xEF\xE7\x3\x2\x2\x2\xEF\xF0\x3\x2\x2\x2\xF0\xF1\x3\x2\x2\x2\xF1\xF2"+
 		"\a\x5\x2\x2\xF2\x19\x3\x2\x2\x2\xF3\xF4\b\xE\x1\x2\xF4\xF5\a\x14\x2\x2"+
 		"\xF5\x105\x5\x1A\xE\x5\xF6\xF7\a\x17\x2\x2\xF7\x105\x5\x1A\xE\x4\xF8\xF9"+
-		"\x5\x1E\x10\x2\xF9\xFA\a\x3\x2\x2\xFA\xFC\x3\x2\x2\x2\xFB\xF8\x3\x2\x2"+
-		"\x2\xFB\xFC\x3\x2\x2\x2\xFC\xFE\x3\x2\x2\x2\xFD\xFF\aK\x2\x2\xFE\xFD\x3"+
-		"\x2\x2\x2\xFE\xFF\x3\x2\x2\x2\xFF\x105\x3\x2\x2\x2\x100\x101\a\x4\x2\x2"+
-		"\x101\x102\x5\x1A\xE\x2\x102\x103\a\x5\x2\x2\x103\x105\x3\x2\x2\x2\x104"+
-		"\xF3\x3\x2\x2\x2\x104\xF6\x3\x2\x2\x2\x104\xFB\x3\x2\x2\x2\x104\x100\x3"+
-		"\x2\x2\x2\x105\x10F\x3\x2\x2\x2\x106\x107\f\a\x2\x2\x107\x10E\x5,\x17"+
-		"\x2\x108\x10A\f\x6\x2\x2\x109\x10B\x5$\x13\x2\x10A\x109\x3\x2\x2\x2\x10A"+
-		"\x10B\x3\x2\x2\x2\x10B\x10C\x3\x2\x2\x2\x10C\x10E\x5.\x18\x2\x10D\x106"+
-		"\x3\x2\x2\x2\x10D\x108\x3\x2\x2\x2\x10E\x111\x3\x2\x2\x2\x10F\x10D\x3"+
-		"\x2\x2\x2\x10F\x110\x3\x2\x2\x2\x110\x1B\x3\x2\x2\x2\x111\x10F\x3\x2\x2"+
-		"\x2\x112\x113\x5\x1E\x10\x2\x113\x114\x5\x1A\xE\x2\x114\x1D\x3\x2\x2\x2"+
-		"\x115\x117\x5(\x15\x2\x116\x115\x3\x2\x2\x2\x116\x117\x3\x2\x2\x2\x117"+
-		"\x118\x3\x2\x2\x2\x118\x11A\aK\x2\x2\x119\x11B\x5$\x13\x2\x11A\x119\x3"+
-		"\x2\x2\x2\x11A\x11B\x3\x2\x2\x2\x11B\x11E\x3\x2\x2\x2\x11C\x11E\a@\x2"+
-		"\x2\x11D\x116\x3\x2\x2\x2\x11D\x11C\x3\x2\x2\x2\x11E\x1F\x3\x2\x2\x2\x11F"+
-		"\x128\a\n\x2\x2\x120\x125\x5\"\x12\x2\x121\x122\a!\x2\x2\x122\x124\x5"+
-		"\"\x12\x2\x123\x121\x3\x2\x2\x2\x124\x127\x3\x2\x2\x2\x125\x123\x3\x2"+
-		"\x2\x2\x125\x126\x3\x2\x2\x2\x126\x129\x3\x2\x2\x2\x127\x125\x3\x2\x2"+
-		"\x2\x128\x120\x3\x2\x2\x2\x128\x129\x3\x2\x2\x2\x129\x12A\x3\x2\x2\x2"+
-		"\x12A\x12B\a\f\x2\x2\x12B!\x3\x2\x2\x2\x12C\x130\x5\x1C\xF\x2\x12D\x130"+
-		"\a\x38\x2\x2\x12E\x130\a\x32\x2\x2\x12F\x12C\x3\x2\x2\x2\x12F\x12D\x3"+
-		"\x2\x2\x2\x12F\x12E\x3\x2\x2\x2\x130\x132\x3\x2\x2\x2\x131\x133\aK\x2"+
-		"\x2\x132\x131\x3\x2\x2\x2\x132\x133\x3\x2\x2\x2\x133\x139\x3\x2\x2\x2"+
-		"\x134\x137\a\"\x2\x2\x135\x138\x5\x1C\xF\x2\x136\x138\x5\x34\x1B\x2\x137"+
-		"\x135\x3\x2\x2\x2\x137\x136\x3\x2\x2\x2\x138\x13A\x3\x2\x2\x2\x139\x134"+
-		"\x3\x2\x2\x2\x139\x13A\x3\x2\x2\x2\x13A#\x3\x2\x2\x2\x13B\x144\a\n\x2"+
-		"\x2\x13C\x141\x5&\x14\x2\x13D\x13E\a!\x2\x2\x13E\x140\x5&\x14\x2\x13F"+
-		"\x13D\x3\x2\x2\x2\x140\x143\x3\x2\x2\x2\x141\x13F\x3\x2\x2\x2\x141\x142"+
-		"\x3\x2\x2\x2\x142\x145\x3\x2\x2\x2\x143\x141\x3\x2\x2\x2\x144\x13C\x3"+
-		"\x2\x2\x2\x144\x145\x3\x2\x2\x2\x145\x146\x3\x2\x2\x2\x146\x147\a\f\x2"+
-		"\x2\x147%\x3\x2\x2\x2\x148\x14B\x5\x1C\xF\x2\x149\x14B\x5\x34\x1B\x2\x14A"+
-		"\x148\x3\x2\x2\x2\x14A\x149\x3\x2\x2\x2\x14B\'\x3\x2\x2\x2\x14C\x157\a"+
-		"\x3\x2\x2\x14D\x14F\aK\x2\x2\x14E\x150\x5$\x13\x2\x14F\x14E\x3\x2\x2\x2"+
-		"\x14F\x150\x3\x2\x2\x2\x150\x151\x3\x2\x2\x2\x151\x153\a\x3\x2\x2\x152"+
+		"\a\x4\x2\x2\xF9\xFA\x5\x1A\xE\x2\xFA\xFB\a\x5\x2\x2\xFB\x105\x3\x2\x2"+
+		"\x2\xFC\xFD\x5\x1E\x10\x2\xFD\xFE\a\x3\x2\x2\xFE\x100\x3\x2\x2\x2\xFF"+
+		"\xFC\x3\x2\x2\x2\xFF\x100\x3\x2\x2\x2\x100\x102\x3\x2\x2\x2\x101\x103"+
+		"\aK\x2\x2\x102\x101\x3\x2\x2\x2\x102\x103\x3\x2\x2\x2\x103\x105\x3\x2"+
+		"\x2\x2\x104\xF3\x3\x2\x2\x2\x104\xF6\x3\x2\x2\x2\x104\xF8\x3\x2\x2\x2"+
+		"\x104\xFF\x3\x2\x2\x2\x105\x10F\x3\x2\x2\x2\x106\x107\f\a\x2\x2\x107\x10E"+
+		"\x5,\x17\x2\x108\x10A\f\x6\x2\x2\x109\x10B\x5$\x13\x2\x10A\x109\x3\x2"+
+		"\x2\x2\x10A\x10B\x3\x2\x2\x2\x10B\x10C\x3\x2\x2\x2\x10C\x10E\x5.\x18\x2"+
+		"\x10D\x106\x3\x2\x2\x2\x10D\x108\x3\x2\x2\x2\x10E\x111\x3\x2\x2\x2\x10F"+
+		"\x10D\x3\x2\x2\x2\x10F\x110\x3\x2\x2\x2\x110\x1B\x3\x2\x2\x2\x111\x10F"+
+		"\x3\x2\x2\x2\x112\x113\x5\x1E\x10\x2\x113\x114\x5\x1A\xE\x2\x114\x1D\x3"+
+		"\x2\x2\x2\x115\x117\x5(\x15\x2\x116\x115\x3\x2\x2\x2\x116\x117\x3\x2\x2"+
+		"\x2\x117\x118\x3\x2\x2\x2\x118\x11A\aK\x2\x2\x119\x11B\x5$\x13\x2\x11A"+
+		"\x119\x3\x2\x2\x2\x11A\x11B\x3\x2\x2\x2\x11B\x11E\x3\x2\x2\x2\x11C\x11E"+
+		"\a@\x2\x2\x11D\x116\x3\x2\x2\x2\x11D\x11C\x3\x2\x2\x2\x11E\x1F\x3\x2\x2"+
+		"\x2\x11F\x128\a\n\x2\x2\x120\x125\x5\"\x12\x2\x121\x122\a!\x2\x2\x122"+
+		"\x124\x5\"\x12\x2\x123\x121\x3\x2\x2\x2\x124\x127\x3\x2\x2\x2\x125\x123"+
+		"\x3\x2\x2\x2\x125\x126\x3\x2\x2\x2\x126\x129\x3\x2\x2\x2\x127\x125\x3"+
+		"\x2\x2\x2\x128\x120\x3\x2\x2\x2\x128\x129\x3\x2\x2\x2\x129\x12A\x3\x2"+
+		"\x2\x2\x12A\x12B\a\f\x2\x2\x12B!\x3\x2\x2\x2\x12C\x130\x5\x1C\xF\x2\x12D"+
+		"\x130\a\x38\x2\x2\x12E\x130\a\x32\x2\x2\x12F\x12C\x3\x2\x2\x2\x12F\x12D"+
+		"\x3\x2\x2\x2\x12F\x12E\x3\x2\x2\x2\x130\x132\x3\x2\x2\x2\x131\x133\aK"+
+		"\x2\x2\x132\x131\x3\x2\x2\x2\x132\x133\x3\x2\x2\x2\x133\x139\x3\x2\x2"+
+		"\x2\x134\x137\a\"\x2\x2\x135\x138\x5\x1C\xF\x2\x136\x138\x5\x34\x1B\x2"+
+		"\x137\x135\x3\x2\x2\x2\x137\x136\x3\x2\x2\x2\x138\x13A\x3\x2\x2\x2\x139"+
+		"\x134\x3\x2\x2\x2\x139\x13A\x3\x2\x2\x2\x13A#\x3\x2\x2\x2\x13B\x144\a"+
+		"\n\x2\x2\x13C\x141\x5&\x14\x2\x13D\x13E\a!\x2\x2\x13E\x140\x5&\x14\x2"+
+		"\x13F\x13D\x3\x2\x2\x2\x140\x143\x3\x2\x2\x2\x141\x13F\x3\x2\x2\x2\x141"+
+		"\x142\x3\x2\x2\x2\x142\x145\x3\x2\x2\x2\x143\x141\x3\x2\x2\x2\x144\x13C"+
+		"\x3\x2\x2\x2\x144\x145\x3\x2\x2\x2\x145\x146\x3\x2\x2\x2\x146\x147\a\f"+
+		"\x2\x2\x147%\x3\x2\x2\x2\x148\x14B\x5\x1C\xF\x2\x149\x14B\x5\x34\x1B\x2"+
+		"\x14A\x148\x3\x2\x2\x2\x14A\x149\x3\x2\x2\x2\x14B\'\x3\x2\x2\x2\x14C\x157"+
+		"\a\x3\x2\x2\x14D\x14F\aK\x2\x2\x14E\x150\x5$\x13\x2\x14F\x14E\x3\x2\x2"+
+		"\x2\x14F\x150\x3\x2\x2\x2\x150\x151\x3\x2\x2\x2\x151\x153\a\x3\x2\x2\x152"+
 		"\x14D\x3\x2\x2\x2\x153\x154\x3\x2\x2\x2\x154\x152\x3\x2\x2\x2\x154\x155"+
 		"\x3\x2\x2\x2\x155\x157\x3\x2\x2\x2\x156\x14C\x3\x2\x2\x2\x156\x152\x3"+
 		"\x2\x2\x2\x157)\x3\x2\x2\x2\x158\x159\a\b\x2\x2\x159\x15A\x5\x30\x19\x2"+
@@ -3541,7 +3541,7 @@ public partial class CppParser : Parser {
 		"O\x3\x2\x2\x2\x1E3\x1E5\aW\x2\x2\x1E4\x1E3\x3\x2\x2\x2\x1E5\x1E6\x3\x2"+
 		"\x2\x2\x1E6\x1E4\x3\x2\x2\x2\x1E6\x1E7\x3\x2\x2\x2\x1E7Q\x3\x2\x2\x2J"+
 		"U\x65kqvz\x81\x86\x8C\x96\x9C\xA0\xA6\xA9\xAD\xB2\xB4\xB8\xC2\xC7\xCE"+
-		"\xDF\xE4\xEC\xEF\xFB\xFE\x104\x10A\x10D\x10F\x116\x11A\x11D\x125\x128"+
+		"\xDF\xE4\xEC\xEF\xFF\x102\x104\x10A\x10D\x10F\x116\x11A\x11D\x125\x128"+
 		"\x12F\x132\x137\x139\x141\x144\x14A\x14F\x154\x156\x168\x16A\x171\x173"+
 		"\x179\x17B\x180\x185\x187\x18F\x19D\x1A2\x1A7\x1AA\x1B2\x1B7\x1BC\x1C2"+
 		"\x1C8\x1CF\x1D1\x1D7\x1D9\x1DF\x1E1\x1E6";
