@@ -8,9 +8,9 @@ namespace CppParser {
 	/// An ASCII progress bar
 	/// </summary>
 	public class ProgressBar : IDisposable, IProgress<double> {
-		private const int MaxBlockCount = 10;
-		private const string Animation = @"|/-\";
-		private readonly TimeSpan interval = TimeSpan.FromSeconds(1.0/8);
+		private const int maxBlockCount = 10;
+		private const string animation = @"|/-\";
+		private readonly TimeSpan interval = TimeSpan.FromSeconds(1.0 / 8);
 
 		private readonly Timer timer;
 
@@ -24,9 +24,9 @@ namespace CppParser {
 
 			// A progress bar is only for temporary display in a console window.
 			// If the console output is redirected, draw nothing.
-			if (Console.IsOutputRedirected) return;
-
-			ResetTimer();
+			if (!Console.IsOutputRedirected) {
+				ResetTimer();
+			}
 		}
 
 		public void Report(double value) {
@@ -39,13 +39,12 @@ namespace CppParser {
 			lock (timer) {
 				if (disposed) return;
 
-				int blockCount = (int) (currentProgress * MaxBlockCount);
+				int blockCount = (int) (currentProgress * maxBlockCount);
 				int percent = (int) (currentProgress * 100);
 				string text = string.Format("[{0}{1}] {2,3}% {3}",
-					new string('#', blockCount), new string('-', MaxBlockCount - blockCount),
+					new string('#', blockCount), new string('-', maxBlockCount - blockCount),
 					percent,
-					Animation[animationIndex++%Animation.Length]);
-
+					animation[animationIndex++ % animation.Length]);
 				SetText(text);
 
 				ResetTimer();
@@ -85,7 +84,7 @@ namespace CppParser {
 		public void Dispose() {
 			lock (timer) {
 				disposed = true;
-				SetText(String.Empty);
+				SetText(string.Empty);
 			}
 		}
 
