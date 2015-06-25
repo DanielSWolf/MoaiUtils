@@ -47,9 +47,8 @@ namespace CppParser {
 				.ToList();
 
 			int errorCount = 0;
-			IntProgress progress = new IntProgress { MaxValue = files.Count + 1 };
 			Console.Write("Parsing files... ");
-			using (new ProgressBar(progress)) {
+			using (var progressBar = new ProgressBar()) {
 				{
 					// TODO: Use better-suited stream
 					ICharStream charStream = new CppFileStream(sourceDir.GetFileInfo(@"lua-headers\moai.lua"));
@@ -62,16 +61,14 @@ namespace CppParser {
 					parser.AddErrorListener(new DebugErrorListener(() => errorCount++));
 
 					IParseTree parseTree = parser.chunk();
-
-					progress.Value++;
 				}
 
 				List<CppParser.FileContext> fileContexts = new List<CppParser.FileContext>();
-				foreach (FileInfo file in files) {
-					CppParser.FileContext fileContext = ParseCppFile(file, () => errorCount++);
+				for (int i = 0; i < files.Count; i++) {
+					CppParser.FileContext fileContext = ParseCppFile(files[i], () => errorCount++);
 					fileContexts.Add(fileContext);
 
-					progress.Value++;
+					progressBar.Report(((double) i + 1) / files.Count);
 				}
 
 				Dictionary<string, ICppType> cppTypes = GetCppTypes(fileContexts);

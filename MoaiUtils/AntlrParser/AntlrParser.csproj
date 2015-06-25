@@ -70,7 +70,6 @@
     <Compile Include="Generated\LuaListener.cs" />
     <Compile Include="Generated\LuaParser.cs" />
     <Compile Include="ICodeElement.cs" />
-    <Compile Include="IProgress.cs" />
     <Compile Include="MoaiCppLexer.cs" />
     <Compile Include="MoaiCppParser.cs" />
     <Compile Include="ParseTreeExtensions.cs" />
