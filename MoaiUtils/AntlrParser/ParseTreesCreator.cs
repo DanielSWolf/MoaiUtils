@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Dfa;
+using CppParser.CodeIssues;
 using MoaiUtils.Tools;
 
 namespace CppParser {
@@ -12,6 +14,7 @@ namespace CppParser {
 
 		private readonly IReadOnlyList<ICharStream> cppFileStreams;
 		private readonly IReadOnlyList<ICharStream> luaFileStreams;
+		private readonly List<ICodeIssue> codeIssues = new List<ICodeIssue>();
 
 		public ParseTreesCreator(IReadOnlyList<ICharStream> cppFileStreams, IReadOnlyList<ICharStream> luaFileStreams) {
 			this.cppFileStreams = cppFileStreams;
@@ -20,7 +23,7 @@ namespace CppParser {
 
 		public IReadOnlyList<CppParser.FileContext> CppParseTrees { get; private set; }
 		public IReadOnlyList<LuaParser.ChunkContext> LuaParseTrees { get; private set; }
-		public int ErrorCount { get; private set; }
+		public IReadOnlyCollection<ICodeIssue> CodeIssues => codeIssues;
 
 		public void Run(IProgress<double> progress) {
 			// Parse C++ files
@@ -37,11 +40,11 @@ namespace CppParser {
 		private CppParser.FileContext ParseCppFile(ICharStream charStream) {
 			CppLexer lexer = new CppLexer(charStream);
 			lexer.RemoveErrorListeners();
-			lexer.AddErrorListener(new LexerDebugErrorListener(() => ErrorCount++));
+			lexer.AddErrorListener(new LexerDebugErrorListener(codeIssues));
 			CommonTokenStream tokenStream = new CommonTokenStream(lexer);
 			CppParser parser = new CppParser(tokenStream);
 			parser.RemoveErrorListeners();
-			parser.AddErrorListener(new DebugErrorListener(() => ErrorCount++));
+			parser.AddErrorListener(new DebugErrorListener(codeIssues));
 
 			return parser.file();
 		}
@@ -49,36 +52,40 @@ namespace CppParser {
 		private LuaParser.ChunkContext ParseLuaFile(ICharStream charStream) {
 			LuaLexer lexer = new LuaLexer(charStream);
 			lexer.RemoveErrorListeners();
-			lexer.AddErrorListener(new LexerDebugErrorListener(() => ErrorCount++));
+			lexer.AddErrorListener(new LexerDebugErrorListener(codeIssues));
 			CommonTokenStream tokenStream = new CommonTokenStream(lexer);
 			LuaParser parser = new LuaParser(tokenStream);
 			parser.RemoveErrorListeners();
-			parser.AddErrorListener(new DebugErrorListener(() => ErrorCount++));
+			parser.AddErrorListener(new DebugErrorListener(codeIssues));
 
 			return parser.chunk();
 		}
 
 		private class LexerDebugErrorListener : IAntlrErrorListener<int> {
-			private readonly Action addError;
 
-			public LexerDebugErrorListener(Action addError) {
-				this.addError = addError;
+			private readonly List<ICodeIssue> codeIssues;
+
+			public LexerDebugErrorListener(List<ICodeIssue> codeIssues) {
+				this.codeIssues = codeIssues;
 			}
 
 			public void SyntaxError(IRecognizer recognizer, int offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e) {
-				addError();
+				CodePosition codePosition = new CodePosition(new FileInfo(recognizer.InputStream.SourceName), line, charPositionInLine + 1);
+				codeIssues.Add(new ParsingErrorCodeIssue(codePosition, msg));
 			}
 		}
 
 		private class DebugErrorListener : BaseErrorListener {
-			private readonly Action addError;
 
-			public DebugErrorListener(Action addError) {
-				this.addError = addError;
+			private readonly List<ICodeIssue> codeIssues;
+
+			public DebugErrorListener(List<ICodeIssue> codeIssues) {
+				this.codeIssues = codeIssues;
 			}
 
 			public override void SyntaxError(IRecognizer recognizer, IToken offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e) {
-				addError();
+				CodePosition codePosition = offendingSymbol.GetCodePosition();
+				codeIssues.Add(new ParsingErrorCodeIssue(codePosition, msg));
 			}
 
 			public override void ReportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, int prediction, SimulatorState acceptState) { }

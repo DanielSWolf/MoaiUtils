@@ -1,37 +1,51 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using CppParser.CodeIssues;
 
 namespace CppParser {
 
 	internal static class Program {
 
 		private static void Main(string[] args) {
-			const int leftColumnWidth = 35;
+			var codeIssues = new List<ICodeIssue>();
 
 			var sourceDir = new DirectoryInfo(@"X:\dev\projects\moai-dev\src");
-
-			Console.Write("Reading source files from disk...".PadRight(leftColumnWidth));
 			SourceFilesLocator sourceFilesLocator = new SourceFilesLocator(sourceDir);
-			using (var progress = new ProgressBar()) {
-				sourceFilesLocator.Run(progress);
-			}
-			Console.WriteLine("Done.");
+			Process(sourceFilesLocator, codeIssues, "Reading source files from disk...");
 
-			Console.Write("Parsing files...".PadRight(leftColumnWidth));
 			ParseTreesCreator parseTreesCreator = new ParseTreesCreator(sourceFilesLocator.CppFileStreams, sourceFilesLocator.LuaFileStreams);
-			using (var progress = new ProgressBar()) {
-				parseTreesCreator.Run(progress);
-			}
-			Console.WriteLine("Done with {0} errors.", parseTreesCreator.ErrorCount);
+			Process(parseTreesCreator, codeIssues, "Parsing files...");
 
-			Console.Write("Performing code analysis...".PadRight(leftColumnWidth));
 			TypesExtractor typesExtractor = new TypesExtractor(parseTreesCreator.CppParseTrees, parseTreesCreator.LuaParseTrees);
-			using (var progress = new ProgressBar()) {
-				typesExtractor.Run(progress);
-			}
-			Console.WriteLine("Done.");
+			Process(typesExtractor, codeIssues, "Performing code analysis...");
 
-			Console.ReadLine();
+			Console.WriteLine();
+
+			// Output code issues in Visual Studio format
+			foreach (ICodeIssue codeIssue in codeIssues) {
+				Console.WriteLine(FormatVisualStudioWarning(codeIssue));
+			}
+		}
+
+		private static void Process(IProcessingStep processingStep, List<ICodeIssue> codeIssues, string message) {
+			const int leftColumnWidth = 35;
+
+			Console.Write(message.PadRight(leftColumnWidth));
+			DateTime start = DateTime.Now;
+			using (var progress = new ProgressBar()) {
+				processingStep.Run(progress);
+				codeIssues.AddRange(processingStep.CodeIssues);
+			}
+			Console.WriteLine("Done ({0:f3}s).", (DateTime.Now - start).TotalSeconds);
+		}
+
+		private static string FormatVisualStudioWarning(ICodeIssue codeIssue) {
+			var pos = codeIssue.Position;
+			string file = pos.ColumnNumber != null ? $"{pos.File}({pos.LineNumber},{pos.ColumnNumber})"
+				: $"{pos.File}({pos.LineNumber ?? 1})";
+			string errorCode = codeIssue.GetType().Name.Replace("CodeIssue", string.Empty);
+			return $"{file} : warning {errorCode} : {codeIssue.Message}";
 		}
 
 	}

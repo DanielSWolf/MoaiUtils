@@ -52,6 +52,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CodeIssues\CodeIssueBase.cs" />
+    <Compile Include="CodeIssueMessageAttribute.cs" />
+    <Compile Include="CodeIssues\InternalErrorCodeIssue.cs" />
+    <Compile Include="CodeIssues\ParsingErrorCodeIssue.cs" />
+    <Compile Include="CodeIssues\UnexpectedFileStructureCodeIssue.cs" />
+    <Compile Include="CodeIssues\UnknownTypeCodeIssue.cs" />
     <Compile Include="CodePosition.cs" />
     <Compile Include="CppFileStream.cs" />
     <Compile Include="CppParserRulePartials.cs" />
@@ -61,6 +67,7 @@
     <Compile Include="CppSymbols\ICppType.cs" />
     <Compile Include="CppSymbols\ICppTypeDraft.cs" />
     <Compile Include="CppSymbols\PrimitiveCppType.cs" />
+    <Compile Include="CodeIssues\ICodeIssue.cs" />
     <Compile Include="IProcessingStep.cs" />
     <Compile Include="ParseTreesCreator.cs" />
     <Compile Include="SourceFilesLocator.cs" />

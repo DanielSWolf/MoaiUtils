@@ -7,6 +7,10 @@ namespace CppParser {
 
 	public static class ParseTreeExtensions {
 
+		public static CodePosition GetCodePosition(this IToken token) {
+			return new CodePosition(token);
+		}
+
 		public static CodePosition GetCodePosition(this ParserRuleContext parserRuleContext) {
 			return new CodePosition(parserRuleContext);
 		}

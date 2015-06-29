@@ -17,6 +17,14 @@ namespace MoaiUtils.Tools {
 			return elements.Skip(start).Take(length);
 		}
 
+		public static IEnumerable<TResult> Select<TSource, TResult>(this IReadOnlyList<TSource> source, Func<TSource, TResult> selector, IProgress<double> progress) {
+			progress.Report(0);
+			for (int i = 0; i < source.Count; i++) {
+				yield return selector(source[i]);
+				progress.Report(((double) i + 1) / source.Count);
+			}
+		}
+
 		private class InlineComparer<T> : IComparer<T> {
 			private readonly Func<T, T, int> compare;
 
