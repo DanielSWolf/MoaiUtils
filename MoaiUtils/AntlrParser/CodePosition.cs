@@ -1,37 +1,46 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Antlr4.Runtime;
 
 namespace CppParser {
 
 	public class CodePosition {
 
-		public CodePosition(FileInfo file, int lineNumber, int columnNumber) {
+		public static readonly CodePosition None = new CodePosition(new FileInfo("No file"));
+
+		public CodePosition(FileInfo file, int? lineNumber = null, int? columnNumber = null) {
+			if (file == null) throw new ArgumentNullException(nameof(file));
+			if (columnNumber == null && lineNumber != null) throw new ArgumentNullException(nameof(columnNumber));
+
 			File = file;
 			LineNumber = lineNumber;
 			ColumnNumber = columnNumber;
 		}
 
-		public CodePosition(ParserRuleContext parserRuleContext) {
-			IToken token = parserRuleContext.Start;
+		public CodePosition(IToken token) {
 			File = new FileInfo(token.InputStream.SourceName);
 			LineNumber = token.Line;
 			ColumnNumber = token.Column + 1;
 		}
 
-		public FileInfo File { get; private set; }
+		public CodePosition(ParserRuleContext parserRuleContext) : this(parserRuleContext.Start) { }
+
+		public FileInfo File { get; }
 
 		/// <summary>
 		/// The line number, one-based
 		/// </summary>
-		public int LineNumber { get; private set; }
+		public int? LineNumber { get; }
 
 		/// <summary>
 		/// The character index within the line, one-based
 		/// </summary>
-		public int ColumnNumber { get; private set; }
+		public int? ColumnNumber { get; }
 
 		public override string ToString() {
-			return $"{File}({LineNumber},{ColumnNumber})";
+			return ColumnNumber != null ? $"{File} ({LineNumber}, {ColumnNumber})"
+				: LineNumber != null ? $"{File} ({LineNumber})"
+				: File.ToString();
 		}
 
 	}

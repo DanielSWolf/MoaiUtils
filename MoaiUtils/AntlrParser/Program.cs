@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using CppParser.CodeIssues;
 
 namespace CppParser {
@@ -17,14 +18,20 @@ namespace CppParser {
 			ParseTreesCreator parseTreesCreator = new ParseTreesCreator(sourceFilesLocator.CppFileStreams, sourceFilesLocator.LuaFileStreams);
 			Process(parseTreesCreator, codeIssues, "Parsing files...");
 
-			TypesExtractor typesExtractor = new TypesExtractor(parseTreesCreator.CppParseTrees, parseTreesCreator.LuaParseTrees);
-			Process(typesExtractor, codeIssues, "Performing code analysis...");
+			CppTypesExtractor cppTypesExtractor = new CppTypesExtractor(parseTreesCreator.CppParseTrees);
+			Process(cppTypesExtractor, codeIssues, "Performing code analysis...");
 
 			Console.WriteLine();
 
 			// Output code issues in Visual Studio format
 			foreach (ICodeIssue codeIssue in codeIssues) {
 				Console.WriteLine(FormatVisualStudioWarning(codeIssue));
+			}
+
+			using (var file = File.CreateText(@"C:\Users\Daniel\Desktop\tmp.txt")) {
+				foreach (var pair in cppTypesExtractor.Types.OrderBy(pair => pair.Value.ToString()).ThenBy(pair => pair.Key)) {
+					file.WriteLine("{0}\t{1}", pair.Key, pair.Value);
+				}
 			}
 		}
 

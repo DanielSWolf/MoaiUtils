@@ -15,6 +15,8 @@ namespace CppParser.CppSymbols {
 			BaseClasses = baseClasses.ToList();
 		}
 
+		public CppClass(string name, params CppClass[] baseClasses) : this(name, (IEnumerable<CppClass>) baseClasses) { }
+
 		public string Name { get; }
 		public IReadOnlyCollection<CppClass> BaseClasses { get; }
 
