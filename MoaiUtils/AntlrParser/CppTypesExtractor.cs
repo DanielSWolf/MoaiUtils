@@ -32,7 +32,7 @@ namespace CppParser {
 
 			// Decide on a single concrete (non-draft) type per name
 			foreach (string typeName in typeDrafts.Keys) {
-				ResolveTypeName(typeName, CodePosition.None);
+				ResolveTypeName(typeName, null);
 			}
 		}
 

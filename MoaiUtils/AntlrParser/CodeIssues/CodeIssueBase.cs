@@ -1,4 +1,5 @@
 ﻿using System;
+using JetBrains.Annotations;
 
 namespace CppParser.CodeIssues {
 
@@ -7,7 +8,7 @@ namespace CppParser.CodeIssues {
 		public CodePosition Position { get; }
 		public string Message { get; }
 
-		protected CodeIssueBase(CodePosition position, params object[] messageArgs) {
+		protected CodeIssueBase([CanBeNull] CodePosition position, params object[] messageArgs) {
 			Position = position;
 
 			var messageAttribute = (CodeIssueMessageAttribute) Attribute.GetCustomAttribute(GetType(), typeof(CodeIssueMessageAttribute));

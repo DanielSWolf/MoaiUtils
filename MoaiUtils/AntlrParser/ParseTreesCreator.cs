@@ -70,7 +70,7 @@ namespace CppParser {
 			}
 
 			public void SyntaxError(IRecognizer recognizer, int offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e) {
-				CodePosition codePosition = new CodePosition(new FileInfo(recognizer.InputStream.SourceName), line, charPositionInLine + 1);
+				CodePosition codePosition = new CodePosition((AntlrInputStream) recognizer.InputStream, recognizer.InputStream.Index - 1);
 				codeIssues.Add(new ParsingErrorCodeIssue(codePosition, msg));
 			}
 		}

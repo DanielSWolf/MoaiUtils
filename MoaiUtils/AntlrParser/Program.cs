@@ -49,8 +49,7 @@ namespace CppParser {
 
 		private static string FormatVisualStudioWarning(ICodeIssue codeIssue) {
 			var pos = codeIssue.Position;
-			string file = pos.ColumnNumber != null ? $"{pos.File}({pos.LineNumber},{pos.ColumnNumber})"
-				: $"{pos.File}({pos.LineNumber ?? 1})";
+			string file = $"{pos.File}({pos.LineNumber},{pos.ColumnNumber})";
 			string errorCode = codeIssue.GetType().Name.Replace("CodeIssue", string.Empty);
 			return $"{file} : warning {errorCode} : {codeIssue.Message}";
 		}

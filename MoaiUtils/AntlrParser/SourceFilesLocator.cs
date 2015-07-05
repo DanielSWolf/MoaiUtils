@@ -38,7 +38,7 @@ namespace CppParser {
 				LuaFileStreams = new[] { new CppFileStream(moaiLua) };
 			} else {
 				LuaFileStreams = new CppFileStream[0];
-				codeIssues.Add(new UnexpectedFileStructureCodeIssue(new CodePosition(moaiLua), $"File '{moaiLua}' does not exist."));
+				codeIssues.Add(new UnexpectedFileStructureCodeIssue($"File '{moaiLua}' does not exist."));
 			}
 		}
 

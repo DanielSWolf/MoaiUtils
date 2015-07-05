@@ -1,46 +1,66 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
 using Antlr4.Runtime;
 
 namespace CppParser {
 
 	public class CodePosition {
 
-		public static readonly CodePosition None = new CodePosition(new FileInfo("No file"));
+		private readonly Lazy<TextPosition> textPosition;
 
-		public CodePosition(FileInfo file, int? lineNumber = null, int? columnNumber = null) {
-			if (file == null) throw new ArgumentNullException(nameof(file));
-			if (columnNumber == null && lineNumber != null) throw new ArgumentNullException(nameof(columnNumber));
+		public CodePosition(AntlrInputStream inputStream, int charIndex) {
+			if (inputStream == null) throw new ArgumentNullException(nameof(inputStream));
+			if (charIndex < 0 || charIndex >= inputStream.Size) throw new ArgumentOutOfRangeException(nameof(inputStream));
 
-			File = file;
-			LineNumber = lineNumber;
-			ColumnNumber = columnNumber;
+			InputStream = inputStream;
+			CharIndex = charIndex;
+			textPosition = new Lazy<TextPosition>(() => {
+				// Get data via reflection to prevent creating a (possibly long) temporary string
+				char[] data = (char[]) typeof(AntlrInputStream).GetField("data", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(inputStream);
+
+				// Determine line and column
+				int lineNumber = 1;
+				int columnNumber = 1;
+				for (int index = 0; index < charIndex; index++) {
+					if (data[index] == '\n') {
+						lineNumber++;
+						columnNumber = 1;
+					} else if (data[index] == '\t') {
+						const int tabSize = 4;
+						columnNumber = columnNumber - ((columnNumber - 1) % tabSize) + tabSize;
+					} else {
+						columnNumber++;
+					}
+				}
+				return new TextPosition { LineNumber = lineNumber, ColumnNumber = columnNumber };
+			});
 		}
 
-		public CodePosition(IToken token) {
-			File = new FileInfo(token.InputStream.SourceName);
-			LineNumber = token.Line;
-			ColumnNumber = token.Column + 1;
-		}
+		public AntlrInputStream InputStream { get; }
+		public int CharIndex { get; }
 
-		public CodePosition(ParserRuleContext parserRuleContext) : this(parserRuleContext.Start) { }
-
-		public FileInfo File { get; }
+		public FileInfo File => new FileInfo(InputStream.name);
 
 		/// <summary>
-		/// The line number, one-based
+		/// Line number, 1-based.
 		/// </summary>
-		public int? LineNumber { get; }
+		public int LineNumber => textPosition.Value.LineNumber;
 
 		/// <summary>
-		/// The character index within the line, one-based
+		/// Column number, 1-based. Assuming 4 columns per tab.
 		/// </summary>
-		public int? ColumnNumber { get; }
+		public int ColumnNumber => textPosition.Value.ColumnNumber;
 
 		public override string ToString() {
-			return ColumnNumber != null ? $"{File} ({LineNumber}, {ColumnNumber})"
-				: LineNumber != null ? $"{File} ({LineNumber})"
-				: File.ToString();
+			return $"{File} ({LineNumber}, {ColumnNumber})";
+		}
+
+		private class TextPosition {
+
+			public int LineNumber;
+			public int ColumnNumber;
+
 		}
 
 	}

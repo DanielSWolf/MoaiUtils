@@ -8,11 +8,12 @@ namespace CppParser {
 	public static class ParseTreeExtensions {
 
 		public static CodePosition GetCodePosition(this IToken token) {
-			return new CodePosition(token);
+			var inputStream = (AntlrInputStream) token.InputStream;
+			return new CodePosition(inputStream, token.StartIndex);
 		}
 
 		public static CodePosition GetCodePosition(this ParserRuleContext parserRuleContext) {
-			return new CodePosition(parserRuleContext);
+			return parserRuleContext.Start.GetCodePosition();
 		}
 
 		public static IEnumerable<IParseTree> GetDescendants(this IParseTree parseTree, bool includeSelf = false) {
