@@ -60,15 +60,29 @@ public interface ICppParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitDeclaration([NotNull] CppParser.DeclarationContext context);
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="CppParser.typedef"/>.
+	/// Enter a parse tree produced by the <c>Typedef</c>
+	/// labeled alternative in <see cref="CppParser.typeDefinition"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void EnterTypedef([NotNull] CppParser.TypedefContext context);
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="CppParser.typedef"/>.
+	/// Exit a parse tree produced by the <c>Typedef</c>
+	/// labeled alternative in <see cref="CppParser.typeDefinition"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitTypedef([NotNull] CppParser.TypedefContext context);
+	/// <summary>
+	/// Enter a parse tree produced by the <c>ClassDefinition</c>
+	/// labeled alternative in <see cref="CppParser.typeDefinition"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterClassDefinition([NotNull] CppParser.ClassDefinitionContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>ClassDefinition</c>
+	/// labeled alternative in <see cref="CppParser.typeDefinition"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitClassDefinition([NotNull] CppParser.ClassDefinitionContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="CppParser.usingDirective"/>.
 	/// </summary>
@@ -89,16 +103,6 @@ public interface ICppParserListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitFunctionDefinition([NotNull] CppParser.FunctionDefinitionContext context);
-	/// <summary>
-	/// Enter a parse tree produced by <see cref="CppParser.classDefinition"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterClassDefinition([NotNull] CppParser.ClassDefinitionContext context);
-	/// <summary>
-	/// Exit a parse tree produced by <see cref="CppParser.classDefinition"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitClassDefinition([NotNull] CppParser.ClassDefinitionContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="CppParser.baseClause"/>.
 	/// </summary>

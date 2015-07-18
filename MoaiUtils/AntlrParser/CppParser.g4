@@ -6,10 +6,9 @@ file : topLevelStatement* EOF ;
 
 topLevelStatement
 	: declaration
-	| typedef
 	| usingDirective
+	| typeDefinition
 	| functionDefinition
-	| classDefinition
 	| constructorDefinition
 	| destructorDefinition
 	| '{' topLevelStatement* '}'
@@ -20,8 +19,15 @@ declaration :
 	('template' templateParamsBlock)?
 	(typeSpecifier | 'class' | 'struct' | 'union' | 'enum') declarator ('=' expression)? ';' ;
 
-typedef
-	: 'typedef' ('class' | 'struct' | 'union' | 'enum')? type ';' ;
+typeDefinition
+	: 'typedef' ('class' | 'struct' | 'union' | 'enum')? type ';'
+	# Typedef
+	|
+	classDocBlock?
+	'typedef'? ('template' templateParamsBlock)?
+	('class' | 'struct' | 'union' | 'enum') (typeSpecifier baseClause?)? bracesBlock Id? ';'
+	# ClassDefinition
+	;
 
 usingDirective
 	: 'using' 'namespace' .*? ';' ;
@@ -30,11 +36,6 @@ functionDefinition :
 	functionDocBlock?
 	('template' templateParamsBlock)?
 	type bracesBlock ;
-
-classDefinition :
-	classDocBlock?
-	'typedef'? ('template' templateParamsBlock)?
-	('class' | 'struct' | 'union' | 'enum') (typeSpecifier baseClause?)? bracesBlock Id? ';' ;
 
 baseClause
 	: ':' typeSpecifier (',' typeSpecifier)* ;

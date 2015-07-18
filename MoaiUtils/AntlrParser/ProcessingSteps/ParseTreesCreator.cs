@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Dfa;
 using CppParser.CodeIssues;
+using CppParser.FileStreams;
 using MoaiUtils.Tools;
 
-namespace CppParser {
+namespace CppParser.ProcessingSteps {
 
 	public class ParseTreesCreator : IProcessingStep {
 
@@ -70,7 +70,7 @@ namespace CppParser {
 			}
 
 			public void SyntaxError(IRecognizer recognizer, int offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e) {
-				CodePosition codePosition = new CodePosition((AntlrInputStream) recognizer.InputStream, recognizer.InputStream.Index - 1);
+				CodePosition codePosition = new CodePosition((FileStreamBase) recognizer.InputStream, recognizer.InputStream.Index - 1);
 				codeIssues.Add(new ParsingErrorCodeIssue(codePosition, msg));
 			}
 		}
@@ -84,8 +84,7 @@ namespace CppParser {
 			}
 
 			public override void SyntaxError(IRecognizer recognizer, IToken offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e) {
-				CodePosition codePosition = offendingSymbol.GetCodePosition();
-				codeIssues.Add(new ParsingErrorCodeIssue(codePosition, msg));
+				codeIssues.Add(new ParsingErrorCodeIssue(offendingSymbol.StartPosition(), msg));
 			}
 
 			public override void ReportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, int prediction, SimulatorState acceptState) { }

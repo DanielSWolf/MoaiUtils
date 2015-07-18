@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CppParser {
+namespace CppParser.CodeIssues {
 
 	[AttributeUsage(AttributeTargets.Class, Inherited = false)]
 	public class CodeIssueMessageAttribute : Attribute {

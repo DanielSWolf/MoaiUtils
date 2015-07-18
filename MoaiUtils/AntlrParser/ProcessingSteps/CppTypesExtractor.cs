@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Antlr4.Runtime;
 using CppParser.CodeIssues;
 using CppParser.CppSymbols;
 using MoaiUtils.Tools;
 
-namespace CppParser {
+namespace CppParser.ProcessingSteps {
 
 	public class CppTypesExtractor : IProcessingStep {
 
@@ -53,16 +54,16 @@ namespace CppParser {
 
 				// STL
 				["string"] = PrimitiveCppType.String,
-				["map"] = new CppClass("map"),
-				["set"] = new CppClass("set"),
-				["vector"] = new CppClass("vector"),
-				["list"] = new CppClass("list"),
-				["iterator"] = new CppClass("iterator"),
+				["map"] = new BuiltInCppClass("map"),
+				["set"] = new BuiltInCppClass("set"),
+				["vector"] = new BuiltInCppClass("vector"),
+				["list"] = new BuiltInCppClass("list"),
+				["iterator"] = new BuiltInCppClass("iterator"),
 
 				// Windows
-				["in_addr"] = new CppClass("in_addr"),
-				["sockaddr"] = new CppClass("sockaddr"),
-				["hostent"] = new CppClass("hostent"),
+				["in_addr"] = new BuiltInCppClass("in_addr"),
+				["sockaddr"] = new BuiltInCppClass("sockaddr"),
+				["hostent"] = new BuiltInCppClass("hostent"),
 				["SOCKET"] = PrimitiveCppType.Number
 			};
 
@@ -80,32 +81,20 @@ namespace CppParser {
 
 		private static MultiValueDictionary<string, ICppTypeDraft> GetTypeDrafts(IReadOnlyList<CppParser.FileContext> fileContexts) {
 			var typeDrafts = new MultiValueDictionary<string, ICppTypeDraft>();
+
 			foreach (var fileContext in fileContexts) {
-				// Handle typedefs
-				var typedefs = fileContext.GetDescendants<CppParser.TypedefContext>();
-				foreach (var typedef in typedefs) {
-					CppTypedefDraft typedefDraft = typedef.type().TypedefDraft;
-					// Skip redundant typedefs, such as "typedef struct lua_State lua_State;"
-					if (typedefDraft.Name == typedefDraft.TargetName) continue;
-
-					typeDrafts.Add(typedefDraft.Name, typedefDraft);
-				}
-
-				// Handle class definitions
-				var classDefinitions = fileContext.GetDescendants<CppParser.ClassDefinitionContext>();
-				foreach (var classDefinition in classDefinitions) {
-					// Skip unnamed types, such as "enum { Foo, Bar };"
-					string name = classDefinition.TypeName;
-					if (name == null) continue;
-
-					var classDraft = new CppClassDraft(classDefinition.GetCodePosition(), name, classDefinition.BaseTypeNames);
-					typeDrafts.Add(name, classDraft);
+				var currentDrafts = fileContext
+					.GetDescendants<ICppTypeDraft>()
+					.Where(draft => draft.IntroducesSymbol);
+				foreach (var draft in currentDrafts) {
+					typeDrafts.Add(draft.Name, draft);
 				}
 			}
+
 			return typeDrafts;
 		}
 
-		private ICppType ResolveTypeName(string typeName, CodePosition reference) {
+		private ICppType ResolveTypeName(string typeName, IToken reference) {
 			if (types.ContainsKey(typeName)) {
 				// Type has already been resolved
 				return types[typeName];
@@ -122,7 +111,7 @@ namespace CppParser {
 			}
 
 			// Type cannot be resolved
-			codeIssues.Add(new UnknownTypeCodeIssue(reference, typeName));
+			codeIssues.Add(new UnknownTypeCodeIssue(reference.StartPosition(), typeName));
 			return types[typeName] = PrimitiveCppType.Unknown;
 		}
 
@@ -130,18 +119,18 @@ namespace CppParser {
 		/// Returns a concrete type for the specified type draft
 		/// </summary>
 		private ICppType ResolveTypeDraft(ICppTypeDraft typeDraft) {
-			if (typeDraft is CppClassDraft) {
+			if (typeDraft is ICppClassDraft) {
 				// Create concrete class
-				CppClassDraft classDraft = (CppClassDraft) typeDraft;
-				var baseTypes = classDraft.BaseTypeNames
-					.Select(baseTypeName => ResolveTypeName(baseTypeName, classDraft.CodePosition))  // TODO: Get precise position
+				ICppClassDraft classDraft = (ICppClassDraft) typeDraft;
+				var baseTypes = classDraft.Context.BaseTypeNames
+					.Select(baseTypeName => ResolveTypeName(baseTypeName.Value, baseTypeName.Token))
 					.OfType<CppClass>();
-				return new CppClass(classDraft.Name, baseTypes);
+				return new CppClass(classDraft.Context, classDraft.Name, baseTypes);
 			}
-			if (typeDraft is CppTypedefDraft) {
+			if (typeDraft is ICppTypedefDraft) {
 				// Determine what the typedef stands for
-				var typedef = (CppTypedefDraft) typeDraft;
-				var targetType = ResolveTypeName(typedef.TargetName, typedef.CodePosition); // TODO: Get precise position
+				var typedef = (ICppTypedefDraft) typeDraft;
+				var targetType = ResolveTypeName(typedef.TargetName, typedef.Context.TargetName.Token);
 
 				// Function-to-anything becomes function, ignoring the actual type
 				if (typedef.IsFunction) return PrimitiveCppType.Function;
@@ -175,7 +164,7 @@ namespace CppParser {
 				var minimumBaseTypes = baseTypes
 					.Where(a => !baseTypes.Any(b => b.AncestorClasses.Contains(a)))
 					.ToList();
-				return new CppClass(classes.First().Name, minimumBaseTypes);
+				return new CppClass(classes.First().Context, classes.First().Name, minimumBaseTypes);
 			}
 
 			// Assume primitive type and go by precedence list

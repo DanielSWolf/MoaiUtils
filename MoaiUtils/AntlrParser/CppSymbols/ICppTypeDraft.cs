@@ -3,9 +3,10 @@
 	/// <summary>
 	/// A "rough version" of a C++ type before it is resolved to an actual <see cref="ICppType"/> instance.
 	/// </summary>
-	public interface ICppTypeDraft : ICodeElement {
+	public interface ICppTypeDraft {
 
 		string Name { get; }
+		bool IntroducesSymbol { get; }
 
 	}
 

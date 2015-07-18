@@ -1,18 +1,15 @@
 ﻿using System.IO;
 using System.Text;
-using Antlr4.Runtime;
 
-namespace CppParser {
+namespace CppParser.FileStreams {
 
-	public class CppFileStream : AntlrInputStream {
-		public CppFileStream(FileInfo file) : base(Preprocess(File.ReadAllText(file.FullName))) {
-			name = file.FullName;
-		}
+	public class CppFileStream : FileStreamBase {
 
-		private static string Preprocess(string code) {
+		public CppFileStream(FileInfo file) : base(file) {}
 
-			// Remove carriage returns. This lets us deal with clean \n line breaks throughout.
-			code = code.Replace("\r", "");
+		protected override string Preprocess(string code) {
+
+			code = CleanLineBreaks(code);
 
 			StringBuilder result = new StringBuilder();
 
@@ -39,6 +36,7 @@ namespace CppParser {
 
 			return result.ToString();
 		}
+
 	}
 
 }

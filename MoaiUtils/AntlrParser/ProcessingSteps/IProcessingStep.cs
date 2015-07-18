@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using CppParser.CodeIssues;
 
-namespace CppParser {
+namespace CppParser.ProcessingSteps {
 
 	public interface IProcessingStep {
 

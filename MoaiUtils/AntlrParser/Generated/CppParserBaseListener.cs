@@ -70,17 +70,29 @@ public partial class CppParserBaseListener : ICppParserListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitDeclaration([NotNull] CppParser.DeclarationContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="CppParser.typedef"/>.
+	/// Enter a parse tree produced by <see cref="CppParser.Typedef"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void EnterTypedef([NotNull] CppParser.TypedefContext context) { }
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="CppParser.typedef"/>.
+	/// Exit a parse tree produced by <see cref="CppParser.Typedef"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitTypedef([NotNull] CppParser.TypedefContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="CppParser.ClassDefinition"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterClassDefinition([NotNull] CppParser.ClassDefinitionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="CppParser.ClassDefinition"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitClassDefinition([NotNull] CppParser.ClassDefinitionContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="CppParser.usingDirective"/>.
 	/// <para>The default implementation does nothing.</para>
@@ -105,18 +117,6 @@ public partial class CppParserBaseListener : ICppParserListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitFunctionDefinition([NotNull] CppParser.FunctionDefinitionContext context) { }
-	/// <summary>
-	/// Enter a parse tree produced by <see cref="CppParser.classDefinition"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterClassDefinition([NotNull] CppParser.ClassDefinitionContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by <see cref="CppParser.classDefinition"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitClassDefinition([NotNull] CppParser.ClassDefinitionContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="CppParser.baseClause"/>.
 	/// <para>The default implementation does nothing.</para>

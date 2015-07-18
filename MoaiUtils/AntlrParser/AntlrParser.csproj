@@ -57,24 +57,30 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CodeIssues\CodeIssueBase.cs" />
-    <Compile Include="CodeIssueMessageAttribute.cs" />
+    <Compile Include="CodeIssues\CodeIssueMessageAttribute.cs" />
     <Compile Include="CodeIssues\InternalErrorCodeIssue.cs" />
     <Compile Include="CodeIssues\ParsingErrorCodeIssue.cs" />
     <Compile Include="CodeIssues\UnexpectedFileStructureCodeIssue.cs" />
     <Compile Include="CodeIssues\UnknownTypeCodeIssue.cs" />
     <Compile Include="CodePosition.cs" />
-    <Compile Include="CppFileStream.cs" />
+    <Compile Include="ContextValue.cs" />
+    <Compile Include="FileStreams\CppFileStream.cs" />
     <Compile Include="CppParserRulePartials.cs" />
+    <Compile Include="CppSymbols\BuiltInCppClass.cs" />
+    <Compile Include="CppSymbols\ICppClassDraft.cs" />
+    <Compile Include="CppSymbols\ICppTypedefDraft.cs" />
     <Compile Include="CppSymbols\CppClass.cs" />
-    <Compile Include="CppSymbols\CppClassDraft.cs" />
-    <Compile Include="CppSymbols\CppTypedefDraft.cs" />
     <Compile Include="CppSymbols\ICppType.cs" />
     <Compile Include="CppSymbols\ICppTypeDraft.cs" />
     <Compile Include="CppSymbols\PrimitiveCppType.cs" />
     <Compile Include="CodeIssues\ICodeIssue.cs" />
-    <Compile Include="IProcessingStep.cs" />
-    <Compile Include="ParseTreesCreator.cs" />
-    <Compile Include="SourceFilesLocator.cs" />
+    <Compile Include="FileStreams\FileStreamBase.cs" />
+    <Compile Include="FileStreams\LuaFileStream.cs" />
+    <Compile Include="IContextProvider.cs" />
+    <Compile Include="ProcessingSteps\IProcessingStep.cs" />
+    <Compile Include="ITokenProvider.cs" />
+    <Compile Include="ProcessingSteps\ParseTreesCreator.cs" />
+    <Compile Include="ProcessingSteps\SourceFilesLocator.cs" />
     <Compile Include="Generated\CppLexer.cs" />
     <Compile Include="Generated\CppParser.cs" />
     <Compile Include="Generated\CppParserBaseListener.cs" />
@@ -83,14 +89,12 @@
     <Compile Include="Generated\LuaLexer.cs" />
     <Compile Include="Generated\LuaListener.cs" />
     <Compile Include="Generated\LuaParser.cs" />
-    <Compile Include="ICodeElement.cs" />
-    <Compile Include="MoaiCppLexer.cs" />
-    <Compile Include="MoaiCppParser.cs" />
     <Compile Include="ParseTreeExtensions.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="ProgressBar.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="CppTypesExtractor.cs" />
+    <Compile Include="ProcessingSteps\CppTypesExtractor.cs" />
+    <Compile Include="TokenValue.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
